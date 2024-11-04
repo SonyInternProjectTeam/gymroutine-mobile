@@ -7,9 +7,12 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 import Combine
 
 class AuthService {
+    private let db = Firestore.firestore()
+    
     // login
     func login(email: String, password: String) -> AnyPublisher<User?, Error> {
         return Future<User?, Error> { promise in
@@ -35,7 +38,18 @@ class AuthService {
                     promise(.failure(error))
                 } else if let authResult = authResult {
                     let user = User(uid: authResult.user.uid, email: authResult.user.email ?? "")
-                    promise(.success(user))
+                    
+                    // Save user data to Firestore
+                    self.db.collection("Users").document(user.uid).setData([
+                        "id": user.uid,
+                        "email": user.email
+                    ]) { error in
+                        if let error = error {
+                            promise(.failure(error))
+                        } else {
+                            promise(.success(user))
+                        }
+                    }
                 } else {
                     promise(.success(nil))
                 }
@@ -53,4 +67,3 @@ class AuthService {
         }
     }
 }
-
