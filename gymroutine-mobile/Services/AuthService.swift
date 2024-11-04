@@ -41,7 +41,7 @@ class AuthService {
                     
                     // Save user data to Firestore
                     self.db.collection("Users").document(user.uid).setData([
-                        "id": user.uid,
+                        "uuid": user.uid,
                         "email": user.email
                     ]) { error in
                         if let error = error {
