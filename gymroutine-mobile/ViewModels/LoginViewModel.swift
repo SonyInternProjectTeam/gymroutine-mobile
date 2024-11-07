@@ -11,7 +11,7 @@ class LoginViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var errorMessage: String? = nil
-    @Published var isLoggedIn: Bool = false  // 로그인 상태
+    @Published var isLoggedIn: Bool = false  // login state
     
     private var cancellables = Set<AnyCancellable>()
     private let authService: AuthService
