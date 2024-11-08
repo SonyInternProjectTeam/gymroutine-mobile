@@ -5,24 +5,33 @@
 //  Created by 조성화 on 2024/11/07.
 //
 
-import Foundation
+// TODO : bottom nav
+
 import SwiftUI
 
 struct MainPageView: View {
     var body: some View {
-        VStack {
-            Text("Login Successful!")
-                .font(.largeTitle)
+        NavigationView {
+            VStack {
+                Text("You have successfully logged in!")
+                    .font(.title)
+                    .padding()
+
+                NavigationLink(destination: TrainSelectionView()) {
+                    Text("Workout start")
+                        .font(.title2)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
                 .padding()
 
-            Text("You have successfully logged in!")
-                .font(.title)
-                .padding()
-
-            Spacer()
+                Spacer()
+            }
+            .navigationBarBackButtonHidden(true)
         }
-        .navigationTitle("Success Page")
-        .navigationBarBackButtonHidden(true)  // hide back arrow
     }
 }
 
