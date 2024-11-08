@@ -1,14 +1,14 @@
 //
-//  SuccessView.swift
+//  MainPageView.swift
 //  gymroutine-mobile
 //
-//  Created by 조성화 on 2024/10/28.
+//  Created by 조성화 on 2024/11/07.
 //
 
 import Foundation
 import SwiftUI
 
-struct SuccessView: View {
+struct MainPageView: View {
     var body: some View {
         VStack {
             Text("Login Successful!")
@@ -27,5 +27,5 @@ struct SuccessView: View {
 }
 
 #Preview {
-    SuccessView()
+    MainPageView()
 }
