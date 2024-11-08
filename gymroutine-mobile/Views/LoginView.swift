@@ -53,7 +53,7 @@ struct LoginView: View {
                 }
                 .padding()
                 .sheet(isPresented: $showingSignup) {
-                    SignupView()  // signup page modal
+                    MainPageView()  // signup page modal
                 }
 
                 if let errorMessage = viewModel.errorMessage {
@@ -63,10 +63,13 @@ struct LoginView: View {
                 }
 
                 Spacer()
-                
-                // if login move to SuccessView
-                NavigationLink(destination: SuccessView(), isActive: $viewModel.isLoggedIn) {
+
+                // If login move to MainPageView
+                NavigationLink(value: viewModel.isLoggedIn) {
                     EmptyView()
+                }
+                .navigationDestination(isPresented: $viewModel.isLoggedIn) {
+                    MainPageView()
                 }
             }
             .padding()
