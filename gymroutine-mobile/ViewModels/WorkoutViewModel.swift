@@ -10,7 +10,9 @@ import FirebaseAuth
 
 class WorkoutViewModel: ObservableObject {
     @Published var trainOptions: [String] = []
+    @Published var exercises: [String] = []
     private var service = WorkoutService()
+    private var currentWorkoutID: String?
     
     func createWorkout() {
         guard let userID = Auth.auth().currentUser?.uid else {
@@ -20,8 +22,8 @@ class WorkoutViewModel: ObservableObject {
         
         service.createWorkoutDocument(userID: userID) { documentID in
             if let documentID = documentID {
-                print("Created workout document with ID: \(documentID)")
-                self.fetchTrainOptions() // fetch train options after creating document
+                self.currentWorkoutID = documentID
+                self.fetchTrainOptions()
             }
         }
     }
@@ -33,5 +35,24 @@ class WorkoutViewModel: ObservableObject {
             }
         }
     }
+    
+    func fetchExercises(for train: String) {
+        service.fetchExercises(for: train) { exercises in
+            DispatchQueue.main.async {
+                self.exercises = exercises
+            }
+        }
+    }
+    
+    func addExerciseToWorkout(exerciseName: String, part: String) {
+        guard let workoutID = currentWorkoutID else { return }
+        
+        service.addExerciseToWorkout(workoutID: workoutID, exerciseName: exerciseName, part: part) { success in
+            if success {
+                print("Exercise added to workout")
+            } else {
+                print("Failed to add exercise to workout")
+            }
+        }
+    }
 }
-
