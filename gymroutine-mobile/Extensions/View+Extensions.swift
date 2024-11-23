@@ -18,3 +18,16 @@ extension View {
             .frame(maxHeight: .infinity, alignment: alignment)
     }
 }
+
+// MARK: - modifier
+
+extension View {
+    func fieldBackground() -> some View {
+        self
+            .padding(12)
+            .background(
+                Color(UIColor.systemGray6)
+                    .cornerRadius(10)
+            )
+    }
+}
