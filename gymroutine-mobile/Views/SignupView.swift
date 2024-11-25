@@ -61,6 +61,8 @@ struct SignupView: View {
                     .fontWeight(.semibold)
 
                 PasswordField(text: $viewModel.password, placeholder: "6文字以上")
+
+                PasswordField(text: $viewModel.confirmPassword, placeholder: "確認用")
             }
         }
     }
