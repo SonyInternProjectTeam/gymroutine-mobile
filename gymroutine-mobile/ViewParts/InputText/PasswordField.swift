@@ -12,12 +12,13 @@ struct PasswordField: View {
 
     @State var isSecured: Bool = true
     @Binding var text: String
+    var placeholder: String? = nil
 
     var body: some View {
         HStack(spacing: 4) {
-            UIKitPasswordField(text: $text, isSecured: $isSecured)
+            UIKitPasswordField(text: $text, isSecured: $isSecured, placeholder: placeholder)
                 .fixedSize(horizontal: false, vertical: true)
-
+            
             Button(action: {
                 isSecured.toggle()
             }) {
@@ -31,18 +32,21 @@ struct PasswordField: View {
 
 #Preview {
     @Previewable @State var text = ""
-    PasswordField(text: $text)
+    PasswordField(text: $text, placeholder: "確認用")
 }
 
 struct UIKitPasswordField: UIViewRepresentable {
 
     @Binding var text: String
     @Binding var isSecured: Bool
+    var placeholder: String?
 
     func makeUIView(context: Context) -> UITextField {
         let textField = UITextField()
+        if let placeholder {
+            textField.attributedPlaceholder = NSAttributedString(string: placeholder)
+        }
         textField.isSecureTextEntry = isSecured
-        textField.placeholder = ""
         textField.backgroundColor = UIColor.clear
         textField.delegate = context.coordinator
         textField.returnKeyType = .done

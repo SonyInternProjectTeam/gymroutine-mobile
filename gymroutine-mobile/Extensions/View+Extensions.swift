@@ -24,7 +24,8 @@ extension View {
 extension View {
     func fieldBackground() -> some View {
         self
-            .padding(12)
+            .padding(.horizontal,12)
+            .frame(height: 48)
             .background(
                 Color(UIColor.systemGray6)
                     .cornerRadius(10)
