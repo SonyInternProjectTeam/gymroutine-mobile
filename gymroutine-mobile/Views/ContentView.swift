@@ -31,7 +31,7 @@ struct ContentView: View {
                     NavigationLink(destination: LoginView()) {
                         Text("ログイン")
                     }
-                    .buttonStyle(SecondayButtonStyle())
+                    .buttonStyle(SecondaryButtonStyle())
                 }
             }
             .vAlign(.center)
