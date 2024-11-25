@@ -1,20 +1,20 @@
 //
-//  ButtonView.swift
+//  CircleButtonStyle.swift
 //  gymroutine-mobile
 //
-//  Created by 森祐樹 on 2024/11/22.
+//  Created by 森祐樹 on 2024/11/25.
 //
 
 import SwiftUI
 
-struct PrimaryButtonStyle: ButtonStyle {
+struct CircleButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.headline)
+            .font(.title)
             .foregroundStyle(.white)
-            .frame(maxWidth: 315, maxHeight: 48)
-            .background(Color.main.cornerRadius(10))
+            .padding(20)
+            .background(.main, in: Circle())
             .opacity(configuration.isPressed ? 0.5 : 1.0)
     }
 }

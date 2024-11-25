@@ -29,11 +29,8 @@ struct LoginView: View {
                 viewModel.login()
             }) {
                 Image(systemName: "chevron.forward")
-                    .font(.title)
-                    .foregroundStyle(.white)
-                    .padding(20)
-                    .background(.main, in: Circle())
             }
+            .buttonStyle(CircleButtonStyle())
             .hAlign(.trailing)
         }
         .padding(.bottom, 16)

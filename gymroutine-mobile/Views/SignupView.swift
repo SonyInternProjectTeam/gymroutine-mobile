@@ -37,11 +37,8 @@ struct SignupView: View {
                     viewModel.signup()
                 }) {
                     Image(systemName: "chevron.forward")
-                        .font(.title)
-                        .foregroundStyle(.white)
-                        .padding(20)
-                        .background(.main, in: Circle())
                 }
+                .buttonStyle(CircleButtonStyle())
             }
         }
         .padding(.bottom, 16)
