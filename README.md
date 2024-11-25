@@ -30,6 +30,13 @@ test: テスト関連の変更
 
 ### Branch Name
 
+##親ばランチ
+```
+チケット名
+[SP5-2]workout実行機能
+ex)
+```
+
 ```
 ex) {your_name}/feat_***
 ```
