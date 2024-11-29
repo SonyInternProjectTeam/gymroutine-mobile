@@ -11,21 +11,31 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         NavigationView {
-            VStack {
-                Text("main page")
-                    .font(.largeTitle)
-                    .padding()
-                
-                NavigationLink(destination: LoginView()) {
-                    Text("login")
-                        .font(.title)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+            VStack(alignment: .center, spacing: 40) {
+                VStack(spacing: 24) {
+                    Image(.welcomeLogo)
+                        .resizable()
+                        .scaledToFit()
+                        .hAlign(.center)
+
+                    Text("ジムルーティーンへようこそ！")
+                        .foregroundStyle(.secondary)
+                }
+
+                VStack(spacing: 16) {
+                    NavigationLink(destination: SignupView()) {
+                        Text("新規登録")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+
+                    NavigationLink(destination: LoginView()) {
+                        Text("ログイン")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
                 }
             }
-            .padding()
+            .vAlign(.center)
+            .padding(.horizontal, 48)
         }
     }
 }
