@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SignupView: View {
     @ObservedObject var viewModel = SignupViewModel()
+    @State private var navigateToSecondView = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -24,27 +25,37 @@ struct SignupView: View {
             Spacer()
 
             HStack(spacing: 0) {
-                if viewModel.isSignedUp {
-                    Text("Signup Success! Please log in.")
-                        .foregroundColor(.green)
-                        .padding()
-                }
-
                 Spacer()
 
-                // TODO: disable対応
                 Button(action: {
-                    viewModel.signup()
+                    viewModel.signupWithEmailAndPassword { success in
+                        if success {
+                            navigateToSecondView = true
+                        }
+                    }
                 }) {
-                    Image(systemName: "chevron.forward")
+                    Text("次へ")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
-                .buttonStyle(CircleButtonStyle())
+                .buttonStyle(PlainButtonStyle())
             }
         }
         .padding(.bottom, 16)
         .padding([.top, .horizontal], 24)
         .navigationTitle("新規登録")
         .navigationBarTitleDisplayMode(.inline)
+        .background(
+            NavigationLink(
+                destination: SignupViewSecond(viewModel: viewModel),
+                isActive: $navigateToSecondView
+            ) {
+                EmptyView()
+            }
+        )
     }
 
     private var InputForm: some View {
@@ -71,4 +82,3 @@ struct SignupView: View {
 #Preview {
     SignupView()
 }
-
