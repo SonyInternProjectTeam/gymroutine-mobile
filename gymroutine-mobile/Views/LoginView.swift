@@ -47,15 +47,17 @@ struct LoginView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("メールアドレス")
                     .fontWeight(.semibold)
-
+              
                 EmailAddressField(text: $viewModel.email)
             }
+
 
             VStack(alignment: .leading, spacing: 12) {
                 Text("パスワード")
                     .fontWeight(.semibold)
 
                 PasswordField(text: $viewModel.password)
+
             }
         }
     }
