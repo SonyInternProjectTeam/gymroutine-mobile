@@ -42,7 +42,11 @@ class AuthService {
                     // Save user data to Firestore
                     self.db.collection("Users").document(user.uid).setData([
                         "uuid": user.uid,
-                        "email": user.email
+                        "email": user.email,
+                        "name": "",
+                        "age": 0,
+                        "gender": "",
+                        "birthday": "" 
                     ]) { error in
                         if let error = error {
                             promise(.failure(error))

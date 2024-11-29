@@ -10,4 +10,8 @@ import Foundation
 struct User {
     var uid: String
     var email: String
+    var name: String
+    var age: Int
+    var gender: String
+    var birthday: String
 }
