@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+/**
+ ### 背景色
+ - `mainColor`
+ ### 形
+ - 横長長方形・角丸
+ ### 用途
+ - 新規登録の選択ボタン
+ */
 struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {

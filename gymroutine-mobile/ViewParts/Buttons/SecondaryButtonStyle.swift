@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+/**
+ ### 背景色
+ - `systemGray5`
+ ### 形
+ - 横長長方形・角丸
+ ### 用途
+ - ログインの選択ボタン
+ */
 struct SecondaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {

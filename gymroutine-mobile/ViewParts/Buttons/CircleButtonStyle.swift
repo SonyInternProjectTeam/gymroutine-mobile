@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+/**
+ ### 背景色
+ - `mainColor`
+ ### 形
+ - 円形
+ ### 用途
+ - ログイン・新規登録の実行ボタン
+ */
 struct CircleButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
