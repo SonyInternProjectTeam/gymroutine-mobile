@@ -10,8 +10,8 @@ import Foundation
 struct User {
     var uid: String
     var email: String
-    var name: String
-    var age: Int
-    var gender: String
-    var birthday: String
+    var name: String = ""
+    var age: Int = 0
+    var gender: String = ""
+    var birthday: Date = Date() // 기본값은 현재 날짜로 설정
 }

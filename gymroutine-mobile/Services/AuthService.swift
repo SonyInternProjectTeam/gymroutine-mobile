@@ -31,22 +31,22 @@ class AuthService {
     }
     
     // signup
-    func signup(email: String, password: String) -> AnyPublisher<User?, Error> {
+    func signup(email: String, password: String, name: String, age: Int, gender: String, birthday: Date) -> AnyPublisher<User?, Error> {
         return Future<User?, Error> { promise in
             Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
                 if let error = error {
                     promise(.failure(error))
                 } else if let authResult = authResult {
-                    let user = User(uid: authResult.user.uid, email: authResult.user.email ?? "")
+                    let user = User(uid: authResult.user.uid, email: email, name: name, age: age, gender: gender, birthday: birthday)
                     
-                    // Save user data to Firestore
+                    // Firestore save
                     self.db.collection("Users").document(user.uid).setData([
                         "uuid": user.uid,
                         "email": user.email,
-                        "name": "",
-                        "age": 0,
-                        "gender": "",
-                        "birthday": "" 
+                        "name": user.name,
+                        "age": user.age,
+                        "gender": user.gender,
+                        "birthday": Timestamp(date: user.birthday) // timestamp
                     ]) { error in
                         if let error = error {
                             promise(.failure(error))
@@ -61,6 +61,7 @@ class AuthService {
         }
         .eraseToAnyPublisher()
     }
+
     
     // logout
     func logout() {

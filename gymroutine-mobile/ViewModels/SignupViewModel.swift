@@ -12,6 +12,10 @@ class SignupViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var confirmPassword: String = ""
+    @Published var name: String = ""
+    @Published var age: Int = 0
+    @Published var gender: String = ""
+    @Published var birthday: Date = Date() // 기본값은 현재 날짜
     @Published var errorMessage: String? = nil
     @Published var isSignedUp: Bool = false
     
@@ -28,7 +32,7 @@ class SignupViewModel: ObservableObject {
             return
         }
         
-        authService.signup(email: email, password: password)
+        authService.signup(email: email, password: password, name: name, age: age, gender: gender, birthday: birthday)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 if case .failure(let error) = completion {
@@ -46,4 +50,5 @@ class SignupViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 }
+
 
