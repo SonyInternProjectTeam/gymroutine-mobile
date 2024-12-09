@@ -67,7 +67,7 @@ class AuthService {
         }
         .eraseToAnyPublisher()
     }
-
+    
     /// Firebase Authentication - logout
     func logout() {
         do {

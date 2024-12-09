@@ -10,19 +10,33 @@ import SwiftUI
 
 struct SuccessView: View {
     var body: some View {
-        VStack {
-            Text("Login Successful!")
-                .font(.largeTitle)
+        NavigationView { // NavigationView로 감쌈
+            VStack {
+                Text("Login Successful!")
+                    .font(.largeTitle)
+                    .padding()
+
+                Text("You have successfully logged in!")
+                    .font(.title)
+                    .padding()
+
+                // TrainSelectionView로 이동하는 NavigationLink
+                NavigationLink(destination: TrainSelectionView()) {
+                    Text("Go to Train Selection")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
                 .padding()
 
-            Text("You have successfully logged in!")
-                .font(.title)
-                .padding()
-
-            Spacer()
+                Spacer()
+            }
+            .navigationTitle("Success Page")
+            .navigationBarBackButtonHidden(true) // Back 버튼 숨기기
         }
-        .navigationTitle("Success Page")
-        .navigationBarBackButtonHidden(true)  // hide back arrow
     }
 }
 
