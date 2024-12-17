@@ -31,6 +31,17 @@ struct SuccessView: View {
                         .cornerRadius(10)
                 }
                 .padding()
+                
+                NavigationLink(destination: CreateWorkoutView()) {
+                    Text("Go to Create Workout")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
+                .padding()
 
                 Spacer()
             }

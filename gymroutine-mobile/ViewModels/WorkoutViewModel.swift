@@ -55,4 +55,33 @@ class WorkoutViewModel: ObservableObject {
             }
         }
     }
+    
+    func addScheduledDaysToWorkout(selectedDays: [String: Bool]) {
+        guard let workoutID = currentWorkoutID else { return }
+            
+        let scheduledDays = selectedDays.filter { $0.value == true } // trueの曜日だけを取得
+            
+        service.addScheduledDaysToWorkout(workoutID: workoutID, scheduledDays: scheduledDays) { success in
+            if success {
+                print("Scheduled days added successfully")
+            } else {
+                print("Failed to add scheduled days")
+            }
+        }
+    }
+    
+    // ワークアウト名と曜日をまとめてFirestoreに保存
+    func createWorkoutWithDetails(name: String, selectedDays: [String: Bool]) {
+        guard let workoutID = currentWorkoutID else { return }
+        
+        let scheduledDays = selectedDays.filter { $0.value } // trueの曜日だけを取得
+        
+        service.addWorkoutDetails(workoutID: workoutID, name: name, scheduledDays: scheduledDays) { success in
+            if success {
+                print("Workout created with name and scheduled days")
+            } else {
+                print("Failed to save workout details")
+            }
+        }
+    }
 }
