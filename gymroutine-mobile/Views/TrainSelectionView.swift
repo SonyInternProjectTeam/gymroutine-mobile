@@ -46,6 +46,7 @@ struct TrainSelectionView: View {
         }
         .onAppear {
             viewModel.createWorkout()
+            viewModel.fetchTrainOptions()
         }
         .navigationTitle("Train Selection")
     }

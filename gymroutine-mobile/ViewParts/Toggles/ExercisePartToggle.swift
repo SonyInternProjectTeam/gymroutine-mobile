@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-struct ExersiceCategoryToggle: View {
-    @State private var flag = false
-    var title :String
+struct ExercisePartToggle: View {
+    var flag = false
+    let exercisePart: ExercisePart
     
     var body: some View {
-        Button{
-            flag.toggle()
-        } label: {
-            Text (title)
+//        Button{
+////            flag.toggle()
+//        } label: {
+            Text (exercisePart.rawValue)
                 .frame(width: 100, height: 35)
                 .foregroundStyle(Color.black)
                 .background(flag ? Color.blue.opacity(0.1): Color.white)
@@ -24,13 +24,12 @@ struct ExersiceCategoryToggle: View {
                         RoundedRectangle(cornerRadius: 30)
                             .stroke(flag ? Color.blue: Color.gray, lineWidth: flag ? 3: 1)
                 )
-        }
+//        }
         .fixedSize()
         }
         
 }
 
 #Preview {
-    @Previewable @State var title = "腕"
-    ExersiceCategoryToggle(title:title)
+    ExercisePartToggle(exercisePart: .arm)
 }

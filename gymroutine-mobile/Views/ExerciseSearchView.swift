@@ -8,25 +8,36 @@
 import SwiftUI
 
 struct ExerciseSearchView: View {
-    @Binding var text: String
+    @ObservedObject var viewModel = ExerciseViewModel()
+    var selecttrainOptions : [String] = []
+    @State private var searchText = ""
+    @State private var contentHeight: CGFloat = 0.0
+    
+    private let Excercisecolumns = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
+    private let Categorycolumns = [
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 20){
+                ExerciseSearchField(text:$viewModel.searchWord)
+                    .onSubmit {
+                        viewModel.searchExerciseName(for: viewModel.searchWord)
+                    }
                 CategoryView
                 ExeriseTabView
             }
             .padding([.top, .horizontal], 24)
             .background(.gray.opacity(0.2))
-            
-                .searchable(text: $text , placement: .automatic, prompt: "エクササイズを検索")
-                .onSubmit(of: .search) {
-                    print("search")
-                }
-//            要変更
-//                .navigationTitle("エクササイズ検索")
-//                .navigationBarTitleDisplayMode(.inline)
-                .toolbarBackground(.visible, for: .navigationBar)
+            .onAppear {
+                viewModel.fetchAll()
+            }
         }
     }
     
@@ -38,14 +49,18 @@ struct ExerciseSearchView: View {
                     .hAlign(.leading)
                     .font(.title2)
                     .fontWeight(.bold)
-                HStack (spacing:20){
-                    ExersiceCategoryToggle(title: "腕")
-                    ExersiceCategoryToggle(title: "腹筋")
-                    ExersiceCategoryToggle(title: "足")
+                LazyVGrid(columns: Categorycolumns,spacing: 20) {
+                    ForEach(ExercisePart.allCases, id: \.self) { part in
+                        ExercisePartToggle(flag:viewModel.selectedExerciseParts.contains(part),exercisePart: part)
+                            .onTapGesture {
+                                viewModel.onTapExercisePartToggle(part: part)
+                            }
+                    }
                 }
             }
         }
     }
+    
     
     private var ExeriseTabView: some View {
         VStack (alignment: .center, spacing:40){
@@ -57,10 +72,11 @@ struct ExerciseSearchView: View {
                     .fontWeight(.bold)
             }
             ScrollView {
-                ForEach(1..<4) {_ in
-                    HStack(alignment: .center, spacing: 13) {
-                        ExersiceSelectButton()
-                        ExersiceSelectButton()
+                LazyVGrid(columns: Excercisecolumns, spacing: 8) {
+                    ForEach(viewModel.filterExercises, id: \.self) { exercise in
+                        NavigationLink (destination: ExerciseDetailView(exercise: exercise),label: {
+                            ExersiceSelectButton(name:exercise.name, option: exercise.part)
+                        })
                     }
                 }
             }
@@ -71,6 +87,5 @@ struct ExerciseSearchView: View {
 
 
 #Preview {
-    @Previewable @State var text = ""
-    ExerciseSearchView(text: $text)
+    ExerciseSearchView()
 }

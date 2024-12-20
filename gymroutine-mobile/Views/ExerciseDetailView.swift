@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ExerciseDetailView: View {
+    let exercise: Exercise
     var body: some View {
         VStack(alignment: .center, spacing: 0){
             Divider()
@@ -15,7 +16,6 @@ struct ExerciseDetailView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(height:400)
-//                .background(.blue)
             VStack(spacing: 20) {
                 PositionView
                 ExplanationView
@@ -30,9 +30,9 @@ struct ExerciseDetailView: View {
             .padding([.top, .horizontal], 24)
             .background(Color(.systemGray6))
         }
-        .navigationTitle("example")
+        .navigationTitle(exercise.name)
         .navigationBarTitleDisplayMode(.inline)
-
+        
     }
     
     private var PositionView: some View {
@@ -41,8 +41,10 @@ struct ExerciseDetailView: View {
                 .font(.title3)
                 .fontWeight(.bold)
             HStack (spacing: 0){
-                ExersiceCategoryToggle(title: "腕")
-                    .disabled(true)
+                if let exercisepart = exercise.toExercisePart() {
+                    ExercisePartToggle(exercisePart: exercisepart)
+                        .disabled(true)
+                }
             }
         }
         .hAlign(.leading)
@@ -53,17 +55,11 @@ struct ExerciseDetailView: View {
             Text("説明")
                 .font(.title3)
                 .fontWeight(.bold)
-            Text("ここにたくさんの文字が刻まれる予定")
+            Text(exercise.description)
                 .font(.footnote)
                 .fontWeight(.regular)
         }
         .hAlign(.leading)
     }
     
-}
-
-#Preview {
-    NavigationStack{
-        ExerciseDetailView()
-    }
 }
