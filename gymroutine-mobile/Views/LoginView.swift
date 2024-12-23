@@ -10,6 +10,7 @@ import SwiftUI
 struct LoginView: View {
 
     @ObservedObject var viewModel = LoginViewModel()
+    @State private var isShowingPasswordReset = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -32,6 +33,18 @@ struct LoginView: View {
             }
             .buttonStyle(CircleButtonStyle())
             .hAlign(.trailing)
+
+            Button(action: {
+                isShowingPasswordReset = true
+            }) {
+                Text("パスワードを忘れた方はこちら")
+                    .font(.footnote)
+                    .foregroundColor(.blue)
+                    .padding(.top, 8)
+            }
+            .sheet(isPresented: $isShowingPasswordReset) {
+                PasswordResetView()
+            }
         }
         .padding(.bottom, 16)
         .padding([.top, .horizontal], 24)
