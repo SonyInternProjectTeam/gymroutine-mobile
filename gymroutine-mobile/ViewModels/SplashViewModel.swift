@@ -21,14 +21,14 @@ final class SplashViewModel: ObservableObject {
     }
     
     private func switchView() {
-        guard let currentUid = authService.getCurrentUserId() else {
+        guard let currentUser = authService.getCurrentUser() else {
             router.switchRootView(to: .welcome)
             return
         }
         
         Task {
             //ローディングView表示
-            let fetchResult = await authService.fetchUser(uid: currentUid)
+            let fetchResult = await authService.fetchUser(uid: currentUser.uid)
             switch fetchResult {
             case .success(let user):
                 router.switchRootView(to: .main(user: user))
