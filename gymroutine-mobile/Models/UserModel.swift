@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct User {
+// TODO1: have to add birthday & gender
+
+struct User: Decodable {
     var uid: String
     var email: String
     var name: String = ""

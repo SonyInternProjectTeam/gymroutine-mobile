@@ -13,6 +13,25 @@ import Combine
 class AuthService {
     private let db = Firestore.firestore()
 
+    
+    /// Checks if the user is currently logged in and returns their user ID.
+    func getCurrentUser() -> FirebaseAuth.User? {
+        return Auth.auth().currentUser
+    }
+    
+    func fetchUser(uid: String) async -> Result<User, Error> {
+        do {
+            let snapshot = try await db
+                .collection("Users")
+                .document(uid)
+                .getDocument()
+            return try .success(snapshot.data(as: User.self))
+        } catch {
+            return .failure(NSError(domain: "FetchUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not found"]))
+        }
+    }
+    
+
     /// Firebase Authentication または Firestore 保存
     func createUser(email: String, password: String) -> AnyPublisher<String, Error> {
         return Future<String, Error> { promise in
@@ -31,10 +50,19 @@ class AuthService {
         .eraseToAnyPublisher()
     }
 
-    /// Firestore
-    func saveUserInfo(user: User) -> AnyPublisher<Void, Error> {
-        return Future<Void, Error> { promise in
-            var userData: [String: Any] = [
+    func saveUserInfo(user: User) async -> Result<Void, Error> {
+        do {
+            let documentRef = db.collection("Users").document(user.uid)
+            
+            /// TODO 1: ロケーション
+            //            if let location = user.location {
+            //                userData["location"] = [
+            //                    "latitude": location.latitude,
+            //                    "longitude": location.longitude
+            //                ]
+            //            }
+            
+            let userData: [String: Any] = [
                 "uid": user.uid,
                 "email": user.email,
                 "name": user.name,
@@ -43,25 +71,13 @@ class AuthService {
                 "isActive": user.isActive,
                 "createdAt": Timestamp(date: user.createdAt)
             ]
-
-/// TODO 1: ロケーション
-//            if let location = user.location {
-//                userData["location"] = [
-//                    "latitude": location.latitude,
-//                    "longitude": location.longitude
-//                ]
-//            }
-
-            self.db.collection("Users").document(user.uid).setData(userData, merge: true) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+            try await documentRef.setData(userData, merge: true)
+            return .success(())
+        } catch {
+            return .failure((NSError(domain: "SaveUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User saved failed"])))
         }
-        .eraseToAnyPublisher()
     }
+    
 
     /// Firebase Authentication - login
     func login(email: String, password: String) -> AnyPublisher<User?, Error> {
@@ -98,7 +114,7 @@ class AuthService {
             print("Error signing out: \(error)")
         }
     }
-
+    
     func sendPasswordReset(email: String, birthday: Date, completion: @escaping (Result<Void, Error>) -> Void) {
         self.db.collection("Users").whereField("email", isEqualTo: email).getDocuments { (snapshot, error) in
             if let error = error {
@@ -112,7 +128,7 @@ class AuthService {
                 completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))
                 return
             }
-
+            
             let calendar = Calendar.current
             if !calendar.isDate(storedBirthday, inSameDayAs: birthday) {
                 completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))

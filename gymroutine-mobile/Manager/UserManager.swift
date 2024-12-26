@@ -44,15 +44,4 @@ class UserManager: ObservableObject {
             completion(.success(user))
         }
     }
-    
-    // User login State
-    func login(user: User) {
-        self.currentUser = user
-        self.isLoggedIn = true
-    }
-
-    func logout() {
-        self.currentUser = nil
-        self.isLoggedIn = false
-    }
 }

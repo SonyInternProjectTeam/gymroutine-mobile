@@ -11,16 +11,16 @@ class LoginViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var errorMessage: String? = nil
-    @Published var isLoggedIn: Bool = false  // login state
     
     private var cancellables = Set<AnyCancellable>()
-    private let authService: AuthService
+    private let authService = AuthService()
+    private let router: Router
     
-    init(authService: AuthService = AuthService()) {
-        self.authService = authService
+    init(router: Router) {
+        self.router = router
     }
     
-    func login(completion: @escaping (User?) -> Void) {
+    func login() {
         authService.login(email: email, password: password)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
@@ -29,16 +29,14 @@ class LoginViewModel: ObservableObject {
                 }
             }, receiveValue: { user in
                 if let user = user {
-                    self.isLoggedIn = true  // update state
                     self.errorMessage = nil
-                    completion(user)  
+                    DispatchQueue.main.async {
+                        self.router.switchRootView(to: .main(user: user))
+                    }
                 } else {
-                    self.isLoggedIn = false
                     self.errorMessage = "login failed"
-                    completion(nil)
                 }
             })
             .store(in: &cancellables)
     }
-
 }

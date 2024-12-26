@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct LoginView: View {
-    @EnvironmentObject var userManager: UserManager  // UserManager를 환경 객체로 주입
-    @ObservedObject var viewModel = LoginViewModel()
+    @ObservedObject var viewModel: LoginViewModel
+
     @State private var isShowingPasswordReset = false
 
     var body: some View {
@@ -27,11 +27,7 @@ struct LoginView: View {
 
             // TODO: disable対応
             Button(action: {
-                viewModel.login { user in
-                    if let user = user {
-                        userManager.login(user: user) // UserManager update
-                    }
-                }
+                viewModel.login()
             }) {
                 Image(systemName: "chevron.forward")
             }
@@ -54,9 +50,6 @@ struct LoginView: View {
         .padding([.top, .horizontal], 24)
         .navigationTitle("ログイン")
         .navigationBarTitleDisplayMode(.inline)
-        .fullScreenCover(isPresented: $viewModel.isLoggedIn) {
-            SuccessView()
-        }
     }
 
     private var InputForm: some View {
@@ -80,7 +73,6 @@ struct LoginView: View {
 
 #Preview {
     NavigationStack {
-        LoginView()
-            .environmentObject(UserManager.shared) // UserManager 주입
+        LoginView(viewModel: LoginViewModel(router: Router()))
     }
 }

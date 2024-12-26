@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct SignupView: View {
-    @ObservedObject var viewModel = SignupViewModel()
-    @State private var navigateToSecondView = false
+    @ObservedObject var viewModel: SignupViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -30,7 +29,7 @@ struct SignupView: View {
                 Button(action: {
                     viewModel.signupWithEmailAndPassword { success in
                         if success {
-                            navigateToSecondView = true
+                            viewModel.router.switchRootView(to: .initProfileSetup)
                         }
                     }
                 }) {
@@ -48,14 +47,6 @@ struct SignupView: View {
         .padding([.top, .horizontal], 24)
         .navigationTitle("新規登録")
         .navigationBarTitleDisplayMode(.inline)
-        .background(
-            NavigationLink(
-                destination: SignupViewSecond(viewModel: viewModel),
-                isActive: $navigateToSecondView
-            ) {
-                EmptyView()
-            }
-        )
     }
 
     private var InputForm: some View {
@@ -80,5 +71,5 @@ struct SignupView: View {
 }
 
 #Preview {
-    SignupView()
+    SignupView(viewModel: SignupViewModel(router: Router()))
 }
