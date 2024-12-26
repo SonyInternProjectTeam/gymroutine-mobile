@@ -29,13 +29,13 @@ class LoginViewModel: ObservableObject {
                 }
             }, receiveValue: { user in
                 if let user = user {
-                    self.isLoggedIn = true  // 상태 업데이트
+                    self.isLoggedIn = true  // update state
                     self.errorMessage = nil
-                    completion(user)  // 성공 시 유저 전달
+                    completion(user)  
                 } else {
                     self.isLoggedIn = false
                     self.errorMessage = "login failed"
-                    completion(nil)  // 실패 시 콜백에 nil 전달
+                    completion(nil)
                 }
             })
             .store(in: &cancellables)

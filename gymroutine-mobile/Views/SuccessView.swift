@@ -12,7 +12,7 @@ struct SuccessView: View {
     @EnvironmentObject var userManager: UserManager
     
     var body: some View {
-        NavigationView { // NavigationView로 감쌈
+        NavigationView { 
             VStack {
                 Text("Login Successful!")
                     .font(.largeTitle)
@@ -23,7 +23,7 @@ struct SuccessView: View {
                     .font(.title)
                     .padding()
 
-                // TrainSelectionView로 이동하는 NavigationLink
+                // TrainSelectionView NavigationLink
                 NavigationLink(destination: TrainSelectionView()) {
                     Text("Go to Train Selection")
                         .font(.headline)
@@ -38,7 +38,7 @@ struct SuccessView: View {
                 Spacer()
             }
             .navigationTitle("Success Page")
-            .navigationBarBackButtonHidden(true) // Back 버튼 숨기기
+            .navigationBarBackButtonHidden(true)
         }
     }
 }

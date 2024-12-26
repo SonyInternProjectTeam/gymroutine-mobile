@@ -14,7 +14,7 @@ class UserManager: ObservableObject {
 
     private let db = Firestore.firestore()
 
-    static let shared = UserManager() // 싱글톤
+    static let shared = UserManager() // Single Tone
 
     private init() {}
 
@@ -45,14 +45,14 @@ class UserManager: ObservableObject {
         }
     }
     
-    // 새로운 login 메서드
-       func login(user: User) {
-           self.currentUser = user
-           self.isLoggedIn = true
-       }
+    // User login State
+    func login(user: User) {
+        self.currentUser = user
+        self.isLoggedIn = true
+    }
 
-       func logout() {
-           self.currentUser = nil
-           self.isLoggedIn = false
-       }
+    func logout() {
+        self.currentUser = nil
+        self.isLoggedIn = false
+    }
 }
