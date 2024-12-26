@@ -13,10 +13,14 @@ struct MainView: View {
     @ObservedObject var viewModel: MainViewModel
     
     var body: some View {
-        Text("メインViewだよ")
+        Text("\(viewModel.user.name)でログインしました！")
+            .font(.headline)
     }
 }
 
 #Preview {
-    MainView(viewModel: MainViewModel(router: Router()))
+    MainView(
+        viewModel: MainViewModel(
+            router: Router(),
+            user: User(uid: "qwerty12345", email: "test@example.com")))
 }

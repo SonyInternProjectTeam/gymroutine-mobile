@@ -25,8 +25,8 @@ struct RootView: View {
                 viewModel: InitProfileSetupViewModel(router: router)
             )
             
-        case .main:
-            MainView(viewModel: MainViewModel(router: router))
+        case .main(let user):
+            MainView(viewModel: MainViewModel(router: router, user: user))
         }
     }
 }

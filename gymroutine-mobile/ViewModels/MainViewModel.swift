@@ -13,8 +13,10 @@ import FirebaseAuth
 final class MainViewModel: ObservableObject {
     
     private let router: Router
+    let user: User
     
-    init(router: Router) {
+    init(router: Router, user: User) {
         self.router = router
+        self.user = user
     }
 }
