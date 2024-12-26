@@ -21,7 +21,9 @@ struct RootView: View {
             WelcomeView(viewModel: WelcomeViewModel(router: router))
             
         case .initProfileSetup:
-            InitProfileSetupView(viewModel: InitProfileSetupViewModel(router: router))
+            InitProfileSetupView(
+                viewModel: InitProfileSetupViewModel(router: router)
+            )
             
         case .main:
             MainView(viewModel: MainViewModel(router: router))
