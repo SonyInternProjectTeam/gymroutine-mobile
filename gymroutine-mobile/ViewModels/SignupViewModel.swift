@@ -56,14 +56,14 @@ class SignupViewModel: ObservableObject {
     }
 
     /// Firestore - save user info
-    func saveAdditionalInfo(completion: @escaping (Bool) -> Void) {
-        guard let userUID = userUID else {
+    func saveAdditionalInfo(user: User, completion: @escaping (Bool) -> Void) {
+        guard !user.uid.isEmpty else {
             self.errorMessage = "User UID not found"
             completion(false)
             return
         }
 
-        authService.saveUserInfo(uid: userUID, email:email, name: name, age: age, gender: gender, birthday: birthday)
+        authService.saveUserInfo(user: user)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completionResult in
                 switch completionResult {

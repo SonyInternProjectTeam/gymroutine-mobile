@@ -34,7 +34,17 @@ struct SignupViewSecond: View {
             Spacer()
 
             Button(action: {
-                viewModel.saveAdditionalInfo { success in
+                let user = User(
+                    uid: viewModel.userUID ?? "",
+                    email: viewModel.email ?? "",
+                    name: viewModel.name,
+                    profilePhoto: "", // 기본값
+                    visibility: 2, // 기본값: 全体公開
+                    isActive: false, // 기본값
+                    createdAt: Date()
+                )
+
+                viewModel.saveAdditionalInfo(user: user) { success in
                     if success {
                         navigateToSuccessView = true
                     }
@@ -62,4 +72,3 @@ struct SignupViewSecond: View {
 #Preview {
     SignupViewSecond(viewModel: SignupViewModel())
 }
-

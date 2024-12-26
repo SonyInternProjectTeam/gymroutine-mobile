@@ -12,44 +12,54 @@ import Combine
 
 class AuthService {
     private let db = Firestore.firestore()
-    
-    /// Firebase Authentication または  Firestore 保存
+
+    /// Firebase Authentication または Firestore 保存
     func createUser(email: String, password: String) -> AnyPublisher<String, Error> {
-            return Future<String, Error> { promise in
-                Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-                    if let error = error {
-                        promise(.failure(error))
-                    } else if let userUID = authResult?.user.uid {
-                        promise(.success(userUID))
-                    } else {
-                        promise(.failure(NSError(domain: "SignupError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User creation failed"])))
-                    }
+        return Future<String, Error> { promise in
+            Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+                if let error = error {
+                    promise(.failure(error))
+                } else if let userUID = authResult?.user.uid {
+                    promise(.success(userUID))
+                } else {
+                    promise(.failure(NSError(domain: "SignupError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User creation failed"])))
                 }
             }
-            .eraseToAnyPublisher()
         }
+        .eraseToAnyPublisher()
+    }
 
-        /// Firestore
-        func saveUserInfo(uid: String, email:String ,name: String, age: Int, gender: String, birthday: Date) -> AnyPublisher<Void, Error> {
-            return Future<Void, Error> { promise in
-                self.db.collection("Users").document(uid).setData([
-                    "uid": uid,
-                    "email": email,
-                    "name": name,
-                    "age": age,
-                    "gender": gender,
-                    "birthday": Timestamp(date: birthday)
-                ], merge: true) { error in
-                    if let error = error {
-                        promise(.failure(error))
-                    } else {
-                        promise(.success(()))
-                    }
+    /// Firestore
+    func saveUserInfo(user: User) -> AnyPublisher<Void, Error> {
+        return Future<Void, Error> { promise in
+            var userData: [String: Any] = [
+                "uid": user.uid,
+                "email": user.email,
+                "name": user.name,
+                "profilePhoto": user.profilePhoto,
+                "visibility": user.visibility,
+                "isActive": user.isActive,
+                "createdAt": Timestamp(date: user.createdAt)
+            ]
+
+/// TODO 1: ロケーション
+//            if let location = user.location {
+//                userData["location"] = [
+//                    "latitude": location.latitude,
+//                    "longitude": location.longitude
+//                ]
+//            }
+
+            self.db.collection("Users").document(user.uid).setData(userData, merge: true) { error in
+                if let error = error {
+                    promise(.failure(error))
+                } else {
+                    promise(.success(()))
                 }
             }
-            .eraseToAnyPublisher()
         }
-
+        .eraseToAnyPublisher()
+    }
 
     /// Firebase Authentication - login
     func login(email: String, password: String) -> AnyPublisher<User?, Error> {
@@ -67,7 +77,7 @@ class AuthService {
         }
         .eraseToAnyPublisher()
     }
-    
+
     /// Firebase Authentication - logout
     func logout() {
         do {
@@ -83,10 +93,10 @@ class AuthService {
                 completion(.failure(error))
                 return
             }
-            
+
             guard let documents = snapshot?.documents, documents.count == 1,
-                let data = documents.first?.data(),
-                let storedBirthday = (data["birthday"] as? Timestamp)?.dateValue() else {
+                  let data = documents.first?.data(),
+                  let storedBirthday = (data["birthday"] as? Timestamp)?.dateValue() else {
                 completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))
                 return
             }
@@ -96,7 +106,7 @@ class AuthService {
                 completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))
                 return
             }
-            
+
             Auth.auth().sendPasswordReset(withEmail: email) { error in
                 if let error = error {
                     completion(.failure(error))
