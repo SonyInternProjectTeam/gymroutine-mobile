@@ -15,7 +15,7 @@ struct gymroutine_mobileApp: App {
     }
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
     }
 }
