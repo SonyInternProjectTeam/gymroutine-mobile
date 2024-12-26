@@ -9,15 +9,20 @@
 import SwiftUI
 
 struct MainView: View {
-    
     @ObservedObject var viewModel: MainViewModel
+    @EnvironmentObject var userManager: UserManager
     
     var body: some View {
         VStack {
-            Text("\(viewModel.user.name)でログインしました！")
-                .font(.headline)
             
-            Button{
+                let email = userManager.currentUser?.email
+                
+                Text("\(email)でログインしました！")
+                    .font(.headline)
+                
+            
+
+            Button {
                 viewModel.logout()
             } label: {
                 Text("ログアウトするよ")
@@ -26,9 +31,3 @@ struct MainView: View {
     }
 }
 
-#Preview {
-    MainView(
-        viewModel: MainViewModel(
-            router: Router(),
-            user: User(uid: "qwerty12345", email: "test@example.com")))
-}

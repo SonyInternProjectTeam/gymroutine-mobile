@@ -13,19 +13,19 @@ import FirebaseAuth
 
 @MainActor
 final class MainViewModel: ObservableObject {
-    
     private let router: Router
-    let user: User
     private let authService = AuthService()
-    
-    init(router: Router, user: User) {
+    @Published private(set) var userManager: UserManager = .shared
+
+    init(router: Router) {
         self.router = router
-        self.user = user
     }
-    
-    //あとで消してね
+
     func logout() {
         authService.logout()
+        userManager.currentUser = nil
+        userManager.isLoggedIn = false
         router.switchRootView(to: .welcome)
     }
 }
+

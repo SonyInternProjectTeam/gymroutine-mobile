@@ -12,7 +12,7 @@ import Combine
 
 class AuthService {
     private let db = Firestore.firestore()
-
+    private let userManager = UserManager.shared
     
     /// Checks if the user is currently logged in and returns their user ID.
     func getCurrentUser() -> FirebaseAuth.User? {
@@ -31,7 +31,7 @@ class AuthService {
         }
     }
     
-
+    
     /// Firebase Authentication または Firestore 保存
     func createUser(email: String, password: String) -> AnyPublisher<String, Error> {
         return Future<String, Error> { promise in
@@ -49,7 +49,7 @@ class AuthService {
         }
         .eraseToAnyPublisher()
     }
-
+    
     func saveUserInfo(user: User) async -> Result<Void, Error> {
         do {
             let documentRef = db.collection("Users").document(user.uid)
@@ -78,34 +78,41 @@ class AuthService {
         }
     }
     
-
+    
     /// Firebase Authentication - login
     func login(email: String, password: String) -> AnyPublisher<User?, Error> {
         return Future<User?, Error> { promise in
             Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
                 if let error = error {
                     promise(.failure(error))
-                } else if let authResult = authResult {
-                    let uid = authResult.user.uid
-
-                    // Firestore
-                    UserManager.shared.fetchUserInfo(uid: uid) { result in
-                        switch result {
-                        case .success(let user):
-                            promise(.success(user))
-                        case .failure(let error):
-                            promise(.failure(error))
+                } else if let _ = authResult {
+                    Task {
+                        do {
+                            // initializeUser 비동기 작업 완료를 명확히 기다림
+                            try await UserManager.shared.initializeUser()
+                            
+                            // UserManager의 상태를 확인하여 Promise 처리
+                            DispatchQueue.main.async {
+                                if let user = UserManager.shared.currentUser {
+                                    promise(.success(user)) // 성공 반환
+                                } else {
+                                    promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User initialization failed."])))
+                                }
+                            }
+                        } catch {
+                            promise(.failure(error)) // 에러 반환
                         }
                     }
                 } else {
-                    promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Login failed"])))
+                    promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Login failed."])))
                 }
             }
         }
         .eraseToAnyPublisher()
     }
-
-
+    
+    
+    
     /// Firebase Authentication - logout
     func logout() {
         do {
@@ -121,7 +128,7 @@ class AuthService {
                 completion(.failure(error))
                 return
             }
-
+            
             guard let documents = snapshot?.documents, documents.count == 1,
                   let data = documents.first?.data(),
                   let storedBirthday = (data["birthday"] as? Timestamp)?.dateValue() else {
@@ -134,7 +141,7 @@ class AuthService {
                 completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))
                 return
             }
-
+            
             Auth.auth().sendPasswordReset(withEmail: email) { error in
                 if let error = error {
                     completion(.failure(error))

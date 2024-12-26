@@ -4,8 +4,8 @@
 //
 //  Created by 조성화 on 2024/12/26.
 //
-
 import Foundation
+import FirebaseAuth
 import FirebaseFirestore
 
 class UserManager: ObservableObject {
@@ -14,34 +14,42 @@ class UserManager: ObservableObject {
 
     private let db = Firestore.firestore()
 
-    static let shared = UserManager() // Single Tone
+    static let shared = UserManager() // Singleton
 
     private init() {}
 
-    func fetchUserInfo(uid: String, completion: @escaping (Result<User, Error>) -> Void) {
-        db.collection("Users").document(uid).getDocument { document, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            guard let data = document?.data() else {
-                completion(.failure(NSError(domain: "FetchError", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data found for user"])))
-                return
-            }
+    func initializeUser() async {
+        guard let authUser = Auth.auth().currentUser else {
+            print("No logged-in user found.")
+            return
+        }
 
-            let user = User(
-                uid: data["uid"] as? String ?? "",
-                email: data["email"] as? String ?? "",
-                name: data["name"] as? String ?? "",
-                profilePhoto: data["profilePhoto"] as? String ?? "",
-                visibility: data["visibility"] as? Int ?? 2,
-                isActive: data["isActive"] as? Bool ?? false,
-                createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
-            )
-
-            self.currentUser = user
-            self.isLoggedIn = true
-            completion(.success(user))
+        do {
+            let user = try await fetchUserInfo(uid: authUser.uid)
+            DispatchQueue.main.async {
+                self.currentUser = user
+                self.isLoggedIn = true
+            }
+        } catch {
+            print("Failed to fetch user info: \(error)")
         }
     }
+
+    func fetchUserInfo(uid: String) async throws -> User {
+        let document = try await db.collection("Users").document(uid).getDocument()
+        guard let data = document.data() else {
+            throw NSError(domain: "FetchError", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data found for user"])
+        }
+
+        return User(
+            uid: data["uid"] as? String ?? "",
+            email: data["email"] as? String ?? "",
+            name: data["name"] as? String ?? "",
+            profilePhoto: data["profilePhoto"] as? String ?? "",
+            visibility: data["visibility"] as? Int ?? 2,
+            isActive: data["isActive"] as? Bool ?? false,
+            createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+        )
+    }
 }
+

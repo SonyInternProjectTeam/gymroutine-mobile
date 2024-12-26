@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct RootView: View {
-    
+    @StateObject private var userManager = UserManager.shared
     @StateObject private var router = Router()
     
     var body: some View {
@@ -26,7 +26,8 @@ struct RootView: View {
             )
             
         case .main(let user):
-            MainView(viewModel: MainViewModel(router: router, user: user))
+            MainView(viewModel: MainViewModel(router: router)).environmentObject(UserManager.shared)
+            // import UserManger
         }
     }
 }

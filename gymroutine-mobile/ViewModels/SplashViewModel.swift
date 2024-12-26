@@ -14,6 +14,7 @@ final class SplashViewModel: ObservableObject {
     
     private let authService: AuthService = AuthService()
     private let router: Router
+    private let userManager = UserManager.shared
     
     init(router: Router) {
         self.router = router
@@ -27,6 +28,7 @@ final class SplashViewModel: ObservableObject {
         }
         
         Task {
+            await userManager.initializeUser()
             //ローディングView表示
             let fetchResult = await authService.fetchUser(uid: currentUser.uid)
             switch fetchResult {
