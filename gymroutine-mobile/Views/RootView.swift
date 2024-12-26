@@ -18,7 +18,7 @@ struct RootView: View {
             SplashView(viewModel: SplashViewModel(router: router))
             
         case .welcome:
-            WelcomeView(viewModel: WelcomeViewModel(router: router))
+            WelcomeView(router: router)
             
         case .initProfileSetup:
             InitProfileSetupView(

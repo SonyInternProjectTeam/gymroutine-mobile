@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
 
-    @ObservedObject var viewModel = LoginViewModel()
+    @ObservedObject var viewModel: LoginViewModel
     @State private var isShowingPasswordReset = false
 
     var body: some View {
@@ -50,9 +50,6 @@ struct LoginView: View {
         .padding([.top, .horizontal], 24)
         .navigationTitle("ログイン")
         .navigationBarTitleDisplayMode(.inline)
-        .fullScreenCover(isPresented: $viewModel.isLoggedIn) {
-            SuccessView()
-        }
     }
 
     private var InputForm: some View {
@@ -78,6 +75,6 @@ struct LoginView: View {
 
 #Preview {
     NavigationStack {
-        LoginView()
+        LoginView(viewModel: LoginViewModel(router: Router()))
     }
 }

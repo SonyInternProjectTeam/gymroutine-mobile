@@ -10,13 +10,49 @@ import SwiftUI
 
 struct WelcomeView: View {
     
-    @ObservedObject var viewModel: WelcomeViewModel
+    let router: Router
     
     var body: some View {
-        Text("WelcomeViewだよ")
+        NavigationStack {
+            VStack(alignment: .center, spacing: 40) {
+                VStack(spacing: 24) {
+                    Image(.welcomeLogo)
+                        .resizable()
+                        .scaledToFit()
+                        .hAlign(.center)
+
+                    Text("ジムルーティーンへようこそ！")
+                        .foregroundStyle(.secondary)
+                }
+
+                VStack(spacing: 16) {
+                    NavigationLink(
+                        destination:
+                            SignupView(
+                                viewModel: SignupViewModel(router: router)
+                            )
+                    ) {
+                        Text("新規登録")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+
+                    NavigationLink(
+                        destination:
+                            LoginView(
+                                viewModel: LoginViewModel(router: router)
+                            )
+                    ) {
+                        Text("ログイン")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                }
+            }
+            .vAlign(.center)
+            .padding(.horizontal, 48)
+        }
     }
 }
 
 #Preview {
-    WelcomeView(viewModel: WelcomeViewModel(router: Router()))
+    WelcomeView(router: Router())
 }
