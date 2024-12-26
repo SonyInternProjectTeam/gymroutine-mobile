@@ -74,6 +74,7 @@ class SignupViewModel: ObservableObject {
                     break
                 }
             }, receiveValue: {
+                UserManager.shared.login(user: user)
                 completion(true)
             })
             .store(in: &cancellables)

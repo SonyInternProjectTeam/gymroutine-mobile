@@ -20,6 +20,8 @@ class AuthService {
                 if let error = error {
                     promise(.failure(error))
                 } else if let userUID = authResult?.user.uid {
+                    // UserManager Update
+                    let newUser = User(uid: userUID, email: email)
                     promise(.success(userUID))
                 } else {
                     promise(.failure(NSError(domain: "SignupError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User creation failed"])))
@@ -68,15 +70,25 @@ class AuthService {
                 if let error = error {
                     promise(.failure(error))
                 } else if let authResult = authResult {
-                    let user = User(uid: authResult.user.uid, email: authResult.user.email ?? "")
-                    promise(.success(user))
+                    let uid = authResult.user.uid
+
+                    // Firestore
+                    UserManager.shared.fetchUserInfo(uid: uid) { result in
+                        switch result {
+                        case .success(let user):
+                            promise(.success(user))
+                        case .failure(let error):
+                            promise(.failure(error))
+                        }
+                    }
                 } else {
-                    promise(.success(nil))
+                    promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Login failed"])))
                 }
             }
         }
         .eraseToAnyPublisher()
     }
+
 
     /// Firebase Authentication - logout
     func logout() {

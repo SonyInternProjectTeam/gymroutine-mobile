@@ -9,13 +9,16 @@ import Foundation
 import SwiftUI
 
 struct SuccessView: View {
+    @EnvironmentObject var userManager: UserManager
+    
     var body: some View {
         NavigationView { // NavigationView로 감쌈
             VStack {
                 Text("Login Successful!")
                     .font(.largeTitle)
                     .padding()
-
+                
+                Text("Hello, \(userManager.currentUser?.name ?? "Guest")")
                 Text("You have successfully logged in!")
                     .font(.title)
                     .padding()

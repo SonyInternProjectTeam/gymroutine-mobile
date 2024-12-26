@@ -20,7 +20,7 @@ class LoginViewModel: ObservableObject {
         self.authService = authService
     }
     
-    func login() {
+    func login(completion: @escaping (User?) -> Void) {
         authService.login(email: email, password: password)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
@@ -28,14 +28,17 @@ class LoginViewModel: ObservableObject {
                     self.errorMessage = error.localizedDescription
                 }
             }, receiveValue: { user in
-                if let _ = user {
-                    self.isLoggedIn = true  // chagne state after login
+                if let user = user {
+                    self.isLoggedIn = true  // 상태 업데이트
                     self.errorMessage = nil
+                    completion(user)  // 성공 시 유저 전달
                 } else {
                     self.isLoggedIn = false
                     self.errorMessage = "login failed"
+                    completion(nil)  // 실패 시 콜백에 nil 전달
                 }
             })
             .store(in: &cancellables)
     }
+
 }

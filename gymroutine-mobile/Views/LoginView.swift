@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LoginView: View {
-
+    @EnvironmentObject var userManager: UserManager  // UserManager를 환경 객체로 주입
     @ObservedObject var viewModel = LoginViewModel()
     @State private var isShowingPasswordReset = false
 
@@ -27,7 +27,11 @@ struct LoginView: View {
 
             // TODO: disable対応
             Button(action: {
-                viewModel.login()
+                viewModel.login { user in
+                    if let user = user {
+                        userManager.login(user: user) // UserManager update
+                    }
+                }
             }) {
                 Image(systemName: "chevron.forward")
             }
@@ -64,13 +68,11 @@ struct LoginView: View {
                 EmailAddressField(text: $viewModel.email)
             }
 
-
             VStack(alignment: .leading, spacing: 12) {
                 Text("パスワード")
                     .fontWeight(.semibold)
 
                 PasswordField(text: $viewModel.password)
-
             }
         }
     }
@@ -79,5 +81,6 @@ struct LoginView: View {
 #Preview {
     NavigationStack {
         LoginView()
+            .environmentObject(UserManager.shared) // UserManager 주입
     }
 }
