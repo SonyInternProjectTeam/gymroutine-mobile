@@ -14,9 +14,16 @@ final class MainViewModel: ObservableObject {
     
     private let router: Router
     let user: User
+    private let authService = AuthService()
     
     init(router: Router, user: User) {
         self.router = router
         self.user = user
+    }
+    
+    //あとで消してね
+    func logout() {
+        authService.logout()
+        router.switchRootView(to: .welcome)
     }
 }

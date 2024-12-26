@@ -13,8 +13,16 @@ struct MainView: View {
     @ObservedObject var viewModel: MainViewModel
     
     var body: some View {
-        Text("\(viewModel.user.name)でログインしました！")
-            .font(.headline)
+        VStack {
+            Text("\(viewModel.user.name)でログインしました！")
+                .font(.headline)
+            
+            Button{
+                viewModel.logout()
+            } label: {
+                Text("ログアウトするよ")
+            }
+        }
     }
 }
 
