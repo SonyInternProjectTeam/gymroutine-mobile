@@ -14,8 +14,8 @@ class AuthService {
     private let db = Firestore.firestore()
     
     /// Checks if the user is currently logged in and returns their user ID.
-    func getCurrentUserId() -> String? {
-        return Auth.auth().currentUser?.uid
+    func getCurrentUser() -> FirebaseAuth.User? {
+        return Auth.auth().currentUser
     }
     
     func fetchUser(uid: String) async -> Result<User, Error> {
