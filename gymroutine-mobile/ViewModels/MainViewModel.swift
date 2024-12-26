@@ -9,6 +9,8 @@
 import Foundation
 import FirebaseAuth
 
+// Todo : UserManagerからユーザー情報撮って状態管理
+
 @MainActor
 final class MainViewModel: ObservableObject {
     

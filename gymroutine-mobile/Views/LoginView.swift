@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct LoginView: View {
-
     @ObservedObject var viewModel: LoginViewModel
+
     @State private var isShowingPasswordReset = false
 
     var body: some View {
@@ -61,13 +61,11 @@ struct LoginView: View {
                 EmailAddressField(text: $viewModel.email)
             }
 
-
             VStack(alignment: .leading, spacing: 12) {
                 Text("パスワード")
                     .fontWeight(.semibold)
 
                 PasswordField(text: $viewModel.password)
-
             }
         }
     }

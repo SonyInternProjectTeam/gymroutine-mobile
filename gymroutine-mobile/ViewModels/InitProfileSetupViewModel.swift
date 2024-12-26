@@ -45,9 +45,10 @@ final class InitProfileSetupViewModel: ObservableObject {
             uid: uid,
             email: email,
             name: self.name,
-            age: self.age,
-            gender: self.gender,
-            birthday: self.birthday
+            profilePhoto: "",
+            visibility: 2,
+            isActive: false,
+            createdAt: Date()
         )
         
         Task {

@@ -10,6 +10,8 @@ import Firebase
 
 @main
 struct gymroutine_mobileApp: App {
+    @StateObject private var userManager = UserManager.shared
+    
     init() {
         FirebaseApp.configure()
     }

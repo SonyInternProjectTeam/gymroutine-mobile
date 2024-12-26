@@ -55,29 +55,5 @@ class SignupViewModel: ObservableObject {
             })
             .store(in: &cancellables)
     }
-
-    /// Firestore - save user info
-//    func saveAdditionalInfo(completion: @escaping (Bool) -> Void) {
-//        guard let userUID = userUID else {
-//            self.errorMessage = "User UID not found"
-//            completion(false)
-//            return
-//        }
-//
-//        authService.saveUserInfo(uid: userUID, email:email, name: name, age: age, gender: gender, birthday: birthday)
-//            .receive(on: DispatchQueue.main)
-//            .sink(receiveCompletion: { [weak self] completionResult in
-//                switch completionResult {
-//                case .failure(let error):
-//                    self?.errorMessage = error.localizedDescription
-//                    completion(false)
-//                case .finished:
-//                    break
-//                }
-//            }, receiveValue: {
-//                completion(true)
-//            })
-//            .store(in: &cancellables)
-//    }
 }
 
