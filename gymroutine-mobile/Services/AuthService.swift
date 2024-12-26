@@ -46,25 +46,22 @@ class AuthService {
         .eraseToAnyPublisher()
     }
     
-    /// Firestore
-    func saveUserInfo(uid: String, email:String ,name: String, age: Int, gender: String, birthday: Date) -> AnyPublisher<Void, Error> {
-        return Future<Void, Error> { promise in
-            self.db.collection("Users").document(uid).setData([
-                "uid": uid,
-                "email": email,
-                "name": name,
-                "age": age,
-                "gender": gender,
-                "birthday": Timestamp(date: birthday)
-            ], merge: true) { error in
-                if let error = error {
-                    promise(.failure(error))
-                } else {
-                    promise(.success(()))
-                }
-            }
+    func saveUserInfo(user: User) async -> Result<Void, Error> {
+        do {
+            let documentRef = db.collection("Users").document(user.uid)
+            let userData: [String: Any] = [
+                "uid": user.uid,
+                "email": user.email,
+                "name": user.name,
+                "age": user.age,
+                "gender": user.gender,
+                "birthday": user.birthday
+            ]
+            try await documentRef.setData(userData, merge: true)
+            return .success(())
+        } catch {
+            return .failure((NSError(domain: "SaveUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User saved failed"])))
         }
-        .eraseToAnyPublisher()
     }
     
     
