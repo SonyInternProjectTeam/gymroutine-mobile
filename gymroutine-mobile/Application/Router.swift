@@ -21,6 +21,8 @@ final class Router: ObservableObject {
     @Published var route = RouteType.splash
 
     func switchRootView(to routeType: RouteType) {
-        route = routeType
+        DispatchQueue.main.async {
+            self.route = routeType
+        }
     }
 }
