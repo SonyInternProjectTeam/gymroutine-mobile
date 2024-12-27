@@ -12,8 +12,8 @@ struct ExerciseSearchView: View {
     @ObservedObject var viewModel = ExerciseViewModel()
 
     private let Categorycolumns = [
-        GridItem(.flexible()),
-        GridItem(.flexible()),
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16),
         GridItem(.flexible())
     ]
 
@@ -36,7 +36,7 @@ struct ExerciseSearchView: View {
             }
         }
         .padding([.top, .horizontal], 24)
-        .background(.gray.opacity(0.2))
+        .background(.gray.opacity(0.03))
         .onAppear {
             viewModel.fetchAll()
         }
@@ -47,13 +47,11 @@ struct ExerciseSearchView: View {
             Text("カテゴリ")
                 .font(.title2)
                 .fontWeight(.bold)
-                .hAlign(.leading)
 
             LazyVGrid(columns: Categorycolumns,spacing: 16) {
                 ForEach(ExercisePart.allCases, id: \.self) { part in
                     Button {
                         viewModel.onTapExercisePartToggle(part: part)
-
                     } label: {
                         ExercisePartToggle(flag:viewModel.selectedExerciseParts.contains(part),
                                            exercisePart: part)
@@ -68,16 +66,15 @@ struct ExerciseSearchView: View {
             Text("おすすめ")
                 .font(.title2)
                 .fontWeight(.bold)
-                .hAlign(.leading)
 
             LazyVGrid(columns: Excercisecolumns, spacing: 12) {
                 ForEach(viewModel.filterExercises, id: \.self) { exercise in
                     NavigationLink (destination: ExerciseDetailView(exercise: exercise), label: {
-                        ExersiceSelectButton(name:exercise.name, option: exercise.part)
+                        ExersiceSelectButton(exercise: exercise)
                     })
                 }
             }
-
+            .padding(.horizontal, 4)
         }
     }
 }

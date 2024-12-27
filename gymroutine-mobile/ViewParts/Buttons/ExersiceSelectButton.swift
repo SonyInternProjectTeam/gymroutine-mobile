@@ -8,44 +8,52 @@
 import SwiftUI
 
 struct ExersiceSelectButton: View {
-    var name: String = ""
-    var option: String = ""
+
+    let exercise: Exercise
+
     var body: some View {
-        VStack(alignment: .center, spacing: 8) {
-            Image(.welcomeLogo)
+        VStack(alignment: .center, spacing: 4) {
+            Image(.workout)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 115,height: 115)
-            Text(name)
-                .font(.headline)
-                .foregroundColor(.black)
-            
-            Divider()
-            Text(option)
-                .font(.headline)
-                .foregroundColor(.black)
-                .padding(.horizontal, 12)
-                .hAlign(.leading)
-            
+                .padding(16)
+                .background(.secondary.opacity(0.2))
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(exercise.part)
+                        .font(.footnote)
+                        .fontWeight(.regular)
+                        .foregroundColor(.secondary)
+
+                    Spacer()
+
+                    Image(systemName: "plus")
+                        .font(.headline)
+                        .foregroundStyle(.main)
+                }
+
+                Text(exercise.name)
+                    .font(.callout)
+                    .fontWeight(.regular)
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
         }
-        //            .frame(width: 150,height: 200)
-        .padding(12)
+        .tint(.primary)
         .background(.white)
-        .cornerRadius(25)
-        .overlay(
-            RoundedRectangle(cornerRadius: 25)
-                .stroke(.gray, lineWidth:  0)
-        )
+        .cornerRadius(8)
+        .clipped()
+        .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
     }
 }
 
 
 #Preview {
     HStack(spacing: 10) {
-        ExersiceSelectButton(name:"ショルダープレス",option: "腕")
-        ExersiceSelectButton(name:"腹筋",option: "腹筋")
+        ExersiceSelectButton(exercise: Exercise(name: "ショルダープレス", description: "", img: "", part: "胸"))
+        ExersiceSelectButton(exercise: Exercise(name: "腹筋", description: "", img: "", part: "arm"))
     }
     .padding()
-    .background(.gray.opacity(0.2))
-    
+    .background(.gray.opacity(0.03))
 }
