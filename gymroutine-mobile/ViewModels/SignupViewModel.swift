@@ -21,10 +21,11 @@ class SignupViewModel: ObservableObject {
     @Published var isSignedUp: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
-    private let authService: AuthService
+    private let authService = AuthService()
+    let router: Router
     
-    init(authService: AuthService = AuthService()) {
-        self.authService = authService
+    init(router: Router) {
+        self.router = router
     }
 
     /// Firebase Authentication - create account
@@ -50,30 +51,6 @@ class SignupViewModel: ObservableObject {
                 self?.userUID = userUID
                 print("User UID: \(userUID)") // 로그 추가
                 self?.errorMessage = nil
-                completion(true)
-            })
-            .store(in: &cancellables)
-    }
-
-    /// Firestore - save user info
-    func saveAdditionalInfo(completion: @escaping (Bool) -> Void) {
-        guard let userUID = userUID else {
-            self.errorMessage = "User UID not found"
-            completion(false)
-            return
-        }
-
-        authService.saveUserInfo(uid: userUID, email:email, name: name, age: age, gender: gender, birthday: birthday)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completionResult in
-                switch completionResult {
-                case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
-                    completion(false)
-                case .finished:
-                    break
-                }
-            }, receiveValue: {
                 completion(true)
             })
             .store(in: &cancellables)

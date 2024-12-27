@@ -22,6 +22,35 @@ class WorkoutService {
         }
     }
     
+    func addScheduledDaysToWorkout(workoutID: String, scheduledDays: [String: Bool], completion: @escaping (Bool) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("Workouts").document(workoutID).updateData([
+            "ScheduledDays": scheduledDays
+        ]) { error in
+            if let error = error {
+                print("Error adding scheduled days: \(error)")
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+    
+    func addWorkoutDetails(workoutID: String, name: String, scheduledDays: [String: Bool], completion: @escaping (Bool) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("Workouts").document(workoutID).updateData([
+            "name": name,
+            "ScheduledDays": scheduledDays
+        ]) { error in
+            if let error = error {
+                print("Error adding workout details: \(error)")
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+    
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
         let db = Firestore.firestore()
         db.collection("Trains").getDocuments { (snapshot, error) in
@@ -63,5 +92,7 @@ class WorkoutService {
             }
         }
     }
+    
+    
 }
 

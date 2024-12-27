@@ -20,11 +20,9 @@ struct ExerciseDetailView: View {
                 PositionView
                 ExplanationView
                 Spacer()
-                
-                NavigationLink(destination:SignupView()) {
-                    Text("追加する")
-                }
-                .buttonStyle(PrimaryButtonStyle())
+
+                Text("追加する")
+                    .buttonStyle(PrimaryButtonStyle())
             }
             .padding(.bottom, 16)
             .padding([.top, .horizontal], 24)
@@ -32,9 +30,9 @@ struct ExerciseDetailView: View {
         }
         .navigationTitle(exercise.name)
         .navigationBarTitleDisplayMode(.inline)
-        
+
     }
-    
+
     private var PositionView: some View {
         VStack(alignment: .leading) {
             Text("部位")
@@ -49,7 +47,7 @@ struct ExerciseDetailView: View {
         }
         .hAlign(.leading)
     }
-    
+
     private var ExplanationView: some View {
         VStack(alignment: .leading, spacing:20){
             Text("説明")
@@ -61,5 +59,5 @@ struct ExerciseDetailView: View {
         }
         .hAlign(.leading)
     }
-    
+
 }
