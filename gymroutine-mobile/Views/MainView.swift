@@ -11,23 +11,28 @@ import SwiftUI
 struct MainView: View {
     @ObservedObject var viewModel: MainViewModel
     @EnvironmentObject var userManager: UserManager
-    
-    var body: some View {
-        VStack {
-            
-                let email = userManager.currentUser?.email
-                
-                Text("\(email)でログインしました！")
-                    .font(.headline)
-                
-            
+    @State private var selectedTab: Int = 0 // 현재 선택된 탭
 
-            Button {
-                viewModel.logout()
-            } label: {
-                Text("ログアウトするよ")
-            }
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            HomeView(viewModel: viewModel)
+                .tabItem {
+                    Label("Home", systemImage: "house")
+                }
+                .tag(0)
+
+
+            CalendarView()
+                .tabItem {
+                    Label("Calendar", systemImage: "calendar")
+                }
+                .tag(1)
+            
+            ProfileView()
+                .tabItem {
+                    Label("Profile", systemImage: "person.circle")
+                }
+                .tag(2)
         }
     }
 }
-
