@@ -8,6 +8,8 @@
 import Foundation
 import FirebaseAuth
 
+// TODO : ViewとViewModelは１：１関係このViewModel修正要
+
 class WorkoutViewModel: ObservableObject {
     @Published var trainOptions: [String] = []
     @Published var exercises: [String] = []

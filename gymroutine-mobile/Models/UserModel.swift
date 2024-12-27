@@ -7,11 +7,14 @@
 
 import Foundation
 
-struct User {
+struct User: Decodable {
     var uid: String
     var email: String
     var name: String = ""
-    var age: Int = 0
-    var gender: String = ""
-    var birthday: Date = Date() // 기본값은 현재 날짜로 설정
+    var profilePhoto: String = ""
+    var visibility: Int = 2 // 0: 非公開, 1: 友達公開, 2: 全体公開
+    var isActive: Bool = false // 運動中なのか
+    var birthday: Date? = nil // birthday
+    var gender: String = "" // gender
+    var createdAt: Date = Date()
 }

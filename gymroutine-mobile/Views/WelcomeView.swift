@@ -1,16 +1,19 @@
 //
-//  ContentView.swift
+//  WelcomeView.swift
 //  gymroutine-mobile
+//  
+//  Created by SATTSAT on 2024/12/26
+//  
 //
-//  Created by 조성화 on 2024/10/27.
-//
-
 
 import SwiftUI
 
-struct ContentView: View {
+struct WelcomeView: View {
+    
+    let router: Router
+    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(alignment: .center, spacing: 40) {
                 VStack(spacing: 24) {
                     Image(.welcomeLogo)
@@ -23,12 +26,22 @@ struct ContentView: View {
                 }
 
                 VStack(spacing: 16) {
-                    NavigationLink(destination: SignupView()) {
+                    NavigationLink(
+                        destination:
+                            SignupView(
+                                viewModel: SignupViewModel(router: router)
+                            )
+                    ) {
                         Text("新規登録")
                     }
                     .buttonStyle(PrimaryButtonStyle())
 
-                    NavigationLink(destination: LoginView()) {
+                    NavigationLink(
+                        destination:
+                            LoginView(
+                                viewModel: LoginViewModel(router: router)
+                            )
+                    ) {
                         Text("ログイン")
                     }
                     .buttonStyle(SecondaryButtonStyle())
@@ -41,5 +54,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    WelcomeView(router: Router())
 }
