@@ -8,6 +8,8 @@
 import Foundation
 import FirebaseAuth
 
+// TODO : ViewとViewModelは１：１関係このViewModel修正要
+
 class WorkoutViewModel: ObservableObject {
     @Published var trainOptions: [String] = []
     @Published var exercises: [String] = []
@@ -52,6 +54,35 @@ class WorkoutViewModel: ObservableObject {
                 print("Exercise added to workout")
             } else {
                 print("Failed to add exercise to workout")
+            }
+        }
+    }
+    
+    func addScheduledDaysToWorkout(selectedDays: [String: Bool]) {
+        guard let workoutID = currentWorkoutID else { return }
+            
+        let scheduledDays = selectedDays.filter { $0.value == true } // trueの曜日だけを取得
+            
+        service.addScheduledDaysToWorkout(workoutID: workoutID, scheduledDays: scheduledDays) { success in
+            if success {
+                print("Scheduled days added successfully")
+            } else {
+                print("Failed to add scheduled days")
+            }
+        }
+    }
+    
+    // ワークアウト名と曜日をまとめてFirestoreに保存
+    func createWorkoutWithDetails(name: String, selectedDays: [String: Bool]) {
+        guard let workoutID = currentWorkoutID else { return }
+        
+        let scheduledDays = selectedDays.filter { $0.value } // trueの曜日だけを取得
+        
+        service.addWorkoutDetails(workoutID: workoutID, name: name, scheduledDays: scheduledDays) { success in
+            if success {
+                print("Workout created with name and scheduled days")
+            } else {
+                print("Failed to save workout details")
             }
         }
     }

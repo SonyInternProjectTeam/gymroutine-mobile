@@ -11,28 +11,25 @@ import SwiftUI
 struct MainView: View {
     @ObservedObject var viewModel: MainViewModel
     @EnvironmentObject var userManager: UserManager
-    @State private var selectedTab: Int = 0 // 현재 선택된 탭
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            HomeView(viewModel: viewModel)
-                .tabItem {
-                    Label("Home", systemImage: "house")
-                }
-                .tag(0)
+        NavigationView {
+            TabView {
+                HomeView(viewModel: viewModel)
+                    .tabItem {
+                        Label("Home", systemImage: "house")
+                    }
 
+                ProfileView()
+                    .tabItem {
+                        Label("Profile", systemImage: "person.circle")
+                    }
 
-            CalendarView()
-                .tabItem {
-                    Label("Calendar", systemImage: "calendar")
-                }
-                .tag(1)
-            
-            ProfileView()
-                .tabItem {
-                    Label("Profile", systemImage: "person.circle")
-                }
-                .tag(2)
+                CalendarView()
+                    .tabItem {
+                        Label("Calendar", systemImage: "calendar")
+                    }
+            }
         }
     }
 }

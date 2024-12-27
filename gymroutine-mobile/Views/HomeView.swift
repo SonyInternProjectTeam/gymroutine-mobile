@@ -27,6 +27,20 @@ struct HomeView: View {
             } label: {
                 Text("ログアウトするよ")
             }
+            
+            // TODO : これを押した瞬間にはWorkoutsドキュメントが生成されたらだめ
+            NavigationLink(destination: CreateWorkoutView()) {
+                Text("Go to Create Workout")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            }
+            .padding()
+
+            Spacer()
         }
         .padding()
         .navigationTitle("Home")
