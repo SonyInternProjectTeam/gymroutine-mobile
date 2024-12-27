@@ -69,6 +69,8 @@ class AuthService {
                 "profilePhoto": user.profilePhoto,
                 "visibility": user.visibility,
                 "isActive": user.isActive,
+                "birthday": user.birthday,
+                "gender": user.gender,
                 "createdAt": Timestamp(date: user.createdAt)
             ]
             try await documentRef.setData(userData, merge: true)

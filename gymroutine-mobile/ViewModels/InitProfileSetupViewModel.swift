@@ -48,6 +48,8 @@ final class InitProfileSetupViewModel: ObservableObject {
             profilePhoto: "",
             visibility: 2,
             isActive: false,
+            birthday: self.birthday,
+            gender: self.gender,
             createdAt: Date()
         )
         
