@@ -35,28 +35,32 @@ struct SearchUserView: View {
                         .padding()
                 } else {
                     List(viewModel.userDetails, id: \.name) { user in
-                        HStack {
-                            if !user.profilePhoto.isEmpty {
-                                AsyncImage(url: URL(string: user.profilePhoto)) { image in
-                                    image.resizable().scaledToFit()
-                                } placeholder: {
-                                    ProgressView()
-                                }
-                                .frame(width: 50, height: 50)
-                                .clipShape(Circle())
-                            } else {
-                                Image(systemName: "person.circle")
-                                    .resizable()
-                                    .frame(width: 50, height: 50)
-                                    .foregroundColor(.gray)
-                            }
-                            Text(user.name)
-                                .font(.headline)
-                        }
+                        userProfileView(for: user)
                     }
                 }
             }
             .navigationTitle("Search Users")
+        }
+    }
+
+    private func userProfileView(for user: (name: String, profilePhoto: String)) -> some View {
+        HStack {
+            if !user.profilePhoto.isEmpty {
+                AsyncImage(url: URL(string: user.profilePhoto)) { image in
+                    image.resizable().scaledToFit()
+                } placeholder: {
+                    ProgressView()
+                }
+                .frame(width: 50, height: 50)
+                .clipShape(Circle())
+            } else {
+                Image(systemName: "person.circle")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(.gray)
+            }
+            Text(user.name)
+                .font(.headline)
         }
     }
 }
