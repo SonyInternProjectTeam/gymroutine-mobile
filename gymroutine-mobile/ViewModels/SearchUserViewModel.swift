@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class SearchUserViewModel: ObservableObject {
     @Published var userDetails: [(name: String, profilePhoto: String)] = []
     @Published var searchName: String = ""
