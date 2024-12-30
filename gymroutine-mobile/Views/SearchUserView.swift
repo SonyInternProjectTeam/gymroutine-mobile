@@ -5,7 +5,7 @@ struct SearchUserView: View {
     @StateObject private var viewModel = SearchUserViewModel()
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 // 検索欄
                 TextField("Search by name", text: $viewModel.searchName)
