@@ -1,21 +1,19 @@
 import SwiftUI
 
 struct SearchUserView: View {
+
     @StateObject private var viewModel = SearchUserViewModel()
-    @State private var searchName = ""
 
     var body: some View {
         NavigationView {
             VStack {
                 // 検索欄
-                TextField("Search by name", text: $searchName)
+                TextField("Search by name", text: $viewModel.searchName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
                 Button(action: {
-                    Task {
-                        await viewModel.fetchUsers(byName: searchName)
-                    }
+                    viewModel.fetchUsers()
                 }) {
                     Text("Search")
                         .frame(maxWidth: .infinity)
