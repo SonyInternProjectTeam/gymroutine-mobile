@@ -48,6 +48,8 @@ class UserManager: ObservableObject {
             profilePhoto: data["profilePhoto"] as? String ?? "",
             visibility: data["visibility"] as? Int ?? 2,
             isActive: data["isActive"] as? Bool ?? false,
+            birthday: (data["birthday"] as? Timestamp)?.dateValue(),
+            gender: data["gender"] as? String ?? "",
             createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
         )
     }
