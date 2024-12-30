@@ -18,7 +18,7 @@ final class InitProfileSetupViewModel: ObservableObject {
     @Published var confirmPassword: String = ""
     @Published var name: String = ""
     @Published var age: Int = 0
-    @Published var gender: String = ""
+    @Published var gender: Gender? = nil
     @Published var birthday: Date = Date()
     @Published var errorMessage: String? = nil
     @Published var isSignedUp: Bool = false
@@ -49,7 +49,7 @@ final class InitProfileSetupViewModel: ObservableObject {
             visibility: 2,
             isActive: false,
             birthday: self.birthday,
-            gender: self.gender,
+            gender: self.gender?.rawValue ?? "未選択",
             createdAt: Date()
         )
         
@@ -63,6 +63,36 @@ final class InitProfileSetupViewModel: ObservableObject {
                 self.errorMessage = error.localizedDescription
             }
             //ローディング画面非表示
+        }
+    }
+
+    /// on tap gender button
+    func selectGender(_ gender: Gender) {
+        self.gender = gender
+    }
+
+    /// for gender button UI
+    func isSelectedGender(_ gender: Gender) -> Bool {
+        return self.gender == gender
+    }
+}
+
+// MARK: - Gender
+extension InitProfileSetupViewModel {
+    enum Gender: String, CaseIterable {
+        case man = "男性"
+        case woman = "女性"
+        case noSelection = "未選択"
+
+        var displeyText: String {
+            switch self {
+            case .man:
+                "男性"
+            case .woman:
+                "女性"
+            case .noSelection:
+                "選択しない"
+            }
         }
     }
 }
