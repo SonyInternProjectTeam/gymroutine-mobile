@@ -27,12 +27,18 @@ struct MainView: View {
                     Label("Calendar", systemImage: "calendar")
                 }
                 .tag(1)
-            
+
+            SnsView()
+                .tabItem {
+                    Label("SNS", systemImage: "magnifyingglass")
+                }
+                .tag(2)
+
             ProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person.circle")
                 }
-                .tag(2)
+                .tag(3)
         }
     }
 }
