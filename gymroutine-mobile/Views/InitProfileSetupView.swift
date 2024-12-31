@@ -18,14 +18,19 @@ struct InitProfileSetupView: View {
             TabBarView(currentStep: currentStep)
                 .padding(.horizontal, 16)
 
-            TabView(selection: $currentStep) {
-                nicknameView.tag(SetupStep.nickname)
-
-                genderView.tag(SetupStep.gender)
-
-                birthdayView.tag(SetupStep.birthday)
+            Group {
+                switch currentStep {
+                case .nickname:
+                    nicknameView
+                case .gender:
+                    genderView
+                case .birthday:
+                    birthdayView
+                }
             }
             .padding(.horizontal, 24)
+
+            Spacer()
 
             actionButton
         }
@@ -71,8 +76,6 @@ extension InitProfileSetupView {
                     .font(.callout)
                     .padding(.leading, 4)
             }
-
-            Spacer()
         }
     }
 
@@ -92,8 +95,6 @@ extension InitProfileSetupView {
                     .buttonStyle(SelectableButtonStyle(isSelected: viewModel.isSelectedGender(gender)))
                 }
             }
-
-            Spacer()
         }
         .sensoryFeedback(.selection, trigger: viewModel.gender)
     }
@@ -106,8 +107,6 @@ extension InitProfileSetupView {
                 .bold()
 
             DatePicker("", selection: $viewModel.birthday, displayedComponents: .date)
-
-            Spacer()
         }
     }
 
