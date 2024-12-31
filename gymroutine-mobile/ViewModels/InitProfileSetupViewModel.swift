@@ -78,6 +78,17 @@ final class InitProfileSetupViewModel: ObservableObject {
         return self.gender == gender
     }
 
+    func isDisabledActionButton() -> Bool {
+        switch currentStep {
+        case .nickname:
+            return name.isEmpty
+        case .gender:
+            return gender == nil
+        case .birthday:
+            return false
+        }
+    }
+
     func toNextStep(_ nextStep: SetupStep) {
         self.currentStep = nextStep
     }

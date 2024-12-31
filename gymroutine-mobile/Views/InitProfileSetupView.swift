@@ -89,7 +89,6 @@ extension InitProfileSetupView {
         }
     }
 
-    // TODO: disable対応
     private var actionButton: some View {
         Group {
             if let nextStep = viewModel.currentStep.nextStep {
@@ -107,6 +106,7 @@ extension InitProfileSetupView {
             }
         }
         .buttonStyle(PrimaryButtonStyle())
+        .disabled(viewModel.isDisabledActionButton())
     }
 }
 
