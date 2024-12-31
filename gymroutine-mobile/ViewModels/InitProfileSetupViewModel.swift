@@ -22,11 +22,13 @@ final class InitProfileSetupViewModel: ObservableObject {
     @Published var birthday: Date = Date()
     @Published var errorMessage: String? = nil
     @Published var isSignedUp: Bool = false
-    
+    @Published var currentStep: SetupStep = .nickname
+
     private let router: Router
     private var cancellables = Set<AnyCancellable>()
     private let authService = AuthService()
-    
+    let setupSteps: [SetupStep] = SetupStep.allCases
+
     init(router: Router) {
         self.router = router
     }
@@ -75,10 +77,31 @@ final class InitProfileSetupViewModel: ObservableObject {
     func isSelectedGender(_ gender: Gender) -> Bool {
         return self.gender == gender
     }
+
+    func toNextStep(_ nextStep: SetupStep) {
+        self.currentStep = nextStep
+    }
 }
 
-// MARK: - Gender
+// MARK: - Enums
 extension InitProfileSetupViewModel {
+    enum SetupStep: CaseIterable {
+        case nickname
+        case gender
+        case birthday
+
+        var nextStep: SetupStep? {
+            switch self {
+            case .nickname:
+                return    .gender
+            case .gender:
+                return   .birthday
+            case .birthday:
+                return nil
+            }
+        }
+    }
+
     enum Gender: String, CaseIterable {
         case man = "男性"
         case woman = "女性"

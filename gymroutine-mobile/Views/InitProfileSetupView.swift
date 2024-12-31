@@ -11,15 +11,14 @@ import SwiftUI
 struct InitProfileSetupView: View {
     
     @ObservedObject var viewModel: InitProfileSetupViewModel
-    @State private var currentStep: SetupStep = .nickname
     
     var body: some View {
         VStack(spacing: 36) {
-            TabBarView(currentStep: currentStep)
+            CustomTabBar(items: viewModel.setupSteps, currentItem: viewModel.currentStep)
                 .padding(.horizontal, 16)
 
             Group {
-                switch currentStep {
+                switch viewModel.currentStep {
                 case .nickname:
                     nicknameView
                 case .gender:
@@ -35,26 +34,6 @@ struct InitProfileSetupView: View {
             actionButton
         }
         .padding(.vertical, 24)
-    }
-}
-
-// MARK: - Setup Step
-extension InitProfileSetupView {
-    enum SetupStep: CaseIterable {
-        case nickname
-        case gender
-        case birthday
-
-        var nextStep: SetupStep? {
-            switch self {
-            case .nickname:
-                return    .gender
-            case .gender:
-                return   .birthday
-            case .birthday:
-                return nil
-            }
-        }
     }
 }
 
@@ -113,9 +92,9 @@ extension InitProfileSetupView {
     // TODO: disable対応
     private var actionButton: some View {
         Group {
-            if let nextStep = currentStep.nextStep {
+            if let nextStep = viewModel.currentStep.nextStep {
                 Button {
-                    self.currentStep = nextStep
+                    viewModel.toNextStep(nextStep)
                 } label: {
                     Text("次へ")
                 }
@@ -130,48 +109,6 @@ extension InitProfileSetupView {
         .buttonStyle(PrimaryButtonStyle())
     }
 }
-
-// MARK: - Tab Bar
-extension InitProfileSetupView {
-    struct TabBarView: View {
-
-        let currentStep: SetupStep
-        @Namespace var namespace
-
-        var body: some View {
-            HStack(alignment: .bottom) {
-                ForEach(SetupStep.allCases, id: \.self) { step in
-                    TabBarItem(step: step,
-                               currentStep: currentStep,
-                               namespace: namespace)
-                }
-            }
-        }
-    }
-
-    struct TabBarItem: View {
-
-        let step: SetupStep
-        let currentStep: SetupStep
-        let namespace: Namespace.ID
-
-        var body: some View {
-            ZStack {
-                Color(.systemGray4)
-
-                if currentStep == step {
-                    Color.main
-                        .matchedGeometryEffect(id: "line",
-                                               in: namespace,
-                                               properties: .frame)
-                }
-            }
-            .frame(height: 2)
-            .animation(.spring(), value: currentStep)
-        }
-    }
-}
-
 
 #Preview {
     InitProfileSetupView(
