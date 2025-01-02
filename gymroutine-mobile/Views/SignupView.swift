@@ -31,9 +31,10 @@ struct SignupView: View {
                     }
                 }
             }) {
-                Text("新規登録する")
+                Image(systemName: "chevron.forward")
             }
-            .buttonStyle(PrimaryButtonStyle())
+            .buttonStyle(CircleButtonStyle())
+            .hAlign(.trailing)
         }
         .padding(.bottom, 16)
         .padding([.top, .horizontal], 24)
