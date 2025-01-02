@@ -78,14 +78,18 @@ extension InitProfileSetupView {
         .sensoryFeedback(.selection, trigger: viewModel.gender)
     }
 
-    // TODO: OTP風の入力にする
     private var birthdayView: some View {
         VStack(alignment: .leading, spacing: 32) {
             Text("生年月日を教えてください")
                 .font(.title)
                 .bold()
 
-            DatePicker("", selection: $viewModel.birthday, displayedComponents: .date)
+            DateInputField(date: $viewModel.birthday) { date in
+                let formatter = DateFormatter()
+                formatter.locale = Locale(identifier: "ja_JP") // 日本語ロケール
+                formatter.dateStyle = .long
+                return formatter.string(from: date)
+            }
         }
     }
 
