@@ -93,7 +93,7 @@ extension InitProfileSetupView {
                 }
 
                 if let errorMessage = viewModel.errorMessage {
-                    Text("エラーが発生しました")
+                    Text(errorMessage)
                         .foregroundColor(.red)
                         .font(.callout)
                         .padding(.horizontal, 8)
