@@ -32,6 +32,7 @@ struct InitProfileSetupView: View {
             Spacer()
 
             actionButton
+                .padding(.horizontal, 24)
         }
         .padding(.vertical, 24)
     }
@@ -110,17 +111,19 @@ extension InitProfileSetupView {
                 Button {
                     viewModel.toNextStep(nextStep)
                 } label: {
-                    Text("次へ")
+                    Image(systemName: "chevron.forward")
                 }
+                .buttonStyle(CircleButtonStyle())
+                .hAlign(.trailing)
             } else {
                 Button {
                     viewModel.saveAdditionalInfo()
                 } label: {
                     Text("登録する")
                 }
+                .buttonStyle(PrimaryButtonStyle())
             }
         }
-        .buttonStyle(PrimaryButtonStyle())
         .disabled(viewModel.isDisabledActionButton())
     }
 }

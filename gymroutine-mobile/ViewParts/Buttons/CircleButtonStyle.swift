@@ -17,12 +17,14 @@ import SwiftUI
  */
 struct CircleButtonStyle: ButtonStyle {
 
+    @Environment(\.isEnabled) var isEnabled: Bool
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.title)
             .foregroundStyle(.white)
             .padding(20)
             .background(.main, in: Circle())
-            .opacity(configuration.isPressed ? 0.5 : 1.0)
+            .opacity(configuration.isPressed || !self.isEnabled ? 0.5 : 1.0)
     }
 }
