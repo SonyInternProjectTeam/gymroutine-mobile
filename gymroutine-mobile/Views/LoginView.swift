@@ -38,7 +38,7 @@ struct LoginView: View {
             Button(action: {
                 viewModel.login()
             }) {
-                Text("ログイン")
+                Text("ログインする")
             }
             .buttonStyle(PrimaryButtonStyle())
         }
