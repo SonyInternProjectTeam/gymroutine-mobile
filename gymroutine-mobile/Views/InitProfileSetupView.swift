@@ -91,6 +91,8 @@ extension InitProfileSetupView {
                     formatter.dateStyle = .long
                     return formatter.string(from: date)
                 }
+                .bold()
+                .fieldBackground()
 
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)

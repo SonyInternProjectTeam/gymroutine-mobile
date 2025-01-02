@@ -32,8 +32,6 @@ struct DateInputField: View {
                     isActive = true
                 }
             }
-            .bold()
-            .fieldBackground()
             .focused($isActive)
             .toolbar {
                 ToolbarItem(placement: .keyboard) {
