@@ -84,11 +84,20 @@ extension InitProfileSetupView {
                 .font(.title)
                 .bold()
 
-            DateInputField(date: $viewModel.birthday) { date in
-                let formatter = DateFormatter()
-                formatter.locale = Locale(identifier: "ja_JP") // 日本語ロケール
-                formatter.dateStyle = .long
-                return formatter.string(from: date)
+            VStack(alignment: .leading, spacing: 16) {
+                DateInputField(date: $viewModel.birthday) { date in
+                    let formatter = DateFormatter()
+                    formatter.locale = Locale(identifier: "ja_JP") // 日本語ロケール
+                    formatter.dateStyle = .long
+                    return formatter.string(from: date)
+                }
+
+                if let errorMessage = viewModel.errorMessage {
+                    Text("エラーが発生しました")
+                        .foregroundColor(.red)
+                        .font(.callout)
+                        .padding(.horizontal, 8)
+                }
             }
         }
     }
