@@ -31,6 +31,9 @@ final class InitProfileSetupViewModel: ObservableObject {
 
     init(router: Router) {
         self.router = router
+
+        // 初期値 2000年1月1日
+        birthday = Calendar.current.date(from: DateComponents(year: 2000, month: 1, day: 1)) ?? Date()
     }
 
     /// Firestore - save user info
