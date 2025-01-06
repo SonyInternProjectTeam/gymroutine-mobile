@@ -11,19 +11,19 @@ import FirebaseFirestore
 class UserManager: ObservableObject {
     @Published var currentUser: User? = nil
     @Published var isLoggedIn: Bool = false
-
+    
     private let db = Firestore.firestore()
-
+    
     static let shared = UserManager() // Singleton
-
+    
     private init() {}
-
+    
     func initializeUser() async {
         guard let authUser = Auth.auth().currentUser else {
             print("No logged-in user found.")
             return
         }
-
+        
         do {
             let user = try await fetchUserInfo(uid: authUser.uid)
             DispatchQueue.main.async {
@@ -34,13 +34,13 @@ class UserManager: ObservableObject {
             print("Failed to fetch user info: \(error)")
         }
     }
-
+    
     func fetchUserInfo(uid: String) async throws -> User {
         let document = try await db.collection("Users").document(uid).getDocument()
         guard let data = document.data() else {
             throw NSError(domain: "FetchError", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data found for user"])
         }
-
+        
         return User(
             uid: data["uid"] as? String ?? "",
             email: data["email"] as? String ?? "",
@@ -52,6 +52,18 @@ class UserManager: ObservableObject {
             gender: data["gender"] as? String ?? "",
             createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
         )
+    }
+    
+    // follower
+    func fetchFollowersCount(userId: String) async throws -> Int {
+        let snapshot = try await db.collection("Users").document(userId).collection("Followers").getDocuments()
+        return snapshot.documents.count
+    }
+    
+    // following
+    func fetchFollowingCount(userId: String) async throws -> Int {
+        let snapshot = try await db.collection("Users").document(userId).collection("Following").getDocuments()
+        return snapshot.documents.count
     }
 }
 
