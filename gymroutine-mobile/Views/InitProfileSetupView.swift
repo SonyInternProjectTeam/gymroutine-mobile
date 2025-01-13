@@ -17,22 +17,24 @@ struct InitProfileSetupView: View {
             CustomTabBar(items: viewModel.setupSteps, currentItem: viewModel.currentStep)
                 .padding(.horizontal, 16)
 
-            Group {
-                switch viewModel.currentStep {
-                case .nickname:
-                    nicknameView
-                case .gender:
-                    genderView
-                case .birthday:
-                    birthdayView
+            VStack(spacing: 0) {
+                Group {
+                    switch viewModel.currentStep {
+                    case .nickname:
+                        nicknameView
+                    case .gender:
+                        genderView
+                    case .birthday:
+                        birthdayView
+                    }
                 }
-            }
-            .padding(.horizontal, 24)
-
-            Spacer()
-
-            actionButton
                 .padding(.horizontal, 24)
+
+                Spacer()
+
+                actionButton
+                    .padding(.horizontal, 24)
+            }
         }
         .padding(.vertical, 24)
     }
