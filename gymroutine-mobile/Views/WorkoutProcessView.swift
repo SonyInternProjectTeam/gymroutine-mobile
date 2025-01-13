@@ -55,6 +55,13 @@ struct WorkoutProcessView: View {
                                 }
                             ))
                             .labelsHidden()
+
+                            Button(action: {
+                                viewModel.removeSet(fromExerciseAt: currentIndex, setIndex: index)
+                            }) {
+                                Image(systemName: "trash")
+                                    .foregroundColor(.red)
+                            }
                         }
                     }
                 }
@@ -63,6 +70,19 @@ struct WorkoutProcessView: View {
             }
 
             Spacer()
+
+            Button(action: {
+                viewModel.addSet(toExerciseAt: currentIndex)
+            }) {
+                Text("Add Set")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            }
+            .padding()
 
             HStack {
                 Button(action: {
