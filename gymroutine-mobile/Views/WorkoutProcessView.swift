@@ -9,6 +9,33 @@ struct WorkoutProcessView: View {
     }
 
     var body: some View {
+
+        VStack {
+            Text("Timer: \(viewModel.timerValue) seconds")
+                .font(.title2)
+                .padding()
+
+            HStack {
+                Button("Start") {
+                    viewModel.startTimer()
+                }
+                .buttonStyle(.bordered)
+
+                Button("Stop") {
+                    viewModel.stopTimer()
+                }
+                .buttonStyle(.bordered)
+
+                Button("Reset") {
+                    viewModel.resetTimer()
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding()
+        }
+
+        Spacer()
+
         VStack {
             if let currentExercise = viewModel.getExercise(at: currentIndex) {
                 Text("Exercise: \(currentExercise["ExerciseName"] as? String ?? "Unknown")")

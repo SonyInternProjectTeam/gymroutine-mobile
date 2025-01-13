@@ -1,7 +1,11 @@
+import Combine
 import Foundation
 
 class WorkoutProcessViewModel: ObservableObject {
     @Published var exercises: [[String: Any]] = []
+    @Published var timerValue: Int = 0
+    private var timer: AnyCancellable?
+    private var isTimerRunning = false
 
     init(exercises: [[String: Any]]) {
         self.exercises = exercises
@@ -60,5 +64,26 @@ class WorkoutProcessViewModel: ObservableObject {
 
     func getTotalExerciseCount() -> Int {
         return exercises.count
+    }
+
+    func startTimer() {
+        guard !isTimerRunning else { return }
+        isTimerRunning = true
+        timer = Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.timerValue += 1
+            }
+    }
+
+    func stopTimer() {
+        isTimerRunning = false
+        timer?.cancel()
+        timer = nil
+    }
+
+    func resetTimer() {
+        stopTimer()
+        timerValue = 0
     }
 }
