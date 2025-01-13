@@ -106,25 +106,36 @@ extension InitProfileSetupView {
     }
 
     private var actionButton: some View {
-        Group {
-            if let nextStep = viewModel.currentStep.nextStep {
+        HStack(spacing: 0) {
+            if let previousStep = viewModel.currentStep.previousStep {
                 Button {
-                    viewModel.toNextStep(nextStep)
+                    viewModel.moveToStep(previousStep)
                 } label: {
-                    Image(systemName: "chevron.forward")
+                    Image(systemName: "chevron.backward")
                 }
-                .buttonStyle(CircleButtonStyle())
-                .hAlign(.trailing)
-            } else {
-                Button {
-                    viewModel.saveAdditionalInfo()
-                } label: {
-                    Text("登録する")
-                }
-                .buttonStyle(PrimaryButtonStyle())
+                .buttonStyle(SecondaryCircleButtonStyle())
             }
+
+            Spacer()
+
+            Group {
+                if let nextStep = viewModel.currentStep.nextStep {
+                    Button {
+                        viewModel.moveToStep(nextStep)
+                    } label: {
+                        Image(systemName: "chevron.forward")
+                    }
+                } else {
+                    Button {
+                        viewModel.saveAdditionalInfo()
+                    } label: {
+                        Image(systemName: "chevron.forward")
+                    }
+                }
+            }
+            .buttonStyle(CircleButtonStyle())
+            .disabled(viewModel.isDisabledActionButton())
         }
-        .disabled(viewModel.isDisabledActionButton())
     }
 }
 

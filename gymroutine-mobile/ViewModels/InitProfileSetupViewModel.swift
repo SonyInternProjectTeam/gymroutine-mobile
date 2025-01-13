@@ -92,8 +92,8 @@ final class InitProfileSetupViewModel: ObservableObject {
         }
     }
 
-    func toNextStep(_ nextStep: SetupStep) {
-        self.currentStep = nextStep
+    func moveToStep(_ step: SetupStep) {
+        self.currentStep = step
     }
 }
 
@@ -105,14 +105,19 @@ extension InitProfileSetupViewModel {
         case birthday
 
         var nextStep: SetupStep? {
-            switch self {
-            case .nickname:
-                return    .gender
-            case .gender:
-                return   .birthday
-            case .birthday:
+            guard let currentIndex = Self.allCases.firstIndex(of: self),
+                  currentIndex < Self.allCases.count - 1 else {
                 return nil
             }
+            return Self.allCases[currentIndex + 1]
+        }
+
+        var previousStep: SetupStep? {
+            guard let currentIndex = Self.allCases.firstIndex(of: self),
+                  currentIndex > 0 else {
+                return nil
+            }
+            return Self.allCases[currentIndex - 1]
         }
     }
 
