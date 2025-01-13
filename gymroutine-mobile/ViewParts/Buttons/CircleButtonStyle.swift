@@ -13,7 +13,7 @@ import SwiftUI
  ### 形
  - 円形
  ### 用途
- - ログイン・新規登録の実行ボタン
+ - 新規登録後のプロフィール登録のネクストボタン
  */
 struct CircleButtonStyle: ButtonStyle {
 
