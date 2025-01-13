@@ -119,17 +119,6 @@ extension InitProfileSetupViewModel {
     enum Gender: String, CaseIterable {
         case man = "男性"
         case woman = "女性"
-        case noSelection = "未選択"
-
-        var displeyText: String {
-            switch self {
-            case .man:
-                "男性"
-            case .woman:
-                "女性"
-            case .noSelection:
-                "選択しない"
-            }
-        }
+        case other = "その他"
     }
 }
