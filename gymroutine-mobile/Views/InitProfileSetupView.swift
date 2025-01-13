@@ -70,7 +70,7 @@ extension InitProfileSetupView {
                     Button {
                         viewModel.selectGender(gender)
                     } label: {
-                        Text(gender.displeyText)
+                        Text(gender.rawValue)
                     }
                     .buttonStyle(SelectableButtonStyle(isSelected: viewModel.isSelectedGender(gender)))
                 }
