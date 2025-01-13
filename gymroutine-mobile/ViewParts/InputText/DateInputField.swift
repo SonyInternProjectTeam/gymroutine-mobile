@@ -34,12 +34,14 @@ struct DateInputField: View {
             }
             .focused($isActive)
             .toolbar {
-                ToolbarItem(placement: .keyboard) {
-                    Button("完了") {
-                        isActive = false
+                if isActive {
+                    ToolbarItem(placement: .keyboard) {
+                        Button("完了") {
+                            isActive = false
+                        }
+                        .tint(.primary)
+                        .hAlign(.trailing)
                     }
-                    .tint(.primary)
-                    .hAlign(.trailing)
                 }
             }
     }
