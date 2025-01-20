@@ -70,7 +70,19 @@ fileprivate struct AddInputViewToTextField<Content: View>: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiView: UIViewType, context: Context) { }
+    func updateUIView(_ uiView: UIViewType, context: Context) {
+        DispatchQueue.main.async {
+            if let window = uiView.window, let textField = window.allSubViews(type: UITextField.self).first(where: {$0.placeholder == id}) {
+                textField.tintColor = .clear
+                let hostView = UIHostingController(rootView: content).view!
+                hostView.backgroundColor = .clear
+                hostView.frame.size = hostView.intrinsicContentSize
+
+                textField.inputView = hostView
+                textField.reloadInputViews()
+            }
+        }
+    }
 }
 
 fileprivate extension UIView {
