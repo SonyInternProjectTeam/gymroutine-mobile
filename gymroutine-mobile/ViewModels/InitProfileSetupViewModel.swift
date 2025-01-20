@@ -54,7 +54,7 @@ final class InitProfileSetupViewModel: ObservableObject {
             visibility: 2,
             isActive: false,
             birthday: self.birthday,
-            gender: self.gender?.rawValue ?? "未選択",
+            gender: self.gender?.rawValue ?? Gender.noAnswer.rawValue,
             createdAt: Date()
         )
         
