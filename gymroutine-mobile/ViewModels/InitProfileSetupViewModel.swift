@@ -124,6 +124,6 @@ extension InitProfileSetupViewModel {
     enum Gender: String, CaseIterable {
         case man = "男性"
         case woman = "女性"
-        case other = "その他"
+        case noAnswer = "無回答"
     }
 }
