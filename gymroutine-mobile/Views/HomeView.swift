@@ -84,8 +84,9 @@ struct HomeView: View {
                     Text("今日のワークアウト")
                         .font(.title2.bold())
                     
-                    Image(systemName: isShowTodayworkouts ? "chevron.up" : "chevron.down")
+                    Image(systemName: "chevron.right")
                         .fontWeight(.semibold)
+                        .rotationEffect(.degrees(isShowTodayworkouts ? 90 : 0))
                 }
                 .hAlign(.leading)
             }
