@@ -73,21 +73,28 @@ class CreateWorkoutViewModel: ObservableObject {
     }
     
     // ワークアウト名と曜日をまとめてFirestoreに保存
-    func createWorkoutWithDetails(name: String, selectedDays: [String: Bool]) {
+    func createWorkoutWithDetails(name: String, selectedDays: [String: Bool], completion: @escaping (String?) -> Void) {
         guard let userID = Auth.auth().currentUser?.uid else {
             print("User is not logged in")
+            completion(nil)
             return
         }
-        
-        let scheduledDays = selectedDays.filter { $0.value }.keys.sorted() // 선택된 요일
-        
+
+        let scheduledDays = selectedDays.filter { $0.value }.keys.sorted() // 선택된 요일만 저장
+
+        // 🟢 Firestore에 워크아웃 도큐먼트 생성 (이름과 요일 포함)
         service.createWorkoutDocument(userID: userID, name: name, scheduledDays: scheduledDays) { documentID in
             if let documentID = documentID {
-                print("Workout created with ID: \(documentID)")
-                self.currentWorkoutID = documentID
+                DispatchQueue.main.async {
+                    print("Workout created successfully with ID: \(documentID)")
+                    self.currentWorkoutID = documentID
+                    completion(documentID) // 생성된 workout ID를 반환
+                }
             } else {
                 print("Failed to create workout document")
+                completion(nil)
             }
         }
     }
+
 }

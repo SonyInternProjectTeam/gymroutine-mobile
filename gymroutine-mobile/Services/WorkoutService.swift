@@ -13,26 +13,26 @@ class WorkoutService {
 
     /// 워크아웃 도큐먼트를 생성하면서 이름과 요일 데이터를 추가
     func createWorkoutDocument(userID: String, name: String, scheduledDays: [String], completion: @escaping (String?) -> Void) {
-        // 초기 데이터를 구성
-        let workoutData: [String: Any] = [
-            "UUid": userID,
-            "Name": name,                      // 워크아웃 이름
-            "ScheduledDays": scheduledDays,    // 선택된 요일
-            "CreatedAt": FieldValue.serverTimestamp() // 생성 시간
-        ]
-        
-        // Firestore에 워크아웃 데이터 추가
+        let db = Firestore.firestore()
         var ref: DocumentReference? = nil
+
+        let workoutData: [String: Any] = [
+            "uuid": userID,      // 사용자 ID
+            "name": name,        // 워크아웃 이름
+            "ScheduledDays": scheduledDays, // 선택한 요일
+            "CreatedAt": Timestamp(date: Date()) // 생성 시간
+        ]
+
         ref = db.collection("Workouts").addDocument(data: workoutData) { error in
             if let error = error {
                 print("Error adding workout document: \(error)")
                 completion(nil)
             } else {
-                // 성공적으로 생성된 문서 ID 반환
                 completion(ref?.documentID)
             }
         }
     }
+
 
     /// 기존 워크아웃 도큐먼트에 요일 데이터만 추가
     func addScheduledDaysToWorkout(workoutID: String, scheduledDays: [String: Bool], completion: @escaping (Bool) -> Void) {
@@ -104,5 +104,26 @@ class WorkoutService {
             }
         }
     }
+    
+    func fetchWorkoutDetails(workoutID: String, completion: @escaping (Result<Workout, Error>) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("Workouts").document(workoutID).getDocument { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else if let document = document, document.exists {
+                let data = document.data() ?? [:]
+                let workout = Workout(
+                    id: workoutID,
+                    name: data["name"] as? String ?? "Unknown",
+                    scheduledDays: data["ScheduledDays"] as? [String] ?? [],
+                    createdAt: (data["CreatedAt"] as? Timestamp)?.dateValue() ?? Date()
+                )
+                completion(.success(workout))
+            } else {
+                completion(.failure(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])))
+            }
+        }
+    }
+
 }
 
