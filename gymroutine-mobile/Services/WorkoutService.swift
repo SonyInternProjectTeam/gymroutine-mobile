@@ -9,21 +9,33 @@ import Foundation
 import Firebase
 
 class WorkoutService {
-    func createWorkoutDocument(userID: String, completion: @escaping (String?) -> Void) {
-        let db = Firestore.firestore()
+    private let db = Firestore.firestore()
+
+    /// 워크아웃 도큐먼트를 생성하면서 이름과 요일 데이터를 추가
+    func createWorkoutDocument(userID: String, name: String, scheduledDays: [String], completion: @escaping (String?) -> Void) {
+        // 초기 데이터를 구성
+        let workoutData: [String: Any] = [
+            "UUid": userID,
+            "Name": name,                      // 워크아웃 이름
+            "ScheduledDays": scheduledDays,    // 선택된 요일
+            "CreatedAt": FieldValue.serverTimestamp() // 생성 시간
+        ]
+        
+        // Firestore에 워크아웃 데이터 추가
         var ref: DocumentReference? = nil
-        ref = db.collection("Workouts").addDocument(data: ["uuid": userID]) { error in
+        ref = db.collection("Workouts").addDocument(data: workoutData) { error in
             if let error = error {
                 print("Error adding workout document: \(error)")
                 completion(nil)
             } else {
+                // 성공적으로 생성된 문서 ID 반환
                 completion(ref?.documentID)
             }
         }
     }
-    
+
+    /// 기존 워크아웃 도큐먼트에 요일 데이터만 추가
     func addScheduledDaysToWorkout(workoutID: String, scheduledDays: [String: Bool], completion: @escaping (Bool) -> Void) {
-        let db = Firestore.firestore()
         db.collection("Workouts").document(workoutID).updateData([
             "ScheduledDays": scheduledDays
         ]) { error in
@@ -35,9 +47,9 @@ class WorkoutService {
             }
         }
     }
-    
+
+    /// 기존 워크아웃 도큐먼트에 제목 및 요일 데이터를 추가
     func addWorkoutDetails(workoutID: String, name: String, scheduledDays: [String: Bool], completion: @escaping (Bool) -> Void) {
-        let db = Firestore.firestore()
         db.collection("Workouts").document(workoutID).updateData([
             "name": name,
             "ScheduledDays": scheduledDays
@@ -50,9 +62,9 @@ class WorkoutService {
             }
         }
     }
-    
+
+    /// 운동 옵션을 불러오는 메서드
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
-        let db = Firestore.firestore()
         db.collection("Trains").getDocuments { (snapshot, error) in
             guard let documents = snapshot?.documents, error == nil else {
                 print("Error fetching train options: \(String(describing: error))")
@@ -63,9 +75,9 @@ class WorkoutService {
             completion(options)
         }
     }
-    
+
+    /// 특정 트레인의 운동 목록을 불러오는 메서드
     func fetchExercises(for train: String, completion: @escaping ([String]) -> Void) {
-        let db = Firestore.firestore()
         db.collection("Trains").document(train).collection("exercises").getDocuments { (snapshot, error) in
             guard let documents = snapshot?.documents, error == nil else {
                 print("Error fetching exercises: \(String(describing: error))")
@@ -76,9 +88,9 @@ class WorkoutService {
             completion(exercises)
         }
     }
-    
+
+    /// 워크아웃에 운동을 추가하는 메서드
     func addExerciseToWorkout(workoutID: String, exerciseName: String, part: String, completion: @escaping (Bool) -> Void) {
-        let db = Firestore.firestore()
         db.collection("Workouts").document(workoutID).collection("exerciseMenus").addDocument(data: [
             "name": exerciseName,
             "part": part,
@@ -92,7 +104,5 @@ class WorkoutService {
             }
         }
     }
-    
-    
 }
 

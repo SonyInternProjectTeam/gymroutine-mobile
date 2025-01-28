@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TrainSelectionView: View {
-    @ObservedObject var viewModel = WorkoutViewModel()
+    @ObservedObject var viewModel = CreateWorkoutViewModel()
     @State private var selectedTrain: String? = nil
     @State private var selectedExercise: String? = nil
     

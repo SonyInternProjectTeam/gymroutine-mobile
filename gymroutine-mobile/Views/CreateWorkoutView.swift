@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CreateWorkoutView: View {
-    @ObservedObject var viewModel = WorkoutViewModel()
+    @ObservedObject var viewModel = CreateWorkoutViewModel()
     @State private var selectedTrain: String? = nil
     @State private var selectedExercise: String? = nil
     
@@ -24,10 +24,12 @@ struct CreateWorkoutView: View {
             Text("Select details")
                 .font(.title)
                 .padding()
+            
             // ワークアウト名の入力フィールド
             TextField("Enter Workout Name", text: $workoutName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
+            
             // 曜日選択部分
             VStack {
                 Text("Select Days")
@@ -53,9 +55,10 @@ struct CreateWorkoutView: View {
             
             // Create Workoutボタン
             Button(action: {
+                // 버튼을 눌렀을 때 워크아웃 생성
                 viewModel.createWorkoutWithDetails(name: workoutName, selectedDays: selectedDays)
             }) {
-                Text("Go to Exsercise select")
+                Text("ルーティン生成")
                     .font(.headline)
                     .padding()
                     .frame(maxWidth: .infinity)
@@ -65,10 +68,6 @@ struct CreateWorkoutView: View {
             }
             .padding()
             .disabled(workoutName.isEmpty) // ワークアウト名が空ならボタンを無効化
-            
-        }
-        .onAppear {
-            viewModel.createWorkout()
         }
         .navigationTitle("Create Workout")
     }
