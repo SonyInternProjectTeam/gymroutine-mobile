@@ -160,20 +160,22 @@ struct HomeView: View {
     
     private var buttonBox: some View {
         HStack {
-            Button {
-                
+            // TODO : これを押した瞬間にはWorkoutsドキュメントが生成されたらだめ
+
+            NavigationLink {
+                CreateWorkoutView()
             } label: {
                 Label("ルーティーン追加", systemImage: "plus")
             }
             .buttonStyle(SecondaryButtonStyle())
             
-            // TODO : これを押した瞬間にはWorkoutsドキュメントが生成されたらだめ
-            NavigationLink {
-                          CreateWorkoutView()
-                      } label: {
-                          Label("今すぐ始める", systemImage: "play")
-                      }
-                      .buttonStyle(PrimaryButtonStyle())
+    
+            Button {
+                    
+            } label: {
+                Label("今すぐ始める", systemImage: "play")
+            }
+            .buttonStyle(PrimaryButtonStyle())
         }
     }
 }
