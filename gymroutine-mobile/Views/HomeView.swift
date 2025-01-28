@@ -99,18 +99,6 @@ struct HomeView: View {
                 }
             }
             
-            // TODO : これを押した瞬間にはWorkoutsドキュメントが生成されたらだめ
-            NavigationLink(destination: CreateWorkoutView()) {
-                Text("Go to Create Workout")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(10)
-            }
-            .padding()
-
             Spacer()
         }
     }
@@ -179,12 +167,13 @@ struct HomeView: View {
             }
             .buttonStyle(SecondaryButtonStyle())
             
-            Button {
-                
-            } label: {
-                Label("今すぐ始める", systemImage: "play")
-            }
-            .buttonStyle(PrimaryButtonStyle())
+            // TODO : これを押した瞬間にはWorkoutsドキュメントが生成されたらだめ
+            NavigationLink {
+                          CreateWorkoutView()
+                      } label: {
+                          Label("今すぐ始める", systemImage: "play")
+                      }
+                      .buttonStyle(PrimaryButtonStyle())
         }
     }
 }
