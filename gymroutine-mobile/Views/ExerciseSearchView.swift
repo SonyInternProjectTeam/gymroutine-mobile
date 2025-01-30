@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ExerciseSearchView: View {
-    @ObservedObject var viewModel = ExerciseViewModel()
+    @ObservedObject var viewModel = ExerciseSearchViewModel()
     let workoutID: String // ✅ Workout ID
 
     private let Categorycolumns = [
