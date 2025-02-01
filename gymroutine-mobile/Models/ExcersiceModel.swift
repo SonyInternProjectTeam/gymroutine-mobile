@@ -18,6 +18,18 @@ struct Exercise:Codable,Hashable {
     }
 }
 
+struct WorkoutExercise: Identifiable, Codable, Hashable {
+    var id: String = UUID().uuidString
+    var name: String
+    var description: String
+    var img: String
+    var part: String
+    var sets: Int
+    var reps: Int
+    var weight: Int
+}
+
+
 enum ExercisePart: String, CaseIterable {
     case arm
     case chest

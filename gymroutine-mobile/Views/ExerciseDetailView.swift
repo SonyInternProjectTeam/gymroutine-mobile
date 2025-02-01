@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct ExerciseDetailView: View {
-
     let exercise: Exercise
+    let workoutID: String // Workout ID를 전달받음
+    @StateObject private var viewModel = ExerciseDetailViewModel()
+    @State private var navigateToWorkoutDetail = false // 화면 전환 플래그
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -24,6 +26,14 @@ struct ExerciseDetailView: View {
         }
         .navigationTitle(exercise.name)
         .navigationBarTitleDisplayMode(.inline)
+        .background(
+            NavigationLink(
+                destination: WorkoutDetailView(workoutID: workoutID),
+                isActive: $navigateToWorkoutDetail
+            ) {
+                EmptyView()
+            }
+        ) // 운동 추가 후 자동 전환
     }
 }
 
@@ -37,7 +47,20 @@ extension ExerciseDetailView {
 
             Spacer()
 
-            Button(action: {}) {
+            Button(action: {
+                viewModel.addExerciseToWorkout(
+                    workoutID: workoutID,
+                    exerciseName: exercise.name,
+                    part: exercise.part
+                ) { success in
+                    if success {
+                        print("운동 추가 성공 ✅")
+                        navigateToWorkoutDetail = true // WorkoutDetailView로 이동
+                    } else {
+                        print("운동 추가 실패 ❌")
+                    }
+                }
+            }) {
                 Text("追加する")
             }
             .buttonStyle(PrimaryButtonStyle())
@@ -72,8 +95,3 @@ extension ExerciseDetailView {
     }
 }
 
-#Preview {
-    NavigationStack {
-        ExerciseDetailView(exercise: Exercise(name: "ショルダープレス", description: "あああ", img: "", part: "arm"))
-    }
-}

@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct ExerciseSearchView: View {
-
-    @ObservedObject var viewModel = ExerciseViewModel()
+    @ObservedObject var viewModel = ExerciseSearchViewModel()
+    let workoutID: String // ✅ Workout ID
 
     private let Categorycolumns = [
         GridItem(.flexible(), spacing: 16),
@@ -48,7 +48,7 @@ struct ExerciseSearchView: View {
                 .font(.title2)
                 .fontWeight(.bold)
 
-            LazyVGrid(columns: Categorycolumns,spacing: 16) {
+            LazyVGrid(columns: Categorycolumns, spacing: 16) {
                 ForEach(ExercisePart.allCases, id: \.self) { part in
                     Button {
                         viewModel.onTapExercisePartToggle(part: part)
@@ -69,9 +69,11 @@ struct ExerciseSearchView: View {
 
             LazyVGrid(columns: Excercisecolumns, spacing: 12) {
                 ForEach(viewModel.filterExercises, id: \.self) { exercise in
-                    NavigationLink (destination: ExerciseDetailView(exercise: exercise), label: {
+                    NavigationLink(
+                        destination: ExerciseDetailView(exercise: exercise, workoutID: workoutID) // ✅ workoutID
+                    ) {
                         ExersiceSelectButton(exercise: exercise)
-                    })
+                    }
                 }
             }
             .padding(.horizontal, 4)
@@ -81,6 +83,6 @@ struct ExerciseSearchView: View {
 
 #Preview {
     NavigationStack {
-        ExerciseSearchView()
+        ExerciseSearchView(workoutID: "sampleWorkoutID") // sample workoutID 
     }
 }
