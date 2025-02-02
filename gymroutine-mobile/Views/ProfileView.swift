@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct ProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
-
+    
     var body: some View {
         ScrollView {
             VStack {
@@ -23,40 +24,64 @@ struct ProfileView: View {
             .padding()
         }
         .navigationTitle("プロフィール")
+        .onChange(of: viewModel.selectedPhotoItem) { newItem in
+            Task {
+                if let newItem = newItem, let data = try? await newItem.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    viewModel.uploadProfilePhoto(image)
+                }
+            }
+        }
     }
-
+    
     private func profileHeader(user: User) -> some View {
         VStack(spacing: 16) {
-            // ✅ 프로필 이미지 (URL이 유효한지 확인 후 로드)
-            if let profileURL = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
-                AsyncImage(url: profileURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 100, height: 100)
-                        .clipShape(Circle())
-                } placeholder: {
+            ZStack {
+                // ✅ 프로필 이미지 표시
+                if let profileURL = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
+                    AsyncImage(url: profileURL) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 100, height: 100)
+                            .clipShape(Circle())
+                    } placeholder: {
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 100, height: 100)
+                    }
+                } else {
                     Circle()
                         .fill(Color.gray.opacity(0.3))
                         .frame(width: 100, height: 100)
                 }
-            } else {
-                // ✅ 기본 프로필 이미지
-                Circle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(width: 100, height: 100)
+                
+                // ✅ 프로필 이미지 변경 버튼 (PhotosPicker)
+                PhotosPicker(
+                    selection: $viewModel.selectedPhotoItem,
+                    matching: .images,
+                    photoLibrary: .shared()
+                ) {
+                    Image(systemName: "plus.circle.fill")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(.blue)
+                        .background(Color.white)
+                        .clipShape(Circle())
+                        .offset(x: 35, y: 35)
+                }
             }
-
-            // ✅ 사용자 이름 및 정보
+            
+            // ✅ 이름 표시
             Text(user.name)
                 .font(.title)
                 .fontWeight(.bold)
-
-            Text("\(String(describing: user.birthday ?? Date()))歳 \(user.gender)")
+            
+            Text("\(String(describing: user.birthday))歳 \(user.gender)")
                 .font(.subheadline)
                 .foregroundColor(.gray)
-
-            // ✅ 팔로워 & 팔로잉 수 표시
+            
+            // ✅ 팔로워 & 팔로잉
             HStack {
                 VStack {
                     Text("フォロワー")
@@ -78,4 +103,3 @@ struct ProfileView: View {
         }
     }
 }
-
