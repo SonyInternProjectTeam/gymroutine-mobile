@@ -14,16 +14,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var user: User?
     @Published var followersCount: Int = 0
     @Published var followingCount: Int = 0
-    @Published var selectedPhotoItem: PhotosPickerItem? {
-        didSet { // ✅ selectedPhotoItem이 변경될 때 자동 실행
-            Task {
-                if let newItem = selectedPhotoItem, let data = try? await newItem.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    uploadProfilePhoto(image)
-                }
-            }
-        }
-    }
+    @Published var selectedPhotoItem: PhotosPickerItem?
     
     private let userManager = UserManager.shared
     private let userService = UserService()

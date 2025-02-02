@@ -37,7 +37,6 @@ struct ProfileView: View {
     private func profileHeader(user: User) -> some View {
         VStack(spacing: 16) {
             ZStack {
-                // ✅ 프로필 이미지 표시
                 if let profileURL = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
                     AsyncImage(url: profileURL) { image in
                         image
@@ -56,7 +55,8 @@ struct ProfileView: View {
                         .frame(width: 100, height: 100)
                 }
                 
-                // ✅ 프로필 이미지 변경 버튼 (PhotosPicker)
+                // PhotosPicker
+                // TODO : 選択する領域が他しいかも
                 PhotosPicker(
                     selection: $viewModel.selectedPhotoItem,
                     matching: .images,
@@ -72,7 +72,6 @@ struct ProfileView: View {
                 }
             }
             
-            // ✅ 이름 표시
             Text(user.name)
                 .font(.title)
                 .fontWeight(.bold)
@@ -81,7 +80,6 @@ struct ProfileView: View {
                 .font(.subheadline)
                 .foregroundColor(.gray)
             
-            // ✅ 팔로워 & 팔로잉
             HStack {
                 VStack {
                     Text("フォロワー")
