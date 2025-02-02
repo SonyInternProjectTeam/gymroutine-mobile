@@ -35,7 +35,7 @@ class UserService {
     
     func uploadProfilePhoto(userID: String, image: UIImage) async -> String? {
             let storageRef = storage.reference().child("profile_photos/\(userID).jpg")
-            guard let imageData = image.jpegData(compressionQuality: 0.8) else { return nil }
+            guard let imageData = image.jpegData(compressionQuality: 0.3) else { return nil }
             
             do {
                 _ = try await storageRef.putDataAsync(imageData, metadata: nil)
