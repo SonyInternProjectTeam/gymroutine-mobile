@@ -17,12 +17,14 @@ import SwiftUI
  */
 struct PrimaryButtonStyle: ButtonStyle {
 
+    @Environment(\.isEnabled) var isEnabled: Bool
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
             .foregroundStyle(.white)
             .frame(maxWidth: 315, maxHeight: 48)
             .background(Color.main.cornerRadius(10))
-            .opacity(configuration.isPressed ? 0.5 : 1.0)
+            .opacity(configuration.isPressed || !self.isEnabled ? 0.5 : 1.0)
     }
 }

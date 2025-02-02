@@ -1,30 +1,30 @@
 //
-//  CircleButtonStyle.swift
+//  SecondaryCircleButtonStyle.swift
 //  gymroutine-mobile
 //
-//  Created by 森祐樹 on 2024/11/25.
+//  Created by 森祐樹 on 2025/01/13.
 //
 
 import SwiftUI
 
 /**
  ### 背景色
- - `mainColor`
+ -`systemGray5`
  ### 形
  - 円形
  ### 用途
- - 新規登録後のプロフィール登録のネクストボタン
+ - 新規登録後のプロフィール登録のバックボタン
  */
-struct CircleButtonStyle: ButtonStyle {
+struct SecondaryCircleButtonStyle: ButtonStyle {
 
     @Environment(\.isEnabled) var isEnabled: Bool
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.title)
-            .foregroundStyle(.white)
+            .foregroundStyle(.main)
             .padding(20)
-            .background(.main, in: Circle())
+            .background(Color(UIColor.systemGray5), in: Circle())
             .opacity(configuration.isPressed || !self.isEnabled ? 0.5 : 1.0)
     }
 }

@@ -11,7 +11,7 @@ struct SignupView: View {
     @ObservedObject var viewModel: SignupViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .center, spacing: 0) {
             InputForm
 
             if let errorMessage = viewModel.errorMessage {
@@ -19,29 +19,22 @@ struct SignupView: View {
                     .foregroundColor(.red)
                     .padding(.top, 8)
                     .padding(.leading, 4)
+                    .hAlign(.leading)
             }
 
             Spacer()
 
-            HStack(spacing: 0) {
-                Spacer()
-
-                Button(action: {
-                    viewModel.signupWithEmailAndPassword { success in
-                        if success {
-                            viewModel.router.switchRootView(to: .initProfileSetup)
-                        }
+            Button(action: {
+                viewModel.signupWithEmailAndPassword { success in
+                    if success {
+                        viewModel.router.switchRootView(to: .initProfileSetup)
                     }
-                }) {
-                    Text("次へ")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
                 }
-                .buttonStyle(PlainButtonStyle())
+            }) {
+                Image(systemName: "chevron.forward")
             }
+            .buttonStyle(CircleButtonStyle())
+            .hAlign(.trailing)
         }
         .padding(.bottom, 16)
         .padding([.top, .horizontal], 24)
