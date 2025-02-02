@@ -27,30 +27,36 @@ struct ProfileView: View {
 
     private func profileHeader(user: User) -> some View {
         VStack(spacing: 16) {
-            // profile image
-            
-            // TODO
-//            AsyncImage(url: URL(string: user.profilePhoto)) { image in
-//                image
-//                    .resizable()
-//                    .aspectRatio(contentMode: .fill)
-//                    .frame(width: 100, height: 100)
-//                    .clipShape(Circle())
-//            } placeholder: {
-//                ProgressView()
-//            }
+            // ✅ 프로필 이미지 (URL이 유효한지 확인 후 로드)
+            if let profileURL = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
+                AsyncImage(url: profileURL) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 100, height: 100)
+                        .clipShape(Circle())
+                } placeholder: {
+                    Circle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 100, height: 100)
+                }
+            } else {
+                // ✅ 기본 프로필 이미지
+                Circle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(width: 100, height: 100)
+            }
 
-            // name
-            // TODO: Birthdayから歳計算必要
+            // ✅ 사용자 이름 및 정보
             Text(user.name)
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text("\(String(describing: user.birthday))歳 \(user.gender)")
+            Text("\(String(describing: user.birthday ?? Date()))歳 \(user.gender)")
                 .font(.subheadline)
                 .foregroundColor(.gray)
 
-            // follower & following
+            // ✅ 팔로워 & 팔로잉 수 표시
             HStack {
                 VStack {
                     Text("フォロワー")
@@ -72,3 +78,4 @@ struct ProfileView: View {
         }
     }
 }
+
