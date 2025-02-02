@@ -28,15 +28,17 @@ struct ProfileView: View {
     private func profileHeader(user: User) -> some View {
         VStack(spacing: 16) {
             // profile image
-            AsyncImage(url: URL(string: user.profilePhoto)) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 100, height: 100)
-                    .clipShape(Circle())
-            } placeholder: {
-                ProgressView()
-            }
+            
+            // TODO
+//            AsyncImage(url: URL(string: user.profilePhoto)) { image in
+//                image
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fill)
+//                    .frame(width: 100, height: 100)
+//                    .clipShape(Circle())
+//            } placeholder: {
+//                ProgressView()
+//            }
 
             // name
             // TODO: Birthdayから歳計算必要

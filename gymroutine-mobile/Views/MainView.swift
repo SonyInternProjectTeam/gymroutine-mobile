@@ -28,7 +28,7 @@ struct MainView: View {
                 }
                 .tag(1)
             
-            ProfileView(viewModel: ProfileViewModel(userManager: UserManager.shared))
+            ProfileView(viewModel: ProfileViewModel())
                 .tabItem {
                     Label("Profile", systemImage: "person.circle")
                 }
