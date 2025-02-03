@@ -11,6 +11,8 @@ import SwiftUI
 // TODO : 仮のカレンダビュー
 
 struct CalendarView: View {
+    
+    @StateObject private var viewModel = CalendarViewModel()
     var body: some View {
         VStack {
             Text("カレンダー")
