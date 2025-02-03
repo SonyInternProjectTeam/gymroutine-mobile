@@ -56,19 +56,21 @@ struct ProfileView: View {
                         .frame(width: 100, height: 100)
                 }
                 
-                // PhotosPicker (프로필 사진 변경)
-                PhotosPicker(
-                    selection: $viewModel.selectedPhotoItem,
-                    matching: .images,
-                    photoLibrary: .shared()
-                ) {
-                    Image(systemName: "plus.circle.fill")
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                        .foregroundColor(.blue)
-                        .background(Color.white)
-                        .clipShape(Circle())
-                        .offset(x: 35, y: 35)
+                // 自分のプロフィールの場合のみ、プロフィール写真変更用のボタンを表示する
+                if viewModel.isCurrentUser {
+                    PhotosPicker(
+                        selection: $viewModel.selectedPhotoItem,
+                        matching: .images,
+                        photoLibrary: .shared()
+                    ) {
+                        Image(systemName: "plus.circle.fill")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(.blue)
+                            .background(Color.white)
+                            .clipShape(Circle())
+                            .offset(x: 35, y: 35)
+                    }
                 }
             }
             
@@ -77,7 +79,7 @@ struct ProfileView: View {
                 .fontWeight(.bold)
             
             if let birthday = user.birthday {
-                // 예시: 생일로 나이 계산 (여기서는 간단하게 연도만 비교)
+                // TODO: 生年月日から年齢を計算（ここでは単純に年数のみ計算）
                 let age = Calendar.current.dateComponents([.year], from: birthday, to: Date()).year ?? 0
                 Text("\(age)歳 \(user.gender)")
                     .font(.subheadline)
@@ -103,11 +105,11 @@ struct ProfileView: View {
             }
             .padding(.horizontal, 32)
             
-            // 내 프로필이면 편집 버튼, 다른 사람의 프로필이면 팔로우 버튼 표시
+            // 自分のプロフィールなら編集ボタン、他人ならフォローボタンを表示する
             if viewModel.isCurrentUser {
                 Button(action: {
-                    // 프로필 편집 화면으로 이동하는 동작 추가
-                    print("프로필 편집 버튼 탭")
+                    // プロフィール編集画面への遷移などを追加
+                    print("プロフィール編集ボタンタップ")
                 }) {
                     Text("プロフィール編集")
                         .font(.headline)
