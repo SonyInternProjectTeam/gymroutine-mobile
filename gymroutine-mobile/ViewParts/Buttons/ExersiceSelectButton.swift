@@ -48,12 +48,3 @@ struct ExersiceSelectButton: View {
     }
 }
 
-
-#Preview {
-    HStack(spacing: 10) {
-        ExersiceSelectButton(exercise: Exercise(name: "ショルダープレス", description: "", img: "", part: "胸"))
-        ExersiceSelectButton(exercise: Exercise(name: "腹筋", description: "", img: "", part: "arm"))
-    }
-    .padding()
-    .background(.gray.opacity(0.03))
-}

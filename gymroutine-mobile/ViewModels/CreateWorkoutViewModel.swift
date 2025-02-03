@@ -10,25 +10,25 @@ import FirebaseAuth
 
 // TODO : ViewとViewModelは１：１関係このViewModel修正要
 
-class WorkoutViewModel: ObservableObject {
+class CreateWorkoutViewModel: ObservableObject {
     @Published var trainOptions: [String] = []
     @Published var exercises: [String] = []
     private var service = WorkoutService()
     private var currentWorkoutID: String?
     
-    func createWorkout() {
-        guard let userID = Auth.auth().currentUser?.uid else {
-            print("User is not logged in")
-            return
-        }
-        
-        service.createWorkoutDocument(userID: userID) { documentID in
-            if let documentID = documentID {
-                self.currentWorkoutID = documentID
-                self.fetchTrainOptions()
-            }
-        }
-    }
+//    func createWorkout() {
+//        guard let userID = Auth.auth().currentUser?.uid else {
+//            print("User is not logged in")
+//            return
+//        }
+//        
+//        service.createWorkoutDocument(userID: userID) { documentID in
+//            if let documentID = documentID {
+//                self.currentWorkoutID = documentID
+//                self.fetchTrainOptions()
+//            }
+//        }
+//    }
     
     func fetchTrainOptions() {
         service.fetchTrainOptions { options in
@@ -73,17 +73,28 @@ class WorkoutViewModel: ObservableObject {
     }
     
     // ワークアウト名と曜日をまとめてFirestoreに保存
-    func createWorkoutWithDetails(name: String, selectedDays: [String: Bool]) {
-        guard let workoutID = currentWorkoutID else { return }
-        
-        let scheduledDays = selectedDays.filter { $0.value } // trueの曜日だけを取得
-        
-        service.addWorkoutDetails(workoutID: workoutID, name: name, scheduledDays: scheduledDays) { success in
-            if success {
-                print("Workout created with name and scheduled days")
+    func createWorkoutWithDetails(name: String, selectedDays: [String: Bool], completion: @escaping (String?) -> Void) {
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("User is not logged in")
+            completion(nil)
+            return
+        }
+
+        let scheduledDays = selectedDays.filter { $0.value }.keys.sorted() // 선택된 요일만 저장
+
+        // 🟢 Firestore에 워크아웃 도큐먼트 생성 (이름과 요일 포함)
+        service.createWorkoutDocument(userID: userID, name: name, scheduledDays: scheduledDays) { documentID in
+            if let documentID = documentID {
+                DispatchQueue.main.async {
+                    print("Workout created successfully with ID: \(documentID)")
+                    self.currentWorkoutID = documentID
+                    completion(documentID) // 생성된 workout ID를 반환
+                }
             } else {
-                print("Failed to save workout details")
+                print("Failed to create workout document")
+                completion(nil)
             }
         }
     }
+
 }

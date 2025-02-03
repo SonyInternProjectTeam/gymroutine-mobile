@@ -19,16 +19,25 @@ struct MainView: View {
                     .tabItem {
                         Label("Home", systemImage: "house")
                     }
-
-                ProfileView()
-                    .tabItem {
-                        Label("Profile", systemImage: "person.circle")
-                    }
-
+                    .tag(0)
+                
                 CalendarView()
                     .tabItem {
                         Label("Calendar", systemImage: "calendar")
                     }
+                    .tag(1)
+                
+                SnsView()
+                    .tabItem {
+                        Label("SNS", systemImage: "magnifyingglass")
+                    }
+                    .tag(2)
+                
+                ProfileView()
+                    .tabItem {
+                        Label("Profile", systemImage: "person.circle")
+                    }
+                    .tag(3)
             }
         }
     }

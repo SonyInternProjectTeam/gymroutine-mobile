@@ -13,12 +13,14 @@ class ExerciseService {
     func fetchAllExercises(for options: [String], completion: @escaping ([Exercise]) -> Void) {
         let db = Firestore.firestore()
         var exercises: [Exercise] = []
-        
+        let group = DispatchGroup() // ✅ 여러 Firestore 요청을 동기적으로 관리
+
         for option in options {
+            group.enter() // ✅ Firestore 요청 시작
             db.collection("Trains").document(option).collection("exercises").getDocuments { snapshot, error in
                 if let error = error {
                     print("Error getting documents: \(error.localizedDescription)")
-                    completion([])
+                    group.leave() // 요청 종료
                     return
                 }
                 snapshot?.documents.forEach { document in
@@ -29,10 +31,16 @@ class ExerciseService {
                         print("Error decoding document: \(error.localizedDescription)")
                     }
                 }
-                completion(exercises)
+                group.leave() // ✅ Firestore 요청 종료
             }
         }
+        
+        // ✅ 모든 Firestore 요청이 끝나면 실행
+        group.notify(queue: .main) {
+            completion(exercises)
+        }
     }
+
     
     func fetchTrainParts(completion: @escaping ([String]) -> Void) {
         let db = Firestore.firestore()
@@ -46,6 +54,4 @@ class ExerciseService {
             completion(options)
         }
     }
-    
-    
 }

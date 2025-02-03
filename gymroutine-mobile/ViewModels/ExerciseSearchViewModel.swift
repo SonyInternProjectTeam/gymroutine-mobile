@@ -2,7 +2,7 @@
 //  ExerciseSearchViewModel.swift
 //  gymroutine-mobile
 //
-//  Created by 堀壮吾 on 2024/12/06.
+//  Created by 조성화 on 2025/01/31.
 //
 
 import Foundation
@@ -20,7 +20,6 @@ class ExerciseSearchViewModel: ObservableObject {
     init() {
         fetchAll()
     }
-    
     func fetchAll() {
         service.fetchTrainParts { options in
             DispatchQueue.main.async {
@@ -80,4 +79,3 @@ class ExerciseSearchViewModel: ObservableObject {
     }
     
 }
-
