@@ -1,3 +1,10 @@
+//
+//  UserService.swift
+//  gymroutine-mobile
+//
+//  Created by 조성화 on 2025/01/02.
+//
+
 import Foundation
 import FirebaseStorage
 import FirebaseFirestore
@@ -8,20 +15,23 @@ class UserService {
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     
+    /// Firestoreから全てのユーザーを取得する
+    /// - Returns: ユーザーの配列またはエラーをResultで返す
     func getAllUsers() async -> Result<[User], Error> {
         do {
             let querySnapshot = try await db.collection("Users").getDocuments()
-            
             let users = try querySnapshot.documents.compactMap { document in
                 try document.data(as: User.self)
             }
-            
             return .success(users)
         } catch {
             return .failure(error)
         }
     }
     
+    /// ユーザー名で検索を行う
+    /// - Parameter name: 検索対象の名前
+    /// - Returns: 名前に部分一致するユーザーの配列またはエラーをResultで返す
     func searchUsersByName(name: String) async -> Result<[User], Error> {
         let result = await getAllUsers()
         switch result {
@@ -33,23 +43,100 @@ class UserService {
         }
     }
     
+    /// プロフィール写真をアップロードし、Firestoreのユーザードキュメントを更新する処理
+    /// - Parameters:
+    ///   - userID: ユーザーID
+    ///   - image: アップロードするUIImage
+    /// - Returns: アップロード成功時はダウンロードURL、失敗時はnilを返す
     func uploadProfilePhoto(userID: String, image: UIImage) async -> String? {
-            let storageRef = storage.reference().child("profile_photos/\(userID).jpg")
-            guard let imageData = image.jpegData(compressionQuality: 0.3) else { return nil }
+        let storageRef = storage.reference().child("profile_photos/\(userID).jpg")
+        guard let imageData = image.jpegData(compressionQuality: 0.3) else { return nil }
+        
+        do {
+            _ = try await storageRef.putDataAsync(imageData, metadata: nil)
+            let downloadURL = try await storageRef.downloadURL()
             
-            do {
-                _ = try await storageRef.putDataAsync(imageData, metadata: nil)
-                let downloadURL = try await storageRef.downloadURL()
-                
-                try await db.collection("Users").document(userID).updateData([
-                    "profilePhoto": downloadURL.absoluteString
-                ])
-                
-                print("✅ Successfully updated profile photo!")
-                return downloadURL.absoluteString
-            } catch {
-                print("🔥 Error uploading profile photo: \(error.localizedDescription)")
-                return nil
-            }
+            try await db.collection("Users").document(userID).updateData([
+                "profilePhoto": downloadURL.absoluteString
+            ])
+            
+            print("✅ プロフィール写真の更新に成功しました！")
+            return downloadURL.absoluteString
+        } catch {
+            print("🔥 プロフィール写真のアップロード中にエラーが発生しました: \(error.localizedDescription)")
+            return nil
         }
+    }
+    
+    // MARK: - フォロー関連のFirebase通信処理
+    
+    /// フォロー状態を確認する
+    /// - Parameters:
+    ///   - currentUserID: 現在ログイン中のユーザーID
+    ///   - profileUserID: 対象プロフィールのユーザーID
+    /// - Returns: フォローしている場合 true、していない場合 false
+    func checkFollowingStatus(currentUserID: String, profileUserID: String) async -> Bool {
+        let doc = try? await db.collection("Users")
+            .document(currentUserID)
+            .collection("Following")
+            .document(profileUserID)
+            .getDocument()
+        return doc?.exists ?? false
+    }
+    
+    /// 指定されたユーザーをフォローする
+    /// - Parameters:
+    ///   - currentUserID: 現在ログイン中のユーザーID
+    ///   - profileUserID: フォロー対象のユーザーID
+    /// - Returns: 処理成功時は true、失敗時は false
+    func followUser(currentUserID: String, profileUserID: String) async -> Bool {
+        do {
+            // 現在のユーザーの Following コレクションに対象ユーザーを追加
+            try await db.collection("Users")
+                .document(currentUserID)
+                .collection("Following")
+                .document(profileUserID)
+                .setData(["followedAt": FieldValue.serverTimestamp()])
+            
+            // 対象ユーザーの Followers コレクションに現在のユーザーを追加
+            try await db.collection("Users")
+                .document(profileUserID)
+                .collection("Followers")
+                .document(currentUserID)
+                .setData(["followedAt": FieldValue.serverTimestamp()])
+            
+            return true
+        } catch {
+            print("🔥 フォロー処理中にエラーが発生しました: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
+    /// 指定されたユーザーのフォローを解除する
+    /// - Parameters:
+    ///   - currentUserID: 現在ログイン中のユーザーID
+    ///   - profileUserID: フォロー解除対象のユーザーID
+    /// - Returns: 処理成功時は true、失敗時は false
+    func unfollowUser(currentUserID: String, profileUserID: String) async -> Bool {
+        do {
+            // 現在のユーザーの Following コレクションから対象ユーザーを削除
+            try await db.collection("Users")
+                .document(currentUserID)
+                .collection("Following")
+                .document(profileUserID)
+                .delete()
+            
+            // 対象ユーザーの Followers コレクションから現在のユーザーを削除
+            try await db.collection("Users")
+                .document(profileUserID)
+                .collection("Followers")
+                .document(currentUserID)
+                .delete()
+            
+            return true
+        } catch {
+            print("🔥 フォロー解除処理中にエラーが発生しました: \(error.localizedDescription)")
+            return false
+        }
+    }
 }
