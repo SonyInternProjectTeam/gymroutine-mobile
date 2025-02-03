@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct SearchUserView: View {
-
     @StateObject private var viewModel = SearchUserViewModel()
 
     var body: some View {
@@ -34,8 +33,10 @@ struct SearchUserView: View {
                         .foregroundColor(.gray)
                         .padding()
                 } else {
-                    List(viewModel.userDetails, id: \.name) { user in
-                        userProfileView(for: user)
+                    List(viewModel.userDetails, id: \.uid) { user in
+                        NavigationLink(destination: ProfileView(viewModel: ProfileViewModel(user: user))) {
+                            userProfileView(for: user)
+                        }
                     }
                 }
             }
@@ -43,10 +44,14 @@ struct SearchUserView: View {
         }
     }
 
-    private func userProfileView(for user: (name: String, profilePhoto: String)) -> some View {
+    /// ユーザーのプロフィール情報を表示するビュー
+    ///  Refactorしないと
+    /// - Parameter user: 表示対象の User オブジェクト
+    /// - Returns: ユーザー情報を表示する View
+    private func userProfileView(for user: User) -> some View {
         HStack {
-            if !user.profilePhoto.isEmpty {
-                AsyncImage(url: URL(string: user.profilePhoto)) { image in
+            if !user.profilePhoto.isEmpty, let url = URL(string: user.profilePhoto) {
+                AsyncImage(url: url) { image in
                     image.resizable().scaledToFit()
                 } placeholder: {
                     ProgressView()
