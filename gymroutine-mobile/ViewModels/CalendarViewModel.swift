@@ -7,7 +7,55 @@
 //
 
 import Foundation
+import SwiftUI
 
 final class CalendarViewModel: ObservableObject {
     
+    @Published var months: [Date] = []  //月ごとのDate情報
+    @Published var selectedDate: Date = Date()  //選択されている日にち
+    @Published var selectedMonth: Date? //Viewに表示されている月
+    
+    private let calendar: Calendar = .current
+    
+    init() {
+        self.months = (-2...2).compactMap { calendar.date(byAdding: .month, value: $0, to: selectedDate) }
+        self.selectedMonth = selectedDate
+    }
+    
+    //カレンダーがスクロールすると呼び出される
+    func onChangeMonth(_ month: Date?) {
+        guard let month = month else { return }
+        
+        print("[DEBUG] ここで「\(month.formatted(.dateTime.year().month()))」のDB取得ロジックを呼び出し")
+        checkAndLoadMoreMonths(for: month)
+    }
+    
+    // スクロール時に前後2ヶ月が確保されるように管理
+    func checkAndLoadMoreMonths(for monthDate: Date) {
+        if let firstIndex = months.firstIndex(of: monthDate),
+           firstIndex == 1 { // 先頭から2番目が表示されたら先月を追加
+            loadPreviousMonth()
+        }
+        
+        if let lastIndex = months.firstIndex(of: monthDate),
+           lastIndex == months.count - 2 { // 末尾から2番目が表示されたら翌月を追加
+            loadNextMonth()
+        }
+    }
+    
+    // months配列に先月を追加
+    func loadPreviousMonth() {
+        if let firstMonth = months.first,
+           let prevMonth = calendar.date(byAdding: .month, value: -1, to: firstMonth) {
+            months.insert(prevMonth, at: 0)
+        }
+    }
+
+    // months配列に来月を追加
+    func loadNextMonth() {
+        if let lastMonth = months.last,
+           let nextMonth = calendar.date(byAdding: .month, value: 1, to: lastMonth) {
+            months.append(nextMonth)
+        }
+    }
 }
