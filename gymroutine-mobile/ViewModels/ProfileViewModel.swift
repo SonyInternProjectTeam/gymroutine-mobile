@@ -28,7 +28,7 @@ final class ProfileViewModel: ObservableObject {
             loadFollowerAndFollowingCounts(userId: user.uid)
             // 自分のプロフィールでない場合、フォロー状態を確認
             if !isCurrentUser {
-                checkFollowingStatus()
+                updateFollowingStatus()
             }
         } else {
             loadUserData()
@@ -82,7 +82,7 @@ final class ProfileViewModel: ObservableObject {
     // MARK: - フォロー関連の機能（UserService 経由）
     
     /// 現在ログイン中のユーザーがこのプロフィールを既にフォローしているか確認する
-    func checkFollowingStatus() {
+    func updateFollowingStatus() {
         Task {
             guard let currentUserID = userManager.currentUser?.uid,
                   let profileUserID = user?.uid,
