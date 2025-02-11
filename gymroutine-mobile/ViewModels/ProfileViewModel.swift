@@ -125,4 +125,14 @@ final class ProfileViewModel: ObservableObject {
             }
         }
     }
+    
+    func handleSelectedPhotoItemChange(_ newItem: PhotosPickerItem?) {
+        Task {
+            if let newItem = newItem,
+               let data = try? await newItem.loadTransferable(type: Data.self),
+               let image = UIImage(data: data) {
+                self.uploadProfilePhoto(image)
+            }
+        }
+    }
 }

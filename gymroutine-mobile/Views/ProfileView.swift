@@ -25,13 +25,7 @@ struct ProfileView: View {
         }
         .navigationTitle("プロフィール")
         .onChange(of: viewModel.selectedPhotoItem) { newItem in
-            Task {
-                if let newItem = newItem,
-                   let data = try? await newItem.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    viewModel.uploadProfilePhoto(image)
-                }
-            }
+            viewModel.handleSelectedPhotoItemChange(newItem)
         }
     }
     
