@@ -14,8 +14,13 @@ class ExerciseSearchViewModel: ObservableObject {
     @Published var filterExercises: [Exercise] = []
     @Published var searchWord: String = ""
     @Published var selectedExerciseParts: [ExercisePart] = []
+    @Published var selectedExercisePart: ExercisePart? = nil
     private var service = ExerciseService()
-    
+    private let workoutService = WorkoutService()
+
+    init() {
+        fetchAll()
+    }
     func fetchAll() {
         service.fetchTrainParts { options in
             DispatchQueue.main.async {
@@ -49,14 +54,13 @@ class ExerciseSearchViewModel: ObservableObject {
     
     func searchExercisePart() {
         var filteredExercises: [Exercise] = []
-        allExercises.forEach { exercise in
-            selectedExerciseParts.forEach{ name in
-                if exercise.part.contains(name.rawValue) {
+        if selectedExercisePart == nil {
+            filteredExercises = allExercises
+        } else {
+            allExercises.forEach { exercise in
+                if exercise.part.contains(selectedExercisePart!.rawValue) {
                     filteredExercises.append(exercise)
                 }
-            }
-            if selectedExerciseParts.isEmpty {
-                filteredExercises = allExercises
             }
         }
         filterExercises = filteredExercises
@@ -74,5 +78,27 @@ class ExerciseSearchViewModel: ObservableObject {
         toggleExercisePart(part: part)
         searchExercisePart()
     }
-    
+
+    func onTapExercisePlusButton(workoutID: String, exercise: Exercise) {
+        addExerciseToWorkout(
+            workoutID: workoutID,
+            exerciseName: exercise.name,
+            part: exercise.part
+        ) { success in
+            // TODO: 画面遷移
+            if success {
+                print("운동 추가 성공 ✅")
+            } else {
+                print("운동 추가 실패 ❌")
+            }
+        }
+    }
+
+    func addExerciseToWorkout(workoutID: String, exerciseName: String, part: String, completion: @escaping (Bool) -> Void) {
+        workoutService.addExerciseToWorkout(workoutID: workoutID, exerciseName: exerciseName, part: part) { success in
+            DispatchQueue.main.async {
+                completion(success) // UI 업데이트를 위해 메인 스레드에서 실행
+            }
+        }
+    }
 }

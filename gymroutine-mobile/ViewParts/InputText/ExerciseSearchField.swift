@@ -10,8 +10,7 @@ import SwiftUI
 struct ExerciseSearchField: View {
     
     @Binding var text: String
-    var onSubmit: () -> Void = { }
-    
+
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -19,9 +18,6 @@ struct ExerciseSearchField: View {
             TextField("エクササイズを検索", text: $text)
         }
         .fieldBackground()
-        .onSubmit {
-            onSubmit()
-        }
     }
 }
 

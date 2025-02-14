@@ -9,26 +9,29 @@ import SwiftUI
 
 struct ExercisePartToggle: View {
 
-    var flag = false
-    let exercisePart: ExercisePart
+    let partName: String
+
+    init(exercisePart: ExercisePart?) {
+        if let exercisePart = exercisePart {
+            partName = exercisePart.rawValue
+        } else {
+            partName = "ALL"
+        }
+    }
 
     var body: some View {
-        Text (exercisePart.rawValue)
+        Text(partName)
             .padding(.vertical, 8)
-            .hAlign(.center)
             .foregroundStyle(Color.black)
+            .hAlign(.center)
             .background (
                 Capsule()
-                    .fill(flag ? Color.blue.opacity(0.1): Color.white)
-                    .strokeBorder(flag ? Color.blue: Color.gray, lineWidth: flag ? 3: 1)
+                    .fill(Color.white)
+                    .strokeBorder(Color.gray)
             )
     }
 }
 
 #Preview {
-    HStack {
-        ExercisePartToggle(exercisePart: .arm)
-        ExercisePartToggle(flag: true, exercisePart: .arm)
-        ExercisePartToggle(flag: true, exercisePart: .arm)
-    }
+    ExercisePartToggle(exercisePart: .arm)
 }
