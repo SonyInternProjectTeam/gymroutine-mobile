@@ -10,6 +10,7 @@ import SwiftUI
 struct ExersiceSelectButton: View {
 
     let exercise: Exercise
+    var onTapPlusButton: () -> Void
 
     var body: some View {
         VStack(alignment: .center, spacing: 4) {
@@ -28,9 +29,13 @@ struct ExersiceSelectButton: View {
 
                     Spacer()
 
-                    Image(systemName: "plus")
-                        .font(.headline)
-                        .foregroundStyle(.main)
+                    Button {
+                        onTapPlusButton()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.headline)
+                            .foregroundStyle(.main)
+                    }
                 }
 
                 Text(exercise.name)
