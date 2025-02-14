@@ -18,7 +18,7 @@ struct ExerciseSearchView: View {
     ]
     
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
                 ExerciseSearchField(text:$viewModel.searchWord)
                     .onSubmit {
@@ -28,8 +28,8 @@ struct ExerciseSearchView: View {
                 CategoryView
                 ExerciseGridView
             }
+            .padding([.top, .horizontal], 24)
         }
-        .padding([.top, .horizontal], 24)
         .background(.gray.opacity(0.03))
     }
     
