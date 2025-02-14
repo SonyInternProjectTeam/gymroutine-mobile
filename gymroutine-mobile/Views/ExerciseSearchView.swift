@@ -34,18 +34,20 @@ struct ExerciseSearchView: View {
     }
     
     private var CategoryView: some View {
-        HStack(spacing: 150) {
+        HStack {
             Text("カテゴリ")
                 .font(.title2)
                 .fontWeight(.bold)
+                .hAlign(.leading)
+
             Button {
                 categorySheet = true
             } label: {
                 ExercisePartToggle(exercisePart: viewModel.selectedExercisePart)
             }
-            .sheet(isPresented: $categorySheet) {
-                ExerciseListView
-            }
+        }
+        .sheet(isPresented: $categorySheet) {
+            ExerciseListView
         }
     }
     
