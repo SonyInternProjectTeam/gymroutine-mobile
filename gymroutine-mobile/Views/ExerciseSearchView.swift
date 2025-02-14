@@ -9,15 +9,10 @@ import SwiftUI
 
 struct ExerciseSearchView: View {
     @ObservedObject var viewModel = ExerciseSearchViewModel()
-    @State var CategorySheet:Bool = false
+    @State var categorySheet:Bool = false
     let workoutID: String // ✅ Workout ID
-    private let Categorycolumns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible())
-    ]
     
-    private let Excercisecolumns = [
+    private let exerciseColumns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible())
     ]
@@ -44,11 +39,11 @@ struct ExerciseSearchView: View {
                 .font(.title2)
                 .fontWeight(.bold)
             Button {
-                CategorySheet = true
+                categorySheet = true
             } label: {
                 ExercisePartToggle(exercisePart: viewModel.selectedExercisePart)
             }
-            .sheet(isPresented: $CategorySheet) {
+            .sheet(isPresented: $categorySheet) {
                 ExerciseListView
             }
         }
@@ -60,7 +55,7 @@ struct ExerciseSearchView: View {
                 .font(.title2)
                 .fontWeight(.bold)
             
-            LazyVGrid(columns: Excercisecolumns, spacing: 12) {
+            LazyVGrid(columns: exerciseColumns, spacing: 12) {
                 ForEach(viewModel.filterExercises, id: \.self) { exercise in
                     NavigationLink(
                         destination: ExerciseDetailView(exercise: exercise, workoutID: workoutID) // ✅ workoutID
@@ -80,7 +75,7 @@ struct ExerciseSearchView: View {
             Button {
                 viewModel.selectedExercisePart = nil
                 viewModel.searchExercisePart()
-                CategorySheet = false
+                categorySheet = false
             } label: {
                 HStack{
                     Text("ALL")
@@ -95,7 +90,7 @@ struct ExerciseSearchView: View {
                 Button {
                     viewModel.selectedExercisePart = Part
                     viewModel.searchExercisePart()
-                    CategorySheet = false
+                    categorySheet = false
                 } label: {
                     HStack{
                         Text(Part.rawValue)
