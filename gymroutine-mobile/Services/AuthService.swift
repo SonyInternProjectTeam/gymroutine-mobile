@@ -69,9 +69,15 @@ class AuthService {
                 "profilePhoto": user.profilePhoto,
                 "visibility": user.visibility,
                 "isActive": user.isActive,
+                "birthday": user.birthday,
+                "gender": user.gender,
                 "createdAt": Timestamp(date: user.createdAt)
             ]
             try await documentRef.setData(userData, merge: true)
+            
+            // Initialize UserManager after saving
+            try await UserManager.shared.initializeUser()
+            
             return .success(())
         } catch {
             return .failure((NSError(domain: "SaveUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User saved failed"])))
