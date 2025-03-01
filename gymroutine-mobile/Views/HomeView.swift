@@ -6,25 +6,22 @@
 //
 //
 
+
 import SwiftUI
 
 struct HomeView: View {
-    @ObservedObject var viewModel: MainViewModel
+    @ObservedObject var viewModel: HomeViewModel
     @EnvironmentObject var userManager: UserManager
     
     @State private var isShowTodayworkouts = true
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            
             header
             
             VStack(spacing: 24) {
-                
                 calendarBox
-                
                 todaysWorkoutsBox
-                
                 userInfoBox
             }
             .padding()
@@ -44,24 +41,72 @@ struct HomeView: View {
         VStack(spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    //仮表示
-                    ForEach(0..<20) {_ in
-                        Circle()
-                            .fill(.main)
-                            .frame(width: 80, height: 80)
+                    // 맨 왼쪽에 현재 사용자의 프로필 사진을 고정적으로 표시
+                    if let currentUser = userManager.currentUser {
+                        VStack(spacing: 4) {
+                            if let url = URL(string: currentUser.profilePhoto), !currentUser.profilePhoto.isEmpty {
+                                AsyncImage(url: url) { image in
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 80, height: 80)
+                                        .clipShape(Circle())
+                                } placeholder: {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.3))
+                                        .frame(width: 80, height: 80)
+                                }
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 80, height: 80)
+                            }
+                            // 내 프로필명을 표시 (필요에 따라 "Me" 대신 현재 사용자 이름을 표시해도 됨)
+                            Text(currentUser.name)
+                                .font(.caption)
+                                .lineLimit(1)
+                                .frame(width: 80)
+                        }
+                    }
+                    // 팔로우한 사용자들의 프로필 이미지와 이름을 표시
+                    ForEach(viewModel.followingUsers, id: \.uid) { user in
+                        VStack(spacing: 4) {
+                            if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
+                                AsyncImage(url: url) { image in
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 80, height: 80)
+                                        .clipShape(Circle())
+                                } placeholder: {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.3))
+                                        .frame(width: 80, height: 80)
+                                }
+                            } else {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 80, height: 80)
+                            }
+                            Text(user.name)
+                                .font(.caption)
+                                .lineLimit(1)
+                                .frame(width: 80)
+                        }
                     }
                 }
             }
             .contentMargins(.horizontal, 16)
             
-            Label("現在2人が筋トレしています！", systemImage: "flame")
+            Label("現在\(viewModel.followingUsers.count)人が筋トレしています！", systemImage: "flame")
                 .fontWeight(.semibold)
                 .padding(.horizontal)
                 .padding(.vertical, 8)
                 .hAlign(.leading)
-                .background(.red.opacity(0.3))
+                .background(Color.red.opacity(0.3))
         }
     }
+    
     
     private var calendarBox: some View {
         VStack {
@@ -93,8 +138,8 @@ struct HomeView: View {
             .foregroundStyle(.primary)
             
             if isShowTodayworkouts {
-                //仮表示
-                ForEach(0..<2) {_ in
+                // 仮表示
+                ForEach(0..<2) { _ in
                     WorkoutCell()
                 }
             }
@@ -108,7 +153,7 @@ struct HomeView: View {
                     .font(.title2.bold())
                     .hAlign(.leading)
                 
-                //仮情報
+                // 仮情報
                 HStack {
                     VStack(spacing: 16) {
                         Text("累計トレーニング日数")
@@ -159,14 +204,14 @@ struct HomeView: View {
     private var buttonBox: some View {
         HStack {
             Button {
-                
+                // ルーティーン追加処理
             } label: {
                 Label("ルーティーン追加", systemImage: "plus")
             }
             .buttonStyle(SecondaryButtonStyle())
             
             Button {
-                
+                // 今すぐ始める処理
             } label: {
                 Label("今すぐ始める", systemImage: "play")
             }
@@ -175,7 +220,3 @@ struct HomeView: View {
     }
 }
 
-#Preview {
-    HomeView(viewModel: MainViewModel(router: Router()))
-        .environmentObject(UserManager.shared)
-}

@@ -10,12 +10,13 @@ import SwiftUI
 
 struct MainView: View {
     @ObservedObject var viewModel: MainViewModel
+    @ObservedObject var HomeViewModel: HomeViewModel
     @EnvironmentObject var userManager: UserManager
     @State private var selectedTab: Int = 0 // 현재 선택된 탭
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView(viewModel: viewModel)
+            HomeView(viewModel: HomeViewModel)
                 .tabItem {
                     Label("Home", systemImage: "house")
                 }
