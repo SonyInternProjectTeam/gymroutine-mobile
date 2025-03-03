@@ -1,12 +1,76 @@
 import SwiftUI
 
 struct SearchUserView: View {
+    
     @StateObject private var viewModel = SearchUserViewModel()
     @FocusState private var isFocused: Bool
     @State private var showCancelButton: Bool = false
     
     private let Usercolumns: [GridItem] = [
         GridItem(.flexible())
+    ]
+    
+    let testUsers: [User] = [
+        User(uid: "5CKiKZmOzlhkEECu4VBDZGltkrn2",
+             email: "wkk03240324@gmail.com",
+             name: "Kakeru Koizumi",
+             profilePhoto: "",
+             visibility: 2,
+             isActive: false,
+             birthday: Date(timeIntervalSince1970: 1017570720), // 2002-03-31 14:32:00 +0000
+             gender: "男",
+             createdAt: Date(timeIntervalSince1970: 1735656838) // 2024-12-31 14:33:58 +0000
+        ),
+        User(uid: "7KSQ7Wlqr9OFa9j1CXdtBqbGkLU2",
+             email: "kazusukechin@gmail.com",
+             name: "Kazu",
+             profilePhoto: "",
+             visibility: 2,
+             isActive: false,
+             birthday: Date(timeIntervalSince1970: 1704182340), // 2024-01-02 05:59:00 +0000
+             gender: "",
+             createdAt: Date(timeIntervalSince1970: 1703839169) // 2024-12-29 05:59:29 +0000
+        ),
+        User(uid: "AIvdESvweDaVwEednWjk6oekzJQ2",
+             email: "test4@test.com",
+             name: "Test4",
+             profilePhoto: "https://firebasestorage.googleapis.com:443/v0/b/gymroutine-b7b6c.appspot.com/o/profile_photos%2FAIvdESvweDaVwEednWjk6oekzJQ2.jpg?alt=media&token=c750172f-c5a5-4f4f-ba05-f18c04278158",
+             visibility: 2,
+             isActive: false,
+             birthday: Date(timeIntervalSince1970: 1733775060), // 2024-12-06 06:51:00 +0000
+             gender: "男性",
+             createdAt: Date(timeIntervalSince1970: 1733071896) // 2024-12-27 06:51:36 +0000
+        ),
+        User(uid: "AhGAfsGPU8cwvsONT2duSFcQGdJ2",
+             email: "yukiyuki1918@icloud.com",
+             name: "ああ",
+             profilePhoto: "https://firebasestorage.googleapis.com:443/v0/b/gymroutine-b7b6c.appspot.com/o/profile_photos%2FAhGAfsGPU8cwvsONT2duSFcQGdJ2.jpg?alt=media&token=866beab3-b914-4a0c-9128-1fa1cf8c0bc8",
+             visibility: 2,
+             isActive: false,
+             birthday: Date(timeIntervalSince1970: 1736512800), // 2025-01-10 12:40:00 +0000
+             gender: "男",
+             createdAt: Date(timeIntervalSince1970: 1737999671) // 2025-01-27 12:41:11 +0000
+        ),
+        User(uid: "FR1jA9UUqKdvV7SUQTZSH0c9Z9G2",
+             email: "test001@gmail.com",
+             name: "テスト1まさと",
+             profilePhoto: "",
+             visibility: 2,
+             isActive: false,
+             birthday: Date(timeIntervalSince1970: 1069868400), // 2003-11-26 15:00:00 +0000
+             gender: "男性",
+             createdAt: Date(timeIntervalSince1970: 1738125403) // 2025-01-29 03:36:43 +0000
+        ),
+        User(uid: "zLU7yST5FMatk7uI3zdDD0Ik1qk1",
+             email: "sattsat763@icloud.com",
+             name: "テストまさと",
+             profilePhoto: "",
+             visibility: 2,
+             isActive: false,
+             birthday: Date(timeIntervalSince1970: 1069949580), // 2003-11-27 09:53:00 +0000
+             gender: "男性",
+             createdAt: Date(timeIntervalSince1970: 1736390040) // 2025-01-08 09:54:00 +0000
+        )
     ]
     
     var body: some View {
@@ -22,22 +86,22 @@ struct SearchUserView: View {
                 .onChange(of: isFocused) {
                     withAnimation{
                         showCancelButton = isFocused
-                        viewModel.searchName = ""
-                        viewModel.fetchUsers()
                     }
+                    viewModel.searchName = ""
+                    viewModel.userDetails = []
                 }
                 if showCancelButton {
                     Button("キャンセル") {
-                        withAnimation{
+                        withAnimation {
                             isFocused = false
                             showCancelButton = false
-                            
                         }
                     }
                 }
             }
+            .padding(.horizontal,16)
+            
             if (isFocused) {
-                // 結果表示
                 if let errorMessage = viewModel.errorMessage {
                     Text("Error: \(errorMessage)")
                         .foregroundColor(.red)
@@ -47,135 +111,39 @@ struct SearchUserView: View {
                         .foregroundColor(.gray)
                         .padding()
                 } else {
-                    List(viewModel.userDetails, id: \.uid) { user in
-                        NavigationLink(destination: ProfileView(viewModel: ProfileViewModel(user: user))) {
-                            userProfileView(for: user)
+                    ScrollView(.vertical) {
+                        ForEach(viewModel.userDetails, id: \.name) { user in
+                            UserListView(user:user)
                         }
                     }
+                    .padding(.horizontal)
                 }
             } else {
-                //                RecommendUserView
+                RecommendUserView
             }
         }
-        .padding([.top, .horizontal], 24)
-        .background(.gray.opacity(0.03))
-        Spacer()
+        .padding([.top], 24)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .background(.primary.opacity(0.1))
     }
     
-
-    
-    /// ユーザーのプロフィール情報を表示するビュー
-    ///  Refactorしないと
-    /// - Parameter user: 表示対象の User オブジェクト
-    /// - Returns: ユーザー情報を表示する View
-    private func userProfileView(for user: User) -> some View {
-        HStack {
-            if !user.profilePhoto.isEmpty, let url = URL(string: user.profilePhoto) {
-                AsyncImage(url: url) { image in
-                    image.resizable().scaledToFit()
-                } placeholder: {
-                    ProgressView()
-                }
-                .frame(width: 50, height: 50)
-                .clipShape(Circle())
-            } else {
-                Image(systemName: "person.circle")
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .foregroundColor(.gray)
+    private var RecommendUserView: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack{
+                Image(systemName: "person.2")
+                Text("おすすめ")
+                    .font(.title2)
+                    .fontWeight(.bold)
             }
-            Text(user.name)
-                .font(.headline)
-        }
-    }
-    
-    //    private func userProfileView(for user: (name: String, age: String, gender: String, profilePhoto: String)) -> some View {
-    //        VStack {
-    //            HStack {
-    //                if !user.profilePhoto.isEmpty {
-    //                    AsyncImage(url: URL(string: user.profilePhoto)) { image in
-    //                        image.resizable().scaledToFit()
-    //                    } placeholder: {
-    //                        ProgressView()
-    //                    }
-    //                    .frame(width: 56, height: 56)
-    //                    .clipShape(Circle())
-    //                } else {
-    //                    Image(systemName: "person.circle")
-    //                        .resizable()
-    //                        .frame(width: 56, height: 56)
-    //                        .foregroundColor(.gray)
-    //                }
-    //                VStack{
-    //                    Text(String(user.age) + "歳" + " " + String(user.gender))
-    //                        .font(.caption)
-    //                        .fontWeight(.thin)
-    //                    Text(user.name)
-    //                        .font(.subheadline)
-    //                        .fontWeight(.bold)
-    //                }
-    //                .frame(width: 74, height: 56)
-    //            }
-    //
-    //
-    //            Button(action: {
-    //                //                フォロー処理
-    //            }) {
-    //                Text("フォロー")
-    //                    .foregroundStyle(Color.black)
-    //                    .font(.caption)
-    //                    .fontWeight(.semibold)
-    //
-    //            }
-    //            .buttonStyle(PrimaryButtonStyle())
-    //            .frame(width: 140, height: 28)
-    //        }
-    //        .frame(width: 156, height: 116)
-    //        .border(Color.blue, width: 3)
-    //    }
-    
-    
-    //    private func userListView(for user: (name: String, age: String, gender: String, profilePhoto: String)) -> some View {
-    //>>>>>>> aa8eecb (UI作成)
-    //        HStack {
-    //            if !user.profilePhoto.isEmpty, let url = URL(string: user.profilePhoto) {
-    //                AsyncImage(url: url) { image in
-    //                    image.resizable().scaledToFit()
-    //                } placeholder: {
-    //                    ProgressView()
-    //                }
-    //                .frame(width: 56, height: 56)
-    //                .clipShape(Circle())
-    //            } else {
-    //                Image(systemName: "person.circle")
-    //                    .resizable()
-    //                    .frame(width: 56, height: 56)
-    //                    .foregroundColor(.gray)
-    //            }
-    //            VStack {
-    //                Text(user.name)
-    //                    .font(.subheadline)
-    //                    .fontWeight(.bold)
-    //                Text(String(user.age) + "歳" + " " + String(user.gender))
-    //                    .font(.caption)
-    //                    .fontWeight(.thin)
-    //            }
-    //        }
-    //    }
-    
-    
-    struct UserSearchField: View {
-        @Binding var text: String
-        var onSubmit: () -> Void = { }
-        var body: some View {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                TextField("ユーザーを検索", text: $text)
-                    .onChange(of: text) {
+            .padding(.leading,16)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(testUsers, id: \.name) { user in
+                        UserProfileView(user: user)
                     }
+                }
             }
-            .fieldBackground()
+            .contentMargins(.leading,16)
         }
     }
 }

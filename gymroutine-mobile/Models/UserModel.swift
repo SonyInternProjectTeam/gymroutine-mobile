@@ -17,4 +17,12 @@ struct User: Decodable {
     var birthday: Date? = nil // birthday
     var gender: String = "" // gender
     var createdAt: Date = Date()
+    
+    /// 年齢を計算する
+    var age: Int {
+        guard let birthday = birthday else { return 0 }
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: birthday, to: Date())
+        return ageComponents.year ?? 0
+    }
 }
