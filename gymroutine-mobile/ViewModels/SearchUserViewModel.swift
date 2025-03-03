@@ -3,7 +3,6 @@ import Foundation
 @MainActor
 final class SearchUserViewModel: ObservableObject {
     @Published var userDetails: [User] = []       // User 型の配列に変更
-    @Published var Test: [User] = []
     @Published var searchName: String = ""
     @Published var errorMessage: String? = nil
     
