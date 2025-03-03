@@ -10,7 +10,8 @@ import PhotosUI
 
 struct ProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
-    
+    @Namespace var namespace
+
     var body: some View {
         Group {
             if let user = viewModel.user {
@@ -29,7 +30,11 @@ struct ProfileView: View {
 
     private func profileContentView(user: User) -> some View {
         ScrollView {
-            profileHeader(user: user)
+            VStack(spacing: 24) {
+                profileHeader(user: user)
+
+                profileTabBar()
+            }
         }
         .ignoresSafeArea(edges: [.top])
 
@@ -58,6 +63,37 @@ struct ProfileView: View {
             }
             .padding(.horizontal, 16)
         }
+    }
+
+    private func profileTabBar() -> some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                ForEach(ProfileViewModel.ProfileTab.allCases, id: \.self) { tab in
+                    Button {
+                        viewModel.selectedTab = tab
+                    } label: {
+                        ZStack(alignment: .bottom) {
+                            Text(tab.toString())
+                                .accentColor(viewModel.selectedTab == tab ? .primary : .secondary)
+                                .fontWeight(.semibold)
+                                .padding(.vertical, 12)
+                                .hAlign(.center)
+
+                            if viewModel.selectedTab == tab {
+                                Color.main
+                                    .frame(width: 100, height: 2)
+                                    .matchedGeometryEffect(id: "line",
+                                                           in: namespace,
+                                                           properties: .frame)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+        .padding(.horizontal, 16)
+        .animation(.spring(), value: viewModel.selectedTab)
     }
 }
 
