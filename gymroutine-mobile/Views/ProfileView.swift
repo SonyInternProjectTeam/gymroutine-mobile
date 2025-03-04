@@ -34,10 +34,12 @@ struct ProfileView: View {
                 profileHeader(user: user)
 
                 profileTabBar()
+
+                profileDetailView()
             }
         }
         .ignoresSafeArea(edges: [.top])
-
+        .background(.mainBackground)
     }
 
     private func profileHeader(user: User) -> some View {
@@ -51,8 +53,8 @@ struct ProfileView: View {
             .padding(.horizontal, 8)
             .frame(height: 280, alignment: .bottom)
             .background(LinearGradient(gradient: Gradient(stops: [.init(color: .gray, location: 0.0),
-                                                                  .init(color: .white, location: 0.75),
-                                                                  .init(color: .white, location: 1.0)]),
+                                                                  .init(color: .mainBackground, location: 0.75),
+                                                                  .init(color: .mainBackground, location: 1.0)]),
                                        startPoint: .top,
                                        endPoint: .bottom))
 
@@ -94,6 +96,39 @@ struct ProfileView: View {
         }
         .padding(.horizontal, 16)
         .animation(.spring(), value: viewModel.selectedTab)
+    }
+
+    private func profileDetailView() -> some View {
+        Group {
+            switch viewModel.selectedTab {
+            case .analysis:
+                Text("分析")
+            case .posts:
+                LazyVStack {
+                    // TODO: Firebaseからデータを取得する
+                    ForEach(0..<10) { item in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("6 種目")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(.secondary)
+                                Text("一軍ワークアウト")
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 16)
+                        .hAlign(.leading)
+                        .background(.white, in: RoundedRectangle(cornerRadius: 8))
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
     }
 }
 
