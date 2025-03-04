@@ -75,11 +75,16 @@ struct ProfileView: View {
                         viewModel.selectedTab = tab
                     } label: {
                         ZStack(alignment: .bottom) {
-                            Text(tab.toString())
-                                .accentColor(viewModel.selectedTab == tab ? .primary : .secondary)
-                                .fontWeight(.semibold)
-                                .padding(.vertical, 12)
-                                .hAlign(.center)
+                            HStack(spacing: 8) {
+                                Image(systemName: tab.imageName())
+                                    .accentColor(viewModel.selectedTab == tab ? .primary : .secondary)
+
+                                Text(tab.toString())
+                                    .accentColor(viewModel.selectedTab == tab ? .primary : .secondary)
+                                    .fontWeight(.semibold)
+                            }
+                            .padding(.vertical, 12)
+                            .hAlign(.center)
 
                             if viewModel.selectedTab == tab {
                                 Color.main

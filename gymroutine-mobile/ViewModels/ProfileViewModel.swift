@@ -30,14 +30,14 @@ final class ProfileViewModel: ObservableObject {
         }
 
         // TODO: 画像追加
-//        func imageName() -> String {
-//            switch self {
-//            case .analysis:
-//                return "analysis"
-//            case .posts:
-//                return "post"
-//            }
-//        }
+        func imageName() -> String {
+            switch self {
+            case .analysis:
+                return "chart.bar.xaxis"
+            case .posts:
+                return "doc.plaintext"
+            }
+        }
     }
     /// プロフィールビューモデル生成時に表示するユーザーを渡すことができます。
     /// ユーザーが渡されない場合は、現在ログインしているユーザーの情報を使用します。
