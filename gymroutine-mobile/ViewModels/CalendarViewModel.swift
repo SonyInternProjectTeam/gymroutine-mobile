@@ -25,17 +25,52 @@ struct TestWorkout: Decodable {
         case scheduledDays = "ScheduledDays"
     }
 }
+
+@MainActor
 final class CalendarViewModel: ObservableObject {
     
     @Published var months: [Date] = []  //月ごとのDate情報
     @Published var selectedDate: Date = Date()  //選択されている日にち
     @Published var selectedMonth: Date? //Viewに表示されている月
+    @Published var workoutsByWeekday: [String: [TestWorkout]] = [:]
     
     private let calendar: Calendar = .current
+    private let workoutService = WorkoutService()
+    private let userManager = UserManager.shared
+    
+    let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     
     init() {
         self.months = (-2...2).compactMap { calendar.date(byAdding: .month, value: $0, to: selectedDate) }
         self.selectedMonth = selectedDate
+        fetchUserRoutine()
+    }
+    
+    func fetchUserRoutine() {
+        guard let uid = userManager.currentUser?.uid else {
+            print("[ERROR] Currentuidが取得できません")
+            return
+        }
+        
+        Task {
+            guard let userWorkouts = await workoutService.fetchUserWorkouts(uid: uid) else {
+                return
+            }
+            self.categorizeWorkoutsByWeekday(userWorkouts)
+        }
+    }
+    
+    // userが設定したScheduleDaysから、曜日ごとにカテゴライズ
+    private func categorizeWorkoutsByWeekday(_ workouts: [TestWorkout]) {
+        var categorizedWorkouts: [String: [TestWorkout]] = [:]
+        
+        for workout in workouts {
+            for scheduledDay in workout.scheduledDays {
+                categorizedWorkouts[scheduledDay, default: []].append(workout)
+            }
+        }
+        
+        self.workoutsByWeekday = categorizedWorkouts
     }
     
     //カレンダーがスクロールすると呼び出される
@@ -73,5 +108,12 @@ final class CalendarViewModel: ObservableObject {
            let nextMonth = calendar.date(byAdding: .month, value: 1, to: lastMonth) {
             months.append(nextMonth)
         }
+    }
+    
+    //曜日indexからその曜日のWorkoutを取得（0 -> 日曜日, 1 -> 月曜日
+    func getWorkoutsForWeekday(index: Int) -> [TestWorkout] {
+        guard index >= 0, index < weekdays.count else { return [] }
+        let weekday = weekdays[index]
+        return workoutsByWeekday[weekday] ?? []
     }
 }

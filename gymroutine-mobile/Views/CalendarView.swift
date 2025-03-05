@@ -93,15 +93,27 @@ extension CalendarView {
                     ForEach(0..<7, id: \.self) { index in
                         Group {
                             if index < week.count, let validDay = week[index] {
-                                Text("\(Calendar.current.component(.day, from: validDay))")
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .stroke(validDay.isSameDay(as: viewModel.selectedDate) ? .main : .clear, lineWidth: 2)
-                                    )
-                                    .onTapGesture {
-                                        viewModel.selectedDate = validDay
+                                let workouts = viewModel.getWorkoutsForWeekday(index: index)
+                                VStack {
+                                    Text("\(Calendar.current.component(.day, from: validDay))")
+                                    
+                                    HStack {
+                                        ForEach(0..<workouts.count, id: \.self) { _ in
+                                            Circle()
+                                                .fill(Color.red)
+                                                .frame(width: 6, height: 6)
+                                        }
                                     }
+                                    .frame(height: 6)
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .stroke(validDay.isSameDay(as: viewModel.selectedDate) ? .main : .clear, lineWidth: 2)
+                                )
+                                .onTapGesture {
+                                    viewModel.selectedDate = validDay
+                                }
                             } else {
                                 Rectangle()
                                     .fill(Color.clear)
@@ -126,11 +138,23 @@ extension CalendarView {
                 .background(Color.gray.opacity(0.2))
             
             ScrollView(showsIndicators: false) {
-                VStack {
-                    Text("ここにWorkoutCellを配置")
-                    Text("ここにWorkoutCellを配置")
-                    Text("ここにWorkoutCellを配置")
+                VStack(spacing: 8) {
+                    let weekdayIndex = Calendar.current.component(.weekday, from: viewModel.selectedDate) - 1
+                    let workouts = viewModel.getWorkoutsForWeekday(index: weekdayIndex)
+                    
+                    if workouts.isEmpty {
+                        Text("ワークアウトなし")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(workouts, id: \.id) { workout in
+                            Text(workout.name)
+                                .font(.headline)
+                                .hAlign(.leading)
+                                .padding()
+                        }
+                    }
                 }
+                .padding()
             }
             .vAlign(.top)
         }
