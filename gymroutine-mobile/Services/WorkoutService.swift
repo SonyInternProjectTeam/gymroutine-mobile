@@ -22,6 +22,30 @@ class WorkoutService {
         }
     }
     
+    func fetchUserWorkouts(uid: String) async -> [TestWorkout]? {
+        let db = Firestore.firestore()
+        let workoutsRef = db.collection("Workouts").whereField("uuid", isEqualTo: uid)
+
+        do {
+            let snapshot = try await workoutsRef.getDocuments()
+            var workouts: [TestWorkout] = []
+
+            for document in snapshot.documents {
+                do {
+                    let workout = try document.data(as: TestWorkout.self)
+                    workouts.append(workout)
+                } catch {
+                    print("[ERROR] Workoutのデコードエラー: \(error)")
+                }
+            }
+            return workouts
+
+        } catch {
+            print("[ERROR] Firestore 取得エラー: \(error)")
+            return nil
+        }
+    }
+    
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
         let db = Firestore.firestore()
         db.collection("Trains").getDocuments { (snapshot, error) in
