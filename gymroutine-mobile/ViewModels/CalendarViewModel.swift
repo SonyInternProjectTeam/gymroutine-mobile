@@ -8,7 +8,23 @@
 
 import Foundation
 import SwiftUI
+import FirebaseFirestore
 
+struct TestWorkout: Decodable {
+    @DocumentID var id: String?
+    let uuid: String
+    let name: String
+    let createdAt: Date
+    let scheduledDays: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case uuid
+        case name
+        case createdAt = "CreatedAt"
+        case scheduledDays = "ScheduledDays"
+    }
+}
 final class CalendarViewModel: ObservableObject {
     
     @Published var months: [Date] = []  //月ごとのDate情報
