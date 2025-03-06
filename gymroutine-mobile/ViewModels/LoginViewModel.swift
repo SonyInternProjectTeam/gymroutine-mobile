@@ -11,13 +11,13 @@ class LoginViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var errorMessage: String? = nil
-    @Published var isLoggedIn: Bool = false  // 로그인 상태
     
     private var cancellables = Set<AnyCancellable>()
-    private let authService: AuthService
+    private let authService = AuthService()
+    private let router: Router
     
-    init(authService: AuthService = AuthService()) {
-        self.authService = authService
+    init(router: Router) {
+        self.router = router
     }
     
     func login() {
@@ -28,11 +28,12 @@ class LoginViewModel: ObservableObject {
                     self.errorMessage = error.localizedDescription
                 }
             }, receiveValue: { user in
-                if let _ = user {
-                    self.isLoggedIn = true  // chagne state after login
+                if let user = user {
                     self.errorMessage = nil
+                    DispatchQueue.main.async {
+                        self.router.switchRootView(to: .main(user: user))
+                    }
                 } else {
-                    self.isLoggedIn = false
                     self.errorMessage = "login failed"
                 }
             })

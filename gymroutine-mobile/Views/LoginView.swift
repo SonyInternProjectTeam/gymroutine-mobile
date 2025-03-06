@@ -5,75 +5,73 @@
 //  Created by 조성화 on 2024/10/27.
 //
 
-import Foundation
 import SwiftUI
 
 struct LoginView: View {
-    @ObservedObject var viewModel = LoginViewModel()
-    @State private var showingSignup = false  // state
+    @ObservedObject var viewModel: LoginViewModel
+
+    @State private var isShowingPasswordReset = false
 
     var body: some View {
-        NavigationStack {
-            VStack {
-                Text("Welcome")
-                    .font(.largeTitle)
-                    .padding()
-                
-                TextField("Email", text: $viewModel.email)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                    .keyboardType(.emailAddress)
-                    .autocapitalization(.none)
+        VStack(alignment: .center, spacing: 0) {
+            InputForm
 
-                SecureField("Password", text: $viewModel.password)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-
-                Button(action: {
-                    viewModel.login()
-                }) {
-                    Text("Login")
-                        .font(.title)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding()
-
-                Button(action: {
-                    showingSignup.toggle()  // move to signup page
-                }) {
-                    Text("Sign Up")
-                        .font(.title)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding()
-                .sheet(isPresented: $showingSignup) {
-                    SignupView()  // signup page modal
-                }
-
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .padding()
-                }
-
-                Spacer()
-                
-                // if login move to SuccessView
-                NavigationLink(destination: SuccessView(), isActive: $viewModel.isLoggedIn) {
-                    EmptyView()
-                }
+            Button(action: {
+                isShowingPasswordReset = true
+            }) {
+                Text("パスワードを忘れた方はこちら")
+                    .font(.callout)
+                    .foregroundColor(.blue)
             }
-            .padding()
+            .padding(.vertical, 16)
+            .hAlign(.leading)
+
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .hAlign(.leading)
+            }
+
+            Spacer()
+
+            // TODO: disable対応
+            Button(action: {
+                viewModel.login()
+            }) {
+                Text("ログインする")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+        }
+        .padding(.bottom, 16)
+        .padding([.top, .horizontal], 24)
+        .navigationTitle("ログイン")
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isShowingPasswordReset) {
+            PasswordResetView()
+        }
+    }
+
+    private var InputForm: some View {
+        VStack(alignment: .center, spacing: 40) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("メールアドレス")
+                    .fontWeight(.semibold)
+              
+                EmailAddressField(text: $viewModel.email)
+            }
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text("パスワード")
+                    .fontWeight(.semibold)
+
+                PasswordField(text: $viewModel.password)
+            }
         }
     }
 }
 
 #Preview {
-    LoginView()
+    NavigationStack {
+        LoginView(viewModel: LoginViewModel(router: Router()))
+    }
 }

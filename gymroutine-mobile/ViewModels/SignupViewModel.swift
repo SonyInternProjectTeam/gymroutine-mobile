@@ -12,36 +12,46 @@ class SignupViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var confirmPassword: String = ""
+    @Published var name: String = ""
+    @Published var age: Int = 0
+    @Published var gender: String = ""
+    @Published var birthday: Date = Date()
     @Published var errorMessage: String? = nil
+    @Published var userUID: String? = nil
     @Published var isSignedUp: Bool = false
-    
+
     private var cancellables = Set<AnyCancellable>()
-    private let authService: AuthService
+    private let authService = AuthService()
+    let router: Router
     
-    init(authService: AuthService = AuthService()) {
-        self.authService = authService
+    init(router: Router) {
+        self.router = router
     }
-    
-    func signup() {
+
+    /// Firebase Authentication - create account
+    func signupWithEmailAndPassword(completion: @escaping (Bool) -> Void) {
         guard password == confirmPassword else {
             self.errorMessage = "Passwords do not match"
+            completion(false)
             return
         }
-        
-        authService.signup(email: email, password: password)
+
+        authService.createUser(email: email, password: password)
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                if case .failure(let error) = completion {
-                    self.errorMessage = error.localizedDescription
+            .sink(receiveCompletion: { [weak self] completionResult in
+                switch completionResult {
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                    print("Error creating user: \(error.localizedDescription)")
+                    completion(false)
+                case .finished:
+                    break
                 }
-            }, receiveValue: { user in
-                if let _ = user {
-                    self.isSignedUp = true
-                    self.errorMessage = nil
-                } else {
-                    self.isSignedUp = false
-                    self.errorMessage = "Signup failed"
-                }
+            }, receiveValue: { [weak self] userUID in
+                self?.userUID = userUID
+                print("User UID: \(userUID)") // 로그 추가
+                self?.errorMessage = nil
+                completion(true)
             })
             .store(in: &cancellables)
     }
