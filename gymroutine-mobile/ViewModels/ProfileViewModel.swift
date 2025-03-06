@@ -16,11 +16,32 @@ final class ProfileViewModel: ObservableObject {
     @Published var followingCount: Int = 0
     @Published var selectedPhotoItem: PhotosPickerItem?
     @Published var isFollowing: Bool = false  // 現在ログイン中のユーザーがこのプロフィールをフォローしているかどうか
-    
+    @Published var selectedTab: ProfileTab = .analysis
+
     private let userManager = UserManager.shared
     private let userService = UserService()
     private let followService = FollowService()
-    
+
+    enum ProfileTab: String, CaseIterable {
+        case analysis = "分析"
+        case posts = "投稿"
+
+        func toString() -> String {
+            rawValue
+        }
+
+        // TODO: 画像追加
+        func imageName() -> String {
+            switch self {
+            case .analysis:
+                return "chart.bar.xaxis"
+            case .posts:
+                return "doc.plaintext"
+            }
+        }
+    }
+
+
     /// プロフィールビューモデル生成時に表示するユーザーを渡すことができます。
     /// ユーザーが渡されない場合は、現在ログインしているユーザーの情報を使用します。
     init(user: User? = nil) {

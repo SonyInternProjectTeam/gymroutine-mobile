@@ -14,7 +14,7 @@ struct InitProfileSetupView: View {
     
     var body: some View {
         VStack(spacing: 36) {
-            CustomTabBar(items: viewModel.setupSteps, currentItem: viewModel.currentStep)
+            ProgressTabBar(items: viewModel.setupSteps, currentItem: viewModel.currentStep)
                 .padding(.horizontal, 16)
 
             VStack(spacing: 0) {
