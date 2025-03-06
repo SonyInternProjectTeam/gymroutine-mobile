@@ -26,7 +26,6 @@ struct ProfileView: View {
                         .font(.headline)
                 }
             }
-            .navigationTitle("プロフィール")
             .navigationBarTitleDisplayMode(.inline)
             .onChange(of: viewModel.selectedPhotoItem) { newItem in
                 viewModel.handleSelectedPhotoItemChange(newItem)
