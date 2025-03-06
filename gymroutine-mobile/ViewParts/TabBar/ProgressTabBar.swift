@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CustomTabBar<T: Hashable & Equatable>: View {
+struct ProgressTabBar<T: Hashable & Equatable>: View {
 
     let items: [T]
     let currentItem: T

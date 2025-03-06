@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SnsView: View {
     var body: some View {
-        Text("SNS View")
+        SearchUserView()
     }
 }
 
