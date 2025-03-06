@@ -5,8 +5,7 @@
 //  Created by SATTSAT on 2024/12/26
 //
 //
-
-
+    
 import SwiftUI
 
 struct HomeView: View {
@@ -41,7 +40,7 @@ struct HomeView: View {
         VStack(spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    // 맨 왼쪽에 현재 사용자의 프로필 사진을 고정적으로 표시
+                    // 左端に自分のプロファイル画像と名前を固定表示
                     if let currentUser = userManager.currentUser {
                         VStack(spacing: 4) {
                             if let url = URL(string: currentUser.profilePhoto), !currentUser.profilePhoto.isEmpty {
@@ -61,14 +60,13 @@ struct HomeView: View {
                                     .fill(Color.gray.opacity(0.3))
                                     .frame(width: 80, height: 80)
                             }
-                            // 내 프로필명을 표시 (필요에 따라 "Me" 대신 현재 사용자 이름을 표시해도 됨)
                             Text(currentUser.name)
                                 .font(.caption)
                                 .lineLimit(1)
                                 .frame(width: 80)
                         }
                     }
-                    // 팔로우한 사용자들의 프로필 이미지와 이름을 표시
+                    // フォロー中のユーザーの画像と名前を表示
                     ForEach(viewModel.followingUsers, id: \.uid) { user in
                         VStack(spacing: 4) {
                             if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
@@ -107,7 +105,6 @@ struct HomeView: View {
         }
     }
     
-    
     private var calendarBox: some View {
         VStack {
             Text("簡易カレンダーView")
@@ -121,7 +118,7 @@ struct HomeView: View {
     private var todaysWorkoutsBox: some View {
         VStack {
             Button {
-                withAnimation() {
+                withAnimation {
                     isShowTodayworkouts.toggle()
                 }
             } label: {
@@ -219,4 +216,3 @@ struct HomeView: View {
         }
     }
 }
-

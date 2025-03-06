@@ -2,7 +2,7 @@
 //  ProfileView.swift
 //  gymroutine-mobile
 //
-//  Created by 조성화 on 2024/12/27.
+//  Created by 조성화 on 2025/12/27.
 //
 
 import SwiftUI
@@ -80,22 +80,35 @@ struct ProfileView: View {
                     .foregroundColor(.gray)
             }
             
-            HStack {
-                VStack {
-                    Text("フォロワー")
-                        .font(.subheadline)
-                    Text("\(viewModel.followersCount)")
-                        .font(.title2)
-                        .fontWeight(.bold)
+            // フォロワーとフォロー中の数をタップ可能なNavigationLinkにより一覧画面に遷移
+            HStack(spacing: 40) {
+                NavigationLink {
+                    FollowersListView(userID: user.uid)
+                } label: {
+                    VStack {
+                        Text("\(viewModel.followersCount)")
+                            .font(.headline)
+                        Text("フォロワー")
+                            .font(.subheadline)
+                    }
+                    .padding()
+                    .contentShape(Rectangle())
                 }
-                Spacer()
-                VStack {
-                    Text("フォロー")
-                        .font(.subheadline)
-                    Text("\(viewModel.followingCount)")
-                        .font(.title2)
-                        .fontWeight(.bold)
+                .buttonStyle(PlainButtonStyle())
+                
+                NavigationLink {
+                    FollowingListView(userID: user.uid)
+                } label: {
+                    VStack {
+                        Text("\(viewModel.followingCount)")
+                            .font(.headline)
+                        Text("フォロー中")
+                            .font(.subheadline)
+                    }
+                    .padding()
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(PlainButtonStyle())
             }
             .padding(.horizontal, 32)
             
