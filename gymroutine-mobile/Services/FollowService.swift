@@ -17,7 +17,9 @@ class FollowService {
     ///   - profileUserID: 対象ユーザーのID
     /// - Returns: フォローしている場合 true、していない場合 false
     func checkFollowingStatus(currentUserID: String, profileUserID: String) async -> Bool {
-        return await repository.checkFollowingStatus(currentUserID: currentUserID, profileUserID: profileUserID)
+        let status = await repository.checkFollowingStatus(currentUserID: currentUserID, profileUserID: profileUserID)
+        print("DEBUG: checkFollowingStatus for \(profileUserID) is \(status)")
+        return status
     }
     
     /// 指定されたユーザーをフォローする
@@ -28,9 +30,10 @@ class FollowService {
     func followUser(currentUserID: String, profileUserID: String) async -> Bool {
         do {
             try await repository.addFollow(currentUserID: currentUserID, profileUserID: profileUserID)
+            print("DEBUG: Successfully followed user \(profileUserID)")
             return true
         } catch {
-            print("🔥 フォロー処理中にエラーが発生しました: \(error.localizedDescription)")
+            print("ERROR: Failed to follow user \(profileUserID): \(error.localizedDescription)")
             return false
         }
     }
@@ -43,9 +46,10 @@ class FollowService {
     func unfollowUser(currentUserID: String, profileUserID: String) async -> Bool {
         do {
             try await repository.removeFollow(currentUserID: currentUserID, profileUserID: profileUserID)
+            print("DEBUG: Successfully unfollowed user \(profileUserID)")
             return true
         } catch {
-            print("🔥 フォロー解除処理中にエラーが発生しました: \(error.localizedDescription)")
+            print("ERROR: Failed to unfollow user \(profileUserID): \(error.localizedDescription)")
             return false
         }
     }
@@ -54,13 +58,29 @@ class FollowService {
     /// - Parameter userID: 対象ユーザーのID
     /// - Returns: フォロワーのUserの配列またはエラーをResultで返す
     func getFollowers(for userID: String) async -> Result<[User], Error> {
-        return await repository.fetchFollowers(for: userID)
+        let result = await repository.fetchFollowers(for: userID)
+        switch result {
+        case .success(let users):
+            print("DEBUG: Fetched followers for \(userID): \(users.map { $0.name })")
+            return .success(users)
+        case .failure(let error):
+            print("ERROR: Fetching followers for \(userID) failed: \(error.localizedDescription)")
+            return .failure(error)
+        }
     }
     
     /// 指定されたユーザーのフォロー中一覧を取得する
     /// - Parameter userID: 対象ユーザーのID
     /// - Returns: フォロー中のUserの配列またはエラーをResultで返す
     func getFollowing(for userID: String) async -> Result<[User], Error> {
-        return await repository.fetchFollowing(for: userID)
+        let result = await repository.fetchFollowing(for: userID)
+        switch result {
+        case .success(let users):
+            print("DEBUG: Fetched following for \(userID): \(users.map { $0.name })")
+            return .success(users)
+        case .failure(let error):
+            print("ERROR: Fetching following for \(userID) failed: \(error.localizedDescription)")
+            return .failure(error)
+        }
     }
 }

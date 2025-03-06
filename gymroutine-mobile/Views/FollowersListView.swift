@@ -45,11 +45,14 @@ struct FollowersListView: View {
         }
         .navigationTitle("フォロワー")
         .task {
+            print("DEBUG: Loading followers list for userID: \(userID)")
             let result = await followService.getFollowers(for: userID)
             switch result {
             case .success(let users):
+                print("DEBUG: Successfully fetched followers: \(users.map { $0.name })")
                 followers = users
             case .failure(let error):
+                print("ERROR: Failed to fetch followers: \(error.localizedDescription)")
                 errorMessage = error.localizedDescription
             }
         }

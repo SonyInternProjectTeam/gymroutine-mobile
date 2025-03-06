@@ -1,9 +1,8 @@
 //
 //  MainView.swift
 //  gymroutine-mobile
-//  
+//
 //  Created by SATTSAT on 2024/12/26
-//  
 //
 
 import SwiftUI
@@ -22,7 +21,6 @@ struct MainView: View {
                 }
                 .tag(0)
 
-
             CalendarView()
                 .tabItem {
                     Label("Calendar", systemImage: "calendar")
@@ -35,11 +33,13 @@ struct MainView: View {
                 }
                 .tag(2)
 
-            ProfileView(viewModel: ProfileViewModel())
-                .tabItem {
-                    Label("Profile", systemImage: "person.circle")
-                }
-                .tag(3)
+            NavigationStack {
+                ProfileView(viewModel: ProfileViewModel())
+            }
+            .tabItem {
+                Label("Profile", systemImage: "person.circle")
+            }
+            .tag(3)
         }
     }
 }
