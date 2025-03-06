@@ -14,6 +14,7 @@ struct EmailAddressField: View {
     var body: some View {
         TextField("", text: $text)
             .keyboardType(.emailAddress)
+            .submitLabel(.done)
             .disableAutocorrection(true)    // typo警告を非表示
             .textInputAutocapitalization(.never)
             .fieldBackground()
