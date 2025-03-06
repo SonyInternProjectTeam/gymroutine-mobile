@@ -2,7 +2,7 @@
 //  ProfileView.swift
 //  gymroutine-mobile
 //
-//  Created by 조성화 on 2024/12/27.
+//  Created by 조성화 on 2025/12/27.
 //
 
 import SwiftUI
@@ -232,6 +232,72 @@ extension ProfileView {
                 Text("\(age)歳 \(user.gender)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+            }
+            
+            // フォロワーとフォロー中の数をタップ可能なNavigationLinkにより一覧画面に遷移
+            HStack(spacing: 40) {
+                NavigationLink {
+                    FollowersListView(userID: user.uid)
+                } label: {
+                    VStack {
+                        Text("\(viewModel.followersCount)")
+                            .font(.headline)
+                        Text("フォロワー")
+                            .font(.subheadline)
+                    }
+                    .padding()
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                NavigationLink {
+                    FollowingListView(userID: user.uid)
+                } label: {
+                    VStack {
+                        Text("\(viewModel.followingCount)")
+                            .font(.headline)
+                        Text("フォロー中")
+                            .font(.subheadline)
+                    }
+                    .padding()
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.horizontal, 32)
+            
+            // 自分のプロフィールなら編集ボタン、他人ならフォローボタンを表示する
+            if viewModel.isCurrentUser {
+                Button(action: {
+                    // プロフィール編集画面への遷移などを追加
+                    print("プロフィール編集ボタンタップ")
+                }) {
+                    Text("プロフィール編集")
+                        .font(.headline)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .padding(.horizontal, 32)
+            } else {
+                Button(action: {
+                    if viewModel.isFollowing {
+                        viewModel.unfollow()
+                    } else {
+                        viewModel.follow()
+                    }
+                }) {
+                    Text(viewModel.isFollowing ? "フォロー中" : "フォローする")
+                        .font(.headline)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(viewModel.isFollowing ? Color.gray : Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .padding(.horizontal, 32)
             }
         }
         .hAlign(.leading)

@@ -20,6 +20,7 @@ final class ProfileViewModel: ObservableObject {
 
     private let userManager = UserManager.shared
     private let userService = UserService()
+    private let followService = FollowService()
 
     enum ProfileTab: String, CaseIterable {
         case analysis = "分析"
@@ -39,6 +40,8 @@ final class ProfileViewModel: ObservableObject {
             }
         }
     }
+
+
     /// プロフィールビューモデル生成時に表示するユーザーを渡すことができます。
     /// ユーザーが渡されない場合は、現在ログインしているユーザーの情報を使用します。
     init(user: User? = nil) {
@@ -75,6 +78,8 @@ final class ProfileViewModel: ObservableObject {
     /// フォロワーとフォロー中の数を読み込む
     /// - Parameter userId: ユーザーのUID
     private func loadFollowerAndFollowingCounts(userId: String) {
+        // ※ここでは UserManager 経由でのカウント取得処理を使っていますが、
+        //    必要に応じて FollowService 経由でフォロワー一覧やフォロー中一覧を取得し、数を更新することも可能です。
         Task {
             let followers = await userManager.fetchFollowersCount(userId: userId)
             let following = await userManager.fetchFollowingCount(userId: userId)
@@ -98,7 +103,7 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    // MARK: - フォロー関連の機能（UserService 経由）
+    // MARK: - フォロー関連の機能（FollowService 経由）
     
     /// 現在ログイン中のユーザーがこのプロフィールを既にフォローしているか確認する
     func updateFollowingStatus() {
@@ -106,20 +111,20 @@ final class ProfileViewModel: ObservableObject {
             guard let currentUserID = userManager.currentUser?.uid,
                   let profileUserID = user?.uid,
                   currentUserID != profileUserID else { return }
-            let status = await userService.checkFollowingStatus(currentUserID: currentUserID, profileUserID: profileUserID)
+            let status = await followService.checkFollowingStatus(currentUserID: currentUserID, profileUserID: profileUserID)
             DispatchQueue.main.async {
                 self.isFollowing = status
             }
         }
     }
     
-    /// フォローする処理（UserService 経由）
+    /// フォローする処理
     func follow() {
         Task {
             guard let currentUserID = userManager.currentUser?.uid,
                   let profileUserID = user?.uid,
                   currentUserID != profileUserID else { return }
-            let success = await userService.followUser(currentUserID: currentUserID, profileUserID: profileUserID)
+            let success = await followService.followUser(currentUserID: currentUserID, profileUserID: profileUserID)
             if success {
                 DispatchQueue.main.async {
                     self.isFollowing = true
@@ -129,13 +134,13 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    /// フォロー解除する処理（UserService 経由）
+    /// フォロー解除する処理
     func unfollow() {
         Task {
             guard let currentUserID = userManager.currentUser?.uid,
                   let profileUserID = user?.uid,
                   currentUserID != profileUserID else { return }
-            let success = await userService.unfollowUser(currentUserID: currentUserID, profileUserID: profileUserID)
+            let success = await followService.unfollowUser(currentUserID: currentUserID, profileUserID: profileUserID)
             if success {
                 DispatchQueue.main.async {
                     self.isFollowing = false
@@ -145,6 +150,8 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
+    /// PhotosPickerで選択された写真の変更を処理する
+    /// - Parameter newItem: 変更後のPhotosPickerItem
     func handleSelectedPhotoItemChange(_ newItem: PhotosPickerItem?) {
         Task {
             if let newItem = newItem,
