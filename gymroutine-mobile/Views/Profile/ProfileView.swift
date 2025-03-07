@@ -44,8 +44,8 @@ struct ProfileView: View {
                         label: { EmptyView() }
                     )
                 }
-                .frame(width: 0, height: 0)
-                .hidden()
+                    .frame(width: 0, height: 0)
+                    .hidden()
             )
         }
     }

@@ -12,16 +12,16 @@ struct ExerciseDetailView: View {
     let workoutID: String // Workout ID를 전달받음
     @StateObject private var viewModel = ExerciseDetailViewModel()
     @State private var navigateToWorkoutDetail = false // 화면 전환 플래그
-
+    
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             Divider()
-
+            
             Image(.welcomeLogo)
                 .resizable()
                 .scaledToFit()
                 .frame(height: 400)
-
+            
             BottomView
         }
         .navigationTitle(exercise.name)
@@ -42,17 +42,20 @@ extension ExerciseDetailView {
     private var BottomView: some View {
         VStack(alignment: .center, spacing: 16) {
             PositionView
-
+            
             ExplanationView
-
+            
             Spacer()
-
+            
             Button(action: {
-                viewModel.addExerciseToWorkout(
-                    workoutID: workoutID,
-                    exerciseName: exercise.name,
-                    part: exercise.part
-                ) { success in
+                // WorkoutExercise 객체 생성 (초기 세트 배열은 빈 배열)
+                let newExercise = WorkoutExercise(
+                    id: UUID().uuidString,
+                    name: exercise.name,
+                    part: exercise.part,
+                    sets: []  // 초기에는 빈 배열
+                )
+                viewModel.addExerciseToWorkout(workoutID: workoutID, exercise: newExercise) { success in
                     if success {
                         print("운동 추가 성공 ✅")
                         navigateToWorkoutDetail = true // WorkoutDetailView로 이동
@@ -63,13 +66,14 @@ extension ExerciseDetailView {
             }) {
                 Text("追加する")
             }
+            
             .buttonStyle(PrimaryButtonStyle())
         }
         .padding(.bottom, 16)
         .padding([.top, .horizontal], 24)
         .background(Color(.systemGray6))
     }
-
+    
     private var PositionView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("部位")
@@ -82,7 +86,7 @@ extension ExerciseDetailView {
         }
         .hAlign(.leading)
     }
-
+    
     private var ExplanationView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("説明")

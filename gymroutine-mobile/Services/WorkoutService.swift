@@ -7,22 +7,25 @@
 
 import Foundation
 import Firebase
+import FirebaseFirestore
 
 class WorkoutService {
     private let db = Firestore.firestore()
 
-    /// 워크아웃 도큐먼트를 생성하면서 이름과 요일 데이터를 추가
+    /// 워크아웃 도큐먼트를 생성하면서 이름, 요일, 루틴 여부, 빈 운동 배열, 메모 등을 추가
     func createWorkoutDocument(userID: String, name: String, scheduledDays: [String], completion: @escaping (String?) -> Void) {
-        let db = Firestore.firestore()
         var ref: DocumentReference? = nil
-
+        
         let workoutData: [String: Any] = [
-            "uuid": userID,      // 사용자 ID
-            "name": name,        // 워크아웃 이름
-            "ScheduledDays": scheduledDays, // 선택한 요일
-            "CreatedAt": Timestamp(date: Date()) // 생성 시간
+            "userId": userID,                 // 사용자 ID
+            "name": name,                     // 워크아웃 이름
+            "isRoutine": true,                // 루틴인 경우 true (필요에 따라 변경 가능)
+            "ScheduledDays": scheduledDays,   // 선택한 요일 (배열)
+            "exercises": [],                  // 초기에는 빈 운동 배열
+            "CreatedAt": Timestamp(date: Date()), // 생성 시간
+            "notes": ""                       // 초기 메모 (추후 수정 가능)
         ]
-
+        
         ref = db.collection("Workouts").addDocument(data: workoutData) { error in
             if let error = error {
                 print("Error adding workout document: \(error)")
@@ -33,37 +36,78 @@ class WorkoutService {
         }
     }
 
-
-    /// 기존 워크아웃 도큐먼트에 요일 데이터만 추가
-    func addScheduledDaysToWorkout(workoutID: String, scheduledDays: [String: Bool], completion: @escaping (Bool) -> Void) {
+    /// 기존 워크아웃 도큐먼트의 요일 데이터를 업데이트 (새로운 구조에서는 ScheduledDays는 [String] 타입)
+    func updateScheduledDaysForWorkout(workoutID: String, scheduledDays: [String], completion: @escaping (Bool) -> Void) {
         db.collection("Workouts").document(workoutID).updateData([
             "ScheduledDays": scheduledDays
         ]) { error in
             if let error = error {
-                print("Error adding scheduled days: \(error)")
+                print("Error updating scheduled days: \(error)")
                 completion(false)
             } else {
                 completion(true)
             }
         }
     }
-
-    /// 기존 워크아웃 도큐먼트에 제목 및 요일 데이터를 추가
-    func addWorkoutDetails(workoutID: String, name: String, scheduledDays: [String: Bool], completion: @escaping (Bool) -> Void) {
+    
+    /// 워크아웃에 운동을 추가하는 메서드 (새로운 운동 구조: name, part, 그리고 빈 Sets 배열)
+    func addExerciseToWorkout(workoutID: String, exercise: WorkoutExercise, completion: @escaping (Bool) -> Void) {
+        let exerciseData: [String: Any] = [
+            "id": exercise.id,         // 고유 ID 저장
+            "name": exercise.name,
+            "part": exercise.part,
+            "Sets": [] // 초기 세트 배열 (빈 배열)
+        ]
+        
         db.collection("Workouts").document(workoutID).updateData([
-            "name": name,
-            "ScheduledDays": scheduledDays
+            "exercises": FieldValue.arrayUnion([exerciseData])
         ]) { error in
             if let error = error {
-                print("Error adding workout details: \(error)")
+                print("🔥 에크서사이즈 추가 에러: \(error.localizedDescription)")
                 completion(false)
             } else {
+                print("✅ 에크서사이즈가 정상적으로 추가되었습니다!")
                 completion(true)
             }
         }
     }
 
-    /// 운동 옵션을 불러오는 메서드
+    
+    /// 워크아웃 상세 정보를 불러오는 메서드 (exercises 필드도 디코딩)
+    func fetchWorkoutDetails(workoutID: String, completion: @escaping (Result<Workout, Error>) -> Void) {
+        db.collection("Workouts").document(workoutID).getDocument { document, error in
+            if let error = error {
+                completion(.failure(error))
+            } else if let document = document, document.exists {
+                let data = document.data() ?? [:]
+                // exercises 필드를 디코딩 시도
+                var exercises: [WorkoutExercise] = []
+                if let exercisesData = data["exercises"] as? [[String: Any]] {
+                    do {
+                        let jsonData = try JSONSerialization.data(withJSONObject: exercisesData)
+                        exercises = try JSONDecoder().decode([WorkoutExercise].self, from: jsonData)
+                    } catch {
+                        print("Error decoding exercises: \(error)")
+                    }
+                }
+                let workout = Workout(
+                    id: workoutID,
+                    userId: data["userId"] as? String ?? "",
+                    name: data["name"] as? String ?? "Unknown",
+                    isRoutine: data["isRoutine"] as? Bool ?? false,
+                    scheduledDays: data["ScheduledDays"] as? [String] ?? [],
+                    exercises: exercises,
+                    createdAt: (data["CreatedAt"] as? Timestamp)?.dateValue() ?? Date(),
+                    notes: data["notes"] as? String ?? ""
+                )
+                completion(.success(workout))
+            } else {
+                completion(.failure(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])))
+            }
+        }
+    }
+
+    /// 운동 옵션(Trains 컬렉션) 불러오기
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
         db.collection("Trains").getDocuments { (snapshot, error) in
             guard let documents = snapshot?.documents, error == nil else {
@@ -76,7 +120,7 @@ class WorkoutService {
         }
     }
 
-    /// 특정 트레인의 운동 목록을 불러오는 메서드
+    /// 특정 트레인의 운동 목록 불러오기
     func fetchExercises(for train: String, completion: @escaping ([String]) -> Void) {
         db.collection("Trains").document(train).collection("exercises").getDocuments { (snapshot, error) in
             guard let documents = snapshot?.documents, error == nil else {
@@ -88,52 +132,4 @@ class WorkoutService {
             completion(exercises)
         }
     }
-
-    /// 워크아웃에 운동을 추가하는 메서드
-    func addExerciseToWorkout(workoutID: String, exerciseName: String, part: String, completion: @escaping (Bool) -> Void) {
-        // 추가할 운동 데이터
-            let newExercise = [
-                "name": exerciseName,
-                "part": part,
-                "sets": 0,
-                "reps":0,
-                "weight" :0,
-                "isCompleted": false
-            ] as [String : Any]
-            
-            // Workouts 문서에 "exercises" 필드를 배열로 추가 또는 업데이트
-            db.collection("Workouts").document(workoutID).updateData([
-                "exercises": FieldValue.arrayUnion([newExercise]) // 운동 배열에 추가
-            ]) { error in
-                if let error = error {
-                    print("Error adding exercise to workout: \(error)")
-                    completion(false) // 실패 처리
-                } else {
-                    print("✅ Successfully added exercise directly to workout: \(exerciseName)")
-                    completion(true) // 성공 처리
-            }
-        }
-    }
-    
-    func fetchWorkoutDetails(workoutID: String, completion: @escaping (Result<Workout, Error>) -> Void) {
-        let db = Firestore.firestore()
-        db.collection("Workouts").document(workoutID).getDocument { document, error in
-            if let error = error {
-                completion(.failure(error))
-            } else if let document = document, document.exists {
-                let data = document.data() ?? [:]
-                let workout = Workout(
-                    id: workoutID,
-                    name: data["name"] as? String ?? "Unknown",
-                    scheduledDays: data["ScheduledDays"] as? [String] ?? [],
-                    createdAt: (data["CreatedAt"] as? Timestamp)?.dateValue() ?? Date()
-                )
-                completion(.success(workout))
-            } else {
-                completion(.failure(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])))
-            }
-        }
-    }
-
 }
-

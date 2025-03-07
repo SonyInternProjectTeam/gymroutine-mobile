@@ -7,32 +7,35 @@
 
 import Foundation
 
-struct Exercise:Codable,Hashable {
+struct Exercise: Codable, Hashable {
     var name: String = ""
     var description: String = ""
     var img: String = ""
     var part: String = ""
     
-    func toExercisePart () -> ExercisePart? {
+    func toExercisePart() -> ExercisePart? {
         return ExercisePart(rawValue: part)
     }
 }
-
-struct WorkoutExercise: Identifiable, Codable, Hashable {
-    var id: String = UUID().uuidString
-    var name: String
-    var description: String
-    var img: String
-    var part: String
-    var sets: Int
-    var reps: Int
-    var weight: Int
-}
-
 
 enum ExercisePart: String, CaseIterable {
     case arm
     case chest
     case back
     case legs
+}
+
+// 새롭게 추가: 각 세트의 정보를 관리하는 모델
+struct ExerciseSet: Codable, Hashable, Identifiable {
+    var id: String = UUID().uuidString
+    var reps: Int
+    var weight: Double
+}
+
+// 기존 WorkoutExercise 모델을 수정하여 세트 정보를 배열로 관리하도록 변경
+struct WorkoutExercise: Identifiable, Codable, Hashable {
+    var id: String = UUID().uuidString
+    var name: String           // 운동 이름 (예: "benchpress")
+    var part: String           // 운동 부위 (예: "chest")
+    var sets: [ExerciseSet]    // 각 세트의 정보 (예: [{ reps: 12, weight: 50 }, ...])
 }
