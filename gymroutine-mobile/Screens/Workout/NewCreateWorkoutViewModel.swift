@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FirebaseAuth
 
 enum Weekday: String, CaseIterable {
     case monday = "Monday"
@@ -65,6 +66,8 @@ final class NewCreateWorkoutViewModel: WorkoutExecisesManager {
     @Published var searchExercisesFlg = false
     @Published var editExerciseSetsFlg = false
     
+    private let service = WorkoutService()
+    
     func toggleSelectionWeekDay(for day: Weekday) {
         if selectedDays.contains(day) {
             selectedDays.remove(day)
@@ -80,5 +83,37 @@ final class NewCreateWorkoutViewModel: WorkoutExecisesManager {
     
     func onClickedAddExerciseButton() {
         searchExercisesFlg = true
+    }
+    
+    // ワークアウト作成
+    func onClickedCreateWorkoutButton() {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            fatalError("[ERROR] ログインしていません")
+        }
+        
+        // 週の順番にソート処理
+        let sortedDays = selectedDays.sorted { lhs, rhs in
+            Weekday.allCases.firstIndex(of: lhs)! < Weekday.allCases.firstIndex(of: rhs)!
+        }
+
+        let workout = Workout(
+            userId: userId,
+            name: self.workoutName,
+            createdAt: Date(),
+            notes: self.notes.isEmpty ? nil : self.notes,
+            isRoutine: self.isRoutine,
+            scheduledDays: sortedDays.map { $0.rawValue },
+            exercises: self.exercises
+        )
+        
+        Task {
+            let result = await service.createWorkout(workout: workout)
+            switch result {
+            case .success(_):
+                print("[DEBUG] ワークアウトの作成に成功しました！")
+            case .failure(let error):
+                print(error.localizedDescription)
+            }
+        }
     }
 }
