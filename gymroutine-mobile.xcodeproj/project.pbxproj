@@ -41,7 +41,6 @@
 		00CDC4442D845E8E003B18EB /* WorkoutProcessViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F42D845E8E003B18EB /* WorkoutProcessViewModel.swift */; };
 		00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F62D845E8E003B18EB /* CapsuleButtonStyle.swift */; };
 		00CDC4462D845E8E003B18EB /* CircleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F72D845E8E003B18EB /* CircleButtonStyle.swift */; };
-		00CDC4472D845E8E003B18EB /* ExersiceSelectButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F82D845E8E003B18EB /* ExersiceSelectButton.swift */; };
 		00CDC4482D845E8E003B18EB /* PrimaryButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F92D845E8E003B18EB /* PrimaryButtonStyle.swift */; };
 		00CDC4492D845E8E003B18EB /* SecondaryButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3FA2D845E8E003B18EB /* SecondaryButtonStyle.swift */; };
 		00CDC44A2D845E8E003B18EB /* SecondaryCircleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3FB2D845E8E003B18EB /* SecondaryCircleButtonStyle.swift */; };
@@ -74,6 +73,13 @@
 		00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC41E2D845E8E003B18EB /* SnsView.swift */; };
 		00CDC4662D845E8E003B18EB /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC41F2D845E8E003B18EB /* SplashView.swift */; };
 		00CDC4672D845E8E003B18EB /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4202D845E8E003B18EB /* WelcomeView.swift */; };
+		00CDC47F2D85C218003B18EB /* NewCreateWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC47E2D85C218003B18EB /* NewCreateWorkoutView.swift */; };
+		00CDC4812D85C408003B18EB /* NewCreateWorkoutViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4802D85C3FC003B18EB /* NewCreateWorkoutViewModel.swift */; };
+		00CDC4842D85DBD1003B18EB /* NewExerciseSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4832D85DBD1003B18EB /* NewExerciseSearchView.swift */; };
+		00CDC4862D87A60D003B18EB /* CheckBoxStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4852D87A608003B18EB /* CheckBoxStyle.swift */; };
+		00CDC4882D87A699003B18EB /* NewExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4872D87A699003B18EB /* NewExerciseDetailView.swift */; };
+		00CDC4902D87B17A003B18EB /* ExerciseGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */; };
+		00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */; };
 		27C5ED742CD90261005380EE /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED732CD90261005380EE /* FirebaseDatabase */; };
 		27C5ED762CD90261005380EE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED752CD90261005380EE /* FirebaseFirestore */; };
 		27C5ED782CD90261005380EE /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED772CD90261005380EE /* FirebaseFirestoreCombine-Community */; };
@@ -133,7 +139,6 @@
 		00CDC3F42D845E8E003B18EB /* WorkoutProcessViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutProcessViewModel.swift; sourceTree = "<group>"; };
 		00CDC3F62D845E8E003B18EB /* CapsuleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleButtonStyle.swift; sourceTree = "<group>"; };
 		00CDC3F72D845E8E003B18EB /* CircleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButtonStyle.swift; sourceTree = "<group>"; };
-		00CDC3F82D845E8E003B18EB /* ExersiceSelectButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExersiceSelectButton.swift; sourceTree = "<group>"; };
 		00CDC3F92D845E8E003B18EB /* PrimaryButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButtonStyle.swift; sourceTree = "<group>"; };
 		00CDC3FA2D845E8E003B18EB /* SecondaryButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButtonStyle.swift; sourceTree = "<group>"; };
 		00CDC3FB2D845E8E003B18EB /* SecondaryCircleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryCircleButtonStyle.swift; sourceTree = "<group>"; };
@@ -168,6 +173,13 @@
 		00CDC4202D845E8E003B18EB /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		00CDC4222D845E8E003B18EB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		00CDC4232D845E8E003B18EB /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		00CDC47E2D85C218003B18EB /* NewCreateWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCreateWorkoutView.swift; sourceTree = "<group>"; };
+		00CDC4802D85C3FC003B18EB /* NewCreateWorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCreateWorkoutViewModel.swift; sourceTree = "<group>"; };
+		00CDC4832D85DBD1003B18EB /* NewExerciseSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewExerciseSearchView.swift; sourceTree = "<group>"; };
+		00CDC4852D87A608003B18EB /* CheckBoxStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBoxStyle.swift; sourceTree = "<group>"; };
+		00CDC4872D87A699003B18EB /* NewExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewExerciseDetailView.swift; sourceTree = "<group>"; };
+		00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseGridCell.swift; sourceTree = "<group>"; };
+		00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseCell.swift; sourceTree = "<group>"; };
 		27E5E5222CCEC9E9003E3E70 /* gymroutine-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gymroutine-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E5322CCEC9EA003E3E70 /* gymroutine-mobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -288,7 +300,6 @@
 			children = (
 				00CDC3E72D845E8E003B18EB /* CreateWorkoutViewModel.swift */,
 				00CDC3E82D845E8E003B18EB /* ExerciseDetailViewModel.swift */,
-				00CDC3E92D845E8E003B18EB /* ExerciseSearchViewModel.swift */,
 				00CDC3EE2D845E8E003B18EB /* PasswordResetViewModel.swift */,
 				00CDC3F32D845E8E003B18EB /* WorkoutDetailViewModel.swift */,
 				00CDC3F42D845E8E003B18EB /* WorkoutProcessViewModel.swift */,
@@ -301,7 +312,6 @@
 			children = (
 				00CDC3F62D845E8E003B18EB /* CapsuleButtonStyle.swift */,
 				00CDC3F72D845E8E003B18EB /* CircleButtonStyle.swift */,
-				00CDC3F82D845E8E003B18EB /* ExersiceSelectButton.swift */,
 				00CDC3F92D845E8E003B18EB /* PrimaryButtonStyle.swift */,
 				00CDC3FA2D845E8E003B18EB /* SecondaryButtonStyle.swift */,
 				00CDC3FB2D845E8E003B18EB /* SecondaryCircleButtonStyle.swift */,
@@ -314,6 +324,8 @@
 			isa = PBXGroup;
 			children = (
 				00CDC3FE2D845E8E003B18EB /* WorkoutCell.swift */,
+				00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */,
+				00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -340,6 +352,7 @@
 		00CDC4082D845E8E003B18EB /* Toggles */ = {
 			isa = PBXGroup;
 			children = (
+				00CDC4852D87A608003B18EB /* CheckBoxStyle.swift */,
 				00CDC4072D845E8E003B18EB /* ExercisePartToggle.swift */,
 			);
 			path = Toggles;
@@ -404,6 +417,8 @@
 		00CDC4682D845EB4003B18EB /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				00CDC4822D85DB9B003B18EB /* Exercise */,
+				00CDC47D2D85C1FB003B18EB /* Workout */,
 				00CDC46E2D8461DD003B18EB /* Root */,
 				00CDC4692D845FCD003B18EB /* Home */,
 				00CDC46B2D846045003B18EB /* Calendar */,
@@ -522,6 +537,25 @@
 				00CDC3EF2D845E8E003B18EB /* ProfileViewModel.swift */,
 			);
 			path = Profile;
+			sourceTree = "<group>";
+		};
+		00CDC47D2D85C1FB003B18EB /* Workout */ = {
+			isa = PBXGroup;
+			children = (
+				00CDC4802D85C3FC003B18EB /* NewCreateWorkoutViewModel.swift */,
+				00CDC47E2D85C218003B18EB /* NewCreateWorkoutView.swift */,
+			);
+			path = Workout;
+			sourceTree = "<group>";
+		};
+		00CDC4822D85DB9B003B18EB /* Exercise */ = {
+			isa = PBXGroup;
+			children = (
+				00CDC4832D85DBD1003B18EB /* NewExerciseSearchView.swift */,
+				00CDC3E92D845E8E003B18EB /* ExerciseSearchViewModel.swift */,
+				00CDC4872D87A699003B18EB /* NewExerciseDetailView.swift */,
+			);
+			path = Exercise;
 			sourceTree = "<group>";
 		};
 		27E5E5192CCEC9E9003E3E70 = {
@@ -712,14 +746,18 @@
 				00CDC4332D845E8E003B18EB /* FollowService.swift in Sources */,
 				00CDC4342D845E8E003B18EB /* SnsService.swift in Sources */,
 				00CDC4352D845E8E003B18EB /* UserService.swift in Sources */,
+				00CDC47F2D85C218003B18EB /* NewCreateWorkoutView.swift in Sources */,
 				00CDC4362D845E8E003B18EB /* WorkoutService.swift in Sources */,
 				00CDC4372D845E8E003B18EB /* CreateWorkoutViewModel.swift in Sources */,
+				00CDC4902D87B17A003B18EB /* ExerciseGridCell.swift in Sources */,
 				00CDC4382D845E8E003B18EB /* ExerciseDetailViewModel.swift in Sources */,
 				00CDC4392D845E8E003B18EB /* ExerciseSearchViewModel.swift in Sources */,
 				00CDC43A2D845E8E003B18EB /* HomeViewModel.swift in Sources */,
 				00CDC43B2D845E8E003B18EB /* InitProfileSetupViewModel.swift in Sources */,
+				00CDC4882D87A699003B18EB /* NewExerciseDetailView.swift in Sources */,
 				00CDC43C2D845E8E003B18EB /* LoginViewModel.swift in Sources */,
 				00CDC43D2D845E8E003B18EB /* MainViewModel.swift in Sources */,
+				00CDC4812D85C408003B18EB /* NewCreateWorkoutViewModel.swift in Sources */,
 				00CDC43E2D845E8E003B18EB /* PasswordResetViewModel.swift in Sources */,
 				00CDC43F2D845E8E003B18EB /* ProfileViewModel.swift in Sources */,
 				00CDC4402D845E8E003B18EB /* SearchUserViewModel.swift in Sources */,
@@ -729,7 +767,7 @@
 				00CDC4442D845E8E003B18EB /* WorkoutProcessViewModel.swift in Sources */,
 				00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */,
 				00CDC4462D845E8E003B18EB /* CircleButtonStyle.swift in Sources */,
-				00CDC4472D845E8E003B18EB /* ExersiceSelectButton.swift in Sources */,
+				00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */,
 				00CDC4482D845E8E003B18EB /* PrimaryButtonStyle.swift in Sources */,
 				00CDC4492D845E8E003B18EB /* SecondaryButtonStyle.swift in Sources */,
 				00CDC44A2D845E8E003B18EB /* SecondaryCircleButtonStyle.swift in Sources */,
@@ -738,6 +776,7 @@
 				00CDC44D2D845E8E003B18EB /* DateInputField.swift in Sources */,
 				00CDC44E2D845E8E003B18EB /* EmailAddressField.swift in Sources */,
 				00CDC44F2D845E8E003B18EB /* ExerciseSearchField.swift in Sources */,
+				00CDC4862D87A60D003B18EB /* CheckBoxStyle.swift in Sources */,
 				00CDC4502D845E8E003B18EB /* PasswordField.swift in Sources */,
 				00CDC4512D845E8E003B18EB /* ProgressTabBar.swift in Sources */,
 				00CDC4522D845E8E003B18EB /* ExercisePartToggle.swift in Sources */,
@@ -754,6 +793,7 @@
 				00CDC45D2D845E8E003B18EB /* HomeView.swift in Sources */,
 				00CDC45E2D845E8E003B18EB /* InitProfileSetupView.swift in Sources */,
 				00CDC45F2D845E8E003B18EB /* LoginView.swift in Sources */,
+				00CDC4842D85DBD1003B18EB /* NewExerciseSearchView.swift in Sources */,
 				00CDC4602D845E8E003B18EB /* MainView.swift in Sources */,
 				00CDC4612D845E8E003B18EB /* PasswordResetView.swift in Sources */,
 				00CDC4622D845E8E003B18EB /* RootView.swift in Sources */,

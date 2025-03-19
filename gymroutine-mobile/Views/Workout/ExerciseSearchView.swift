@@ -62,7 +62,7 @@ struct ExerciseSearchView: View {
                     NavigationLink(
                         destination: ExerciseDetailView(exercise: exercise, workoutID: workoutID) // ✅ workoutID
                     ) {
-                        ExersiceSelectButton(exercise: exercise, onTapPlusButton: {
+                        ExerciseGridCell(exercise: exercise, onTapPlusButton: {
                             viewModel.onTapExercisePlusButton(workoutID: workoutID, exercise: exercise)
                         })
                     }

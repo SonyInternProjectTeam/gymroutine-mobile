@@ -17,6 +17,10 @@ class ExerciseSearchViewModel: ObservableObject {
     @Published var selectedExercisePart: ExercisePart? = nil
     private var service = ExerciseService()
     private let workoutService = WorkoutService()
+    
+    
+    
+    @Published var isBoolmarkOnly: Bool = false
 
     init() {
         fetchAll()

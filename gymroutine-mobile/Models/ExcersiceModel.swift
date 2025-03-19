@@ -16,6 +16,15 @@ struct Exercise: Codable, Hashable {
     func toExercisePart() -> ExercisePart? {
         return ExercisePart(rawValue: part)
     }
+    
+    static func mock() -> Exercise{
+        return Exercise(
+            name: "サンプルエクササイズ",
+            description: "サンプルの部位を鍛えることができます",
+            img: "https://picsum.photos/200",
+            part: ExercisePart.arm.rawValue
+        )
+    }
 }
 
 enum ExercisePart: String, CaseIterable {
@@ -38,4 +47,16 @@ struct WorkoutExercise: Identifiable, Codable, Hashable {
     var name: String           // 운동 이름 (예: "benchpress")
     var part: String           // 운동 부위 (예: "chest")
     var sets: [ExerciseSet]    // 각 세트의 정보 (예: [{ reps: 12, weight: 50 }, ...])
+    
+    static func mock() -> WorkoutExercise {
+        return WorkoutExercise(
+            name: "Bench Press",
+            part: "Chest",
+            sets: [
+                ExerciseSet(reps: 12, weight: 50.0),
+                ExerciseSet(reps: 10, weight: 55.0),
+                ExerciseSet(reps: 8, weight: 60.0)
+            ]
+        )
+    }
 }

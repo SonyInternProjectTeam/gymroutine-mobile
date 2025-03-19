@@ -13,6 +13,7 @@ struct HomeView: View {
     @EnvironmentObject var userManager: UserManager
     
     @State private var isShowTodayworkouts = true
+    @State private var createWorkoutFlg = false
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -33,6 +34,9 @@ struct HomeView: View {
                 .clipped()
                 .shadow(radius: 4)
                 .padding()
+        }
+        .fullScreenCover(isPresented: $createWorkoutFlg) {
+            NewCreateWorkoutView()
         }
     }
     
@@ -202,10 +206,8 @@ struct HomeView: View {
     
     private var buttonBox: some View {
         HStack {
-            // TODO : これを押した瞬間にはWorkoutsドキュメントが生成されたらだめ
-            
-            NavigationLink {
-                CreateWorkoutView()
+            Button {
+                createWorkoutFlg.toggle()
             } label: {
                 Label("ルーティーン追加", systemImage: "plus")
             }
@@ -220,4 +222,9 @@ struct HomeView: View {
             .buttonStyle(PrimaryButtonStyle())
         }
     }
+}
+
+#Preview {
+    HomeView(viewModel: HomeViewModel())
+        .environmentObject(UserManager.shared)
 }

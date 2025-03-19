@@ -1,23 +1,24 @@
 //
-//  ExersiceSelectButton.swift
+//  ExerciseGridCell.swift
 //  gymroutine-mobile
-//
-//  Created by 堀壮吾 on 2024/11/29.
+//  
+//  Created by SATTSAT on 2025/03/17
+//  
 //
 
 import SwiftUI
 
-struct ExersiceSelectButton: View {
-
+struct ExerciseGridCell: View {
+    
     let exercise: Exercise
-    var onTapPlusButton: () -> Void
+    var onTapPlusButton: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .center, spacing: 4) {
             Image(.workout)
                 .resizable()
                 .scaledToFit()
-                .padding(16)
+                .padding()
                 .background(.secondary.opacity(0.2))
 
             VStack(alignment: .leading, spacing: 8) {
@@ -30,7 +31,7 @@ struct ExersiceSelectButton: View {
                     Spacer()
 
                     Button {
-                        onTapPlusButton()
+                        onTapPlusButton?()
                     } label: {
                         Image(systemName: "plus")
                             .font(.headline)
@@ -46,10 +47,13 @@ struct ExersiceSelectButton: View {
             .padding(.horizontal, 16)
         }
         .tint(.primary)
-        .background(.white)
+        .background()
         .cornerRadius(8)
         .clipped()
         .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
     }
 }
 
+#Preview {
+    ExerciseGridCell(exercise: .mock())
+}
