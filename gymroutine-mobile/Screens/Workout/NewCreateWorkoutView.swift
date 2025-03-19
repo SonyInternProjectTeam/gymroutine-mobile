@@ -26,6 +26,7 @@ struct NewCreateWorkoutView: View {
                 VStack(spacing: 24) {
                     nameBox
                     routineBox
+                    notesBox
                     execisesBox
                 }
                 .padding()
@@ -107,6 +108,19 @@ extension NewCreateWorkoutView {
             }
         }
         .animation(.default, value: viewModel.isRoutine)
+    }
+    
+    private var notesBox: some View {
+        VStack(alignment: .leading) {
+            Text("メモ")
+                .font(.headline)
+            
+            TextField("追加情報を入力する...", text: $viewModel.notes, axis: .vertical)
+                .fieldBackground()
+                .submitLabel(.done)
+                .clipped()
+                .shadow(radius: 1)
+        }
     }
     
     private var execisesBox: some View {

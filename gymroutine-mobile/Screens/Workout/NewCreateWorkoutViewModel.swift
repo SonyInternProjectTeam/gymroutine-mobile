@@ -57,6 +57,7 @@ class WorkoutExecisesManager: ObservableObject {
 
 final class NewCreateWorkoutViewModel: WorkoutExecisesManager {
     @Published var workoutName: String = ""
+    @Published var notes: String = ""
     @Published var isRoutine = false
     @Published var selectedDays: Set<Weekday> = []
     @Published var selectedIndex: Int? = nil
