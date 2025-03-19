@@ -39,6 +39,11 @@ struct ExerciseSet: Identifiable, Codable {
     var id: String = UUID().uuidString
     var reps: Int
     var weight: Double
+    
+    //Firestore書き込み時にidを無視
+    private enum CodingKeys: String, CodingKey {
+        case reps, weight
+    }
 }
 
 // 기존 WorkoutExercise 모델을 수정하여 세트 정보를 배열로 관리하도록 변경
