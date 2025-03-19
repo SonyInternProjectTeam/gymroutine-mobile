@@ -128,7 +128,7 @@ extension NewCreateWorkoutView {
             Text("エクササイズ")
                 .font(.headline)
             
-            ForEach(Array(viewModel.exercises.enumerated()), id: \.element) { index, workoutExercise in
+            ForEach(Array(viewModel.exercises.enumerated()), id: \.element.id) { index, workoutExercise in
                 HStack {
                     VStack {
                         Text("\(index + 1)")

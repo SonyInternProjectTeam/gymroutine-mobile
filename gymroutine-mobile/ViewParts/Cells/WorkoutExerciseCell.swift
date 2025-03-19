@@ -49,7 +49,7 @@ struct WorkoutExerciseCell: View {
                     }
                 }
                 
-                ForEach(Array(workoutExercise.sets.enumerated()), id: \.element) { index, set in
+                ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { index, set in
                     HStack {
                         Text("\(index + 1)").hAlign(.center)
                         
@@ -59,8 +59,6 @@ struct WorkoutExerciseCell: View {
                     }
                     .font(.subheadline)
                 }
-                
-                
             }
         }
         .padding()

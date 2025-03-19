@@ -35,14 +35,14 @@ enum ExercisePart: String, CaseIterable {
 }
 
 // 새롭게 추가: 각 세트의 정보를 관리하는 모델
-struct ExerciseSet: Codable, Hashable, Identifiable {
+struct ExerciseSet: Identifiable, Codable {
     var id: String = UUID().uuidString
     var reps: Int
     var weight: Double
 }
 
 // 기존 WorkoutExercise 모델을 수정하여 세트 정보를 배열로 관리하도록 변경
-struct WorkoutExercise: Identifiable, Codable, Hashable {
+struct WorkoutExercise: Identifiable, Codable {
     var id: String = UUID().uuidString
     var name: String           // 운동 이름 (예: "benchpress")
     var part: String           // 운동 부위 (예: "chest")
