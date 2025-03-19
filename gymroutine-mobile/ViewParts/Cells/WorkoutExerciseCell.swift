@@ -62,7 +62,7 @@ struct WorkoutExerciseCell: View {
             }
         }
         .padding()
-        .background()
+        .background(Color(UIColor.systemGray6))
         .clipShape(.rect(cornerRadius: 8))
         .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
     }

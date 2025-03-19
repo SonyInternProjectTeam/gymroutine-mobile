@@ -1,5 +1,5 @@
 //
-//  NewExeciseDetailView.swift
+//  NewExerciseDetailView.swift
 //  gymroutine-mobile
 //  
 //  Created by SATTSAT on 2025/03/17
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct NewExerciseDetailView: View {
+struct ExerciseDetailView: View {
     
     let exercise: Exercise
     let isReadOnly: Bool
@@ -46,7 +46,7 @@ struct NewExerciseDetailView: View {
     }
 }
 
-extension NewExerciseDetailView {
+extension ExerciseDetailView {
     private var headerBox: some View {
         Image(.welcomeLogo)
             .resizable()
@@ -91,7 +91,7 @@ extension NewExerciseDetailView {
 
 #Preview {
     NavigationStack {
-        NewExerciseDetailView(
+        ExerciseDetailView(
             exercise: .mock(),
             isReadOnly: false,
             onAddButtonTapped: {

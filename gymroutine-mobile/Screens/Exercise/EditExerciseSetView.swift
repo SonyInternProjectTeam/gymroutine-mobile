@@ -123,7 +123,11 @@ extension EditExerciseSetView {
                 }
                 
                 Button {
-                    workoutExercise.sets.append(ExerciseSet(reps: 0, weight: 0))
+                    if let lastSet = workoutExercise.sets.last {
+                        workoutExercise.sets.append(ExerciseSet(reps: lastSet.reps, weight: lastSet.weight))
+                    } else {
+                        workoutExercise.sets.append(ExerciseSet(reps: 0, weight: 0))
+                    }
                 } label: {
                     Label("セットを追加する", systemImage: "plus")
                         .font(.headline)

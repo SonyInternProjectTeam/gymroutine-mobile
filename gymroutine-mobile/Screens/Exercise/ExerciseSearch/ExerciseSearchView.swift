@@ -1,5 +1,5 @@
 //
-//  NewExeciseSearchView.swift
+//  NewExerciseSearchView.swift
 //  gymroutine-mobile
 //  
 //  Created by SATTSAT on 2025/03/16
@@ -8,19 +8,19 @@
 
 import SwiftUI
 
-struct NewExerciseSearchView: View {
+struct ExerciseSearchView: View {
     
     private let isReadOnly: Bool
-    @ObservedObject var execisesManager: WorkoutExecisesManager
+    @ObservedObject var exercisesManager: WorkoutExercisesManager
     @StateObject private var viewModel = ExerciseSearchViewModel()
     private let exerciseColumns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible())
     ]
     
-    init(execisesManager: WorkoutExecisesManager? = nil) {
-        self.isReadOnly = execisesManager == nil
-        self.execisesManager = execisesManager ?? WorkoutExecisesManager()
+    init(exercisesManager: WorkoutExercisesManager? = nil) {
+        self.isReadOnly = exercisesManager == nil
+        self.exercisesManager = exercisesManager ?? WorkoutExercisesManager()
     }
     
     var body: some View {
@@ -82,16 +82,16 @@ struct NewExerciseSearchView: View {
             LazyVGrid(columns: exerciseColumns, spacing: 12) {
                 ForEach(viewModel.filterExercises, id: \.self) { exercise in
                     NavigationLink {
-                        NewExerciseDetailView(
+                        ExerciseDetailView(
                             exercise: exercise,
                             isReadOnly: isReadOnly,
                             onAddButtonTapped: {
-                                execisesManager.appendExercise(exercise: exercise)
+                                exercisesManager.appendExercise(exercise: exercise)
                             }
                         )
                     } label: {
                         ExerciseGridCell(exercise: exercise, onTapPlusButton: {
-                            execisesManager.appendExercise(exercise: exercise)
+                            exercisesManager.appendExercise(exercise: exercise)
                         })
                     }
                 }
@@ -102,5 +102,5 @@ struct NewExerciseSearchView: View {
 }
 
 #Preview {
-    NewExerciseSearchView()
+    ExerciseSearchView()
 }

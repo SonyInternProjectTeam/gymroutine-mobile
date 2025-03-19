@@ -33,10 +33,10 @@ enum Weekday: String, CaseIterable {
 }
 
 // エクササイズのCRUDを管理
-class WorkoutExecisesManager: ObservableObject {
+class WorkoutExercisesManager: ObservableObject {
     @Published var exercises: [WorkoutExercise] = []
     
-    //ExerciseをWorkoutExerciseに変換しながら削除
+    //ExerciseをWorkoutExerciseに変換しながら追加
     func appendExercise(exercise: Exercise) {
         let newWorkoutExercise = WorkoutExercise(
             name: exercise.name,
@@ -56,7 +56,7 @@ class WorkoutExecisesManager: ObservableObject {
     }
 }
 
-final class NewCreateWorkoutViewModel: WorkoutExecisesManager {
+final class CreateWorkoutViewModel: WorkoutExercisesManager {
     @Published var workoutName: String = ""
     @Published var notes: String = ""
     @Published var isRoutine = false

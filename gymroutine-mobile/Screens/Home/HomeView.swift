@@ -36,7 +36,7 @@ struct HomeView: View {
                 .padding()
         }
         .fullScreenCover(isPresented: $createWorkoutFlg) {
-            NewCreateWorkoutView()
+            CreateWorkoutView()
         }
     }
     

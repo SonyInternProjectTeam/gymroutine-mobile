@@ -8,10 +8,10 @@
 
 import SwiftUI
 
-struct NewCreateWorkoutView: View {
+struct CreateWorkoutView: View {
     
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel = NewCreateWorkoutViewModel()
+    @StateObject var viewModel = CreateWorkoutViewModel()
     let columns: [GridItem] = Array(repeating: .init(.flexible()),
                                             count: 3)
     
@@ -27,7 +27,7 @@ struct NewCreateWorkoutView: View {
                     nameBox
                     routineBox
                     notesBox
-                    execisesBox
+                    exercisesBox
                 }
                 .padding()
             }
@@ -36,23 +36,25 @@ struct NewCreateWorkoutView: View {
             .contentMargins(.bottom, 80)
         }
         .sheet(isPresented: $viewModel.searchExercisesFlg) {
-            NewExerciseSearchView(execisesManager: viewModel)
+            ExerciseSearchView(exercisesManager: viewModel)
                 .presentationDragIndicator(.visible)
         }
         .overlay(alignment: .bottom) {
             buttonBox
                 .background(Color(UIColor.systemGray6))
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 }
 
 //MARK: views
-extension NewCreateWorkoutView {
+extension CreateWorkoutView {
     private var headerBox: some View {
         Text("ワークアウト作成")
             .font(.title3.bold())
             .hAlign(.center)
             .padding()
+            .background(Color(UIColor.systemGray6))
     }
     
     private var nameBox: some View {
@@ -123,7 +125,7 @@ extension NewCreateWorkoutView {
         }
     }
     
-    private var execisesBox: some View {
+    private var exercisesBox: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("エクササイズ")
                 .font(.headline)
@@ -211,5 +213,5 @@ extension NewCreateWorkoutView {
 }
 
 #Preview {
-    NewCreateWorkoutView()
+    CreateWorkoutView()
 }
