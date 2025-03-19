@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */; };
 		00CDC4252D845E8E003B18EB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC3DB2D845E8E003B18EB /* Preview Assets.xcassets */; };
 		00CDC4262D845E8E003B18EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC4222D845E8E003B18EB /* Assets.xcassets */; };
 		00CDC4272D845E8E003B18EB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC4232D845E8E003B18EB /* GoogleService-Info.plist */; };
@@ -107,6 +108,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseSetView.swift; sourceTree = "<group>"; };
 		00CDC3D02D845E8E003B18EB /* gymroutine_mobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gymroutine_mobileApp.swift; sourceTree = "<group>"; };
 		00CDC3D12D845E8E003B18EB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		00CDC3D32D845E8E003B18EB /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
@@ -554,6 +556,7 @@
 				00CDC4832D85DBD1003B18EB /* NewExerciseSearchView.swift */,
 				00CDC3E92D845E8E003B18EB /* ExerciseSearchViewModel.swift */,
 				00CDC4872D87A699003B18EB /* NewExerciseDetailView.swift */,
+				009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */,
 			);
 			path = Exercise;
 			sourceTree = "<group>";
@@ -797,6 +800,7 @@
 				00CDC4602D845E8E003B18EB /* MainView.swift in Sources */,
 				00CDC4612D845E8E003B18EB /* PasswordResetView.swift in Sources */,
 				00CDC4622D845E8E003B18EB /* RootView.swift in Sources */,
+				009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */,
 				00CDC4632D845E8E003B18EB /* SearchUserView.swift in Sources */,
 				00CDC4642D845E8E003B18EB /* SignupView.swift in Sources */,
 				00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */,

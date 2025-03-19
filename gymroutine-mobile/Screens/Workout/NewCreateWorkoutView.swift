@@ -14,7 +14,7 @@ struct NewCreateWorkoutView: View {
     @StateObject var viewModel = NewCreateWorkoutViewModel()
     let columns: [GridItem] = Array(repeating: .init(.flexible()),
                                             count: 3)
-    @State private var searchExecisesFlg = false
+    
     var body: some View {
         VStack(spacing: 0) {
             
@@ -34,7 +34,7 @@ struct NewCreateWorkoutView: View {
             .contentMargins(.top, 16)
             .contentMargins(.bottom, 80)
         }
-        .sheet(isPresented: $searchExecisesFlg) {
+        .sheet(isPresented: $viewModel.searchExercisesFlg) {
             NewExerciseSearchView(execisesManager: viewModel)
                 .presentationDragIndicator(.visible)
         }
@@ -119,7 +119,8 @@ extension NewCreateWorkoutView {
                     VStack {
                         Text("\(index + 1)")
                             .font(.title2)
-                            .padding(12)
+                            .fontWeight(.semibold)
+                            .padding()
                             .background(.main)
                             .clipShape(Circle())
                         
@@ -128,19 +129,43 @@ extension NewCreateWorkoutView {
                             .frame(width: 4)
                     }
                     
-                    WorkoutExerciseCell(workoutExercise: workoutExercise) {
-                        viewModel.addExerciseSet(workoutExercise: workoutExercise)
-                    }
+                    WorkoutExerciseCell(workoutExercise: workoutExercise)
+                        .onTapGesture {
+                            viewModel.onClickedExerciseSets(index: index)
+                        }
+                        .overlay(alignment: .topTrailing) {
+                            Button(action: {
+                                viewModel.removeExercise(workoutExercise)
+                            }, label: {
+                                Image(systemName: "xmark")
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                                    .padding(8)
+                                    .background(.red .opacity(0.5))
+                                    .clipShape(Circle())
+                                    .padding(10)
+                            })
+                        }
+                }
+            }
+            .sheet(isPresented: $viewModel.editExerciseSetsFlg) {
+                if let index = viewModel.selectedIndex {
+                    EditExerciseSetView(
+                        order: (index + 1),
+                        workoutExercise: $viewModel.exercises[index])
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
                 }
             }
             
             Button {
-                searchExecisesFlg.toggle()
+                viewModel.onClickedAddExerciseButton()
             } label: {
                 Text("エクササイズを追加する")
                     .font(.headline)
             }
             .buttonStyle(CapsuleButtonStyle(color: .main))
+            .padding(.horizontal)
         }
     }
     

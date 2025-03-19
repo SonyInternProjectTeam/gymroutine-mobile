@@ -35,6 +35,7 @@ enum Weekday: String, CaseIterable {
 class WorkoutExecisesManager: ObservableObject {
     @Published var exercises: [WorkoutExercise] = []
     
+    //ExerciseをWorkoutExerciseに変換しながら削除
     func appendExercise(exercise: Exercise) {
         let newWorkoutExercise = WorkoutExercise(
             name: exercise.name,
@@ -43,9 +44,13 @@ class WorkoutExecisesManager: ObservableObject {
         exercises.append(newWorkoutExercise)
     }
     
-    func addExerciseSet(workoutExercise: WorkoutExercise) {
+    func removeExercise(_ workoutExercise: WorkoutExercise) {
+        exercises.removeAll { $0.id == workoutExercise.id }
+    }
+    
+    func updateExerciseSet(for workoutExercise: WorkoutExercise) {
         if let index = exercises.firstIndex(where: { $0.id == workoutExercise.id }) {
-            exercises[index].sets.append(ExerciseSet(reps: 0, weight: 0))
+            exercises[index].sets = workoutExercise.sets
         }
     }
 }
@@ -54,6 +59,10 @@ final class NewCreateWorkoutViewModel: WorkoutExecisesManager {
     @Published var workoutName: String = ""
     @Published var isRoutine = false
     @Published var selectedDays: Set<Weekday> = []
+    @Published var selectedIndex: Int? = nil
+    //ModalFlg
+    @Published var searchExercisesFlg = false
+    @Published var editExerciseSetsFlg = false
     
     func toggleSelectionWeekDay(for day: Weekday) {
         if selectedDays.contains(day) {
@@ -61,5 +70,14 @@ final class NewCreateWorkoutViewModel: WorkoutExecisesManager {
         } else {
             selectedDays.insert(day)
         }
+    }
+    
+    func onClickedExerciseSets(index: Int) {
+        selectedIndex = index
+        editExerciseSetsFlg = true
+    }
+    
+    func onClickedAddExerciseButton() {
+        searchExercisesFlg = true
     }
 }

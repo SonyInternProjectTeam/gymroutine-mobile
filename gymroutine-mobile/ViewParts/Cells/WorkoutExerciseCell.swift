@@ -11,11 +11,10 @@ import SwiftUI
 struct WorkoutExerciseCell: View {
     
     let workoutExercise: WorkoutExercise
-    var onTapAddSetButton: () -> Void
     private let exerciseDetailOptions = ["セット", "レップ数", "重さ"]
     
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             HStack(spacing: 16) {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(.main)
@@ -40,26 +39,6 @@ struct WorkoutExerciseCell: View {
             Divider()
             
             VStack(spacing: 16) {
-                HStack {
-                    Text("詳細")
-                        .font(.headline)
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        onTapAddSetButton()
-                    }, label: {
-                        Label("追加", systemImage: "plus")
-                            .font(.headline)
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .stroke(.secondary.opacity(0.4), lineWidth: 2)
-                            )
-                    })
-                    .tint(.primary)
-                }
                 
                 HStack {
                     ForEach(exerciseDetailOptions, id: \.self) { name in
@@ -93,10 +72,8 @@ struct WorkoutExerciseCell: View {
 
 #Preview {
     VStack {
-        WorkoutExerciseCell(workoutExercise: .mock()) {
-            print("セットを追加")
-        }
-        .padding()
+        WorkoutExerciseCell(workoutExercise: .mock())
+            .padding()
     }
     .vAlign(.center)
     .background(Color.gray.opacity(0.1))
