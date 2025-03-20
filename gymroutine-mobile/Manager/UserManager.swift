@@ -54,6 +54,7 @@ class UserManager: ObservableObject {
         )
     }
     
+    // TODO : Service or Repoに移動するべき
     // follower
     func fetchFollowersCount(userId: String) async -> Int {
         do {
