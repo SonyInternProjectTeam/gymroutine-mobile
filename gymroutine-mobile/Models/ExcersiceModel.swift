@@ -53,6 +53,10 @@ struct WorkoutExercise: Identifiable, Codable {
     var part: String           // 운동 부위 (예: "chest")
     var sets: [ExerciseSet]    // 각 세트의 정보 (예: [{ reps: 12, weight: 50 }, ...])
     
+    private enum CodingKeys: String, CodingKey {
+        case name, part, sets
+    }
+    
     static func mock() -> WorkoutExercise {
         return WorkoutExercise(
             name: "Bench Press",
