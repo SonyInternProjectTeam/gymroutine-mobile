@@ -45,6 +45,7 @@ struct FollowingListView: View {
         }
         .navigationTitle("フォロー中")
         .task {
+            UIApplication.showLoading()
             print("DEBUG: Loading following list for userID: \(userID)")
             let result = await followService.getFollowing(for: userID)
             switch result {
@@ -55,6 +56,7 @@ struct FollowingListView: View {
                 print("ERROR: Failed to fetch following users: \(error.localizedDescription)")
                 errorMessage = error.localizedDescription
             }
+            UIApplication.hideLoading()
         }
     }
 }

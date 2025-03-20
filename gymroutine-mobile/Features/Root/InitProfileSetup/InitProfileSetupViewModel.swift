@@ -9,6 +9,7 @@
 import Foundation
 import FirebaseAuth
 import Combine
+import SwiftUI
 
 @MainActor
 final class InitProfileSetupViewModel: ObservableObject {
@@ -59,7 +60,7 @@ final class InitProfileSetupViewModel: ObservableObject {
         )
         
         Task {
-            //ローディング画面表示
+            UIApplication.showLoading()
             let saveResult = await authService.saveUserInfo(user: user)
             switch saveResult {
             case .success(_):
@@ -67,7 +68,7 @@ final class InitProfileSetupViewModel: ObservableObject {
             case .failure(let error):
                 self.errorMessage = error.localizedDescription
             }
-            //ローディング画面非表示
+            UIApplication.hideLoading()
         }
     }
 
