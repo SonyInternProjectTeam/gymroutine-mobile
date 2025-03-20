@@ -390,7 +390,7 @@
 				00CDC3DA2D845E8E003B18EB /* Models */,
 				00CDC3DF2D845E8E003B18EB /* Repositories */,
 				00CDC3E62D845E8E003B18EB /* Services */,
-				00CDC4682D845EB4003B18EB /* Screens */,
+				00CDC4682D845EB4003B18EB /* Features */,
 				00CDC3F52D845E8E003B18EB /* ViewModels */,
 				00CDC4092D845E8E003B18EB /* ViewParts */,
 				00CDC4212D845E8E003B18EB /* Views */,
@@ -401,7 +401,7 @@
 			path = "gymroutine-mobile";
 			sourceTree = "<group>";
 		};
-		00CDC4682D845EB4003B18EB /* Screens */ = {
+		00CDC4682D845EB4003B18EB /* Features */ = {
 			isa = PBXGroup;
 			children = (
 				00CDC4822D85DB9B003B18EB /* Exercise */,
@@ -412,7 +412,7 @@
 				00CDC46C2D846083003B18EB /* Sns */,
 				00CDC4742D8464B5003B18EB /* Profile */,
 			);
-			path = Screens;
+			path = Features;
 			sourceTree = "<group>";
 		};
 		00CDC4692D845FCD003B18EB /* Home */ = {
