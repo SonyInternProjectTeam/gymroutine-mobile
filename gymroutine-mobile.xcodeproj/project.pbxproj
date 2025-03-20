@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		003AF5DA2D8BE9F60019B3AF /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003AF5D92D8BE9F60019B3AF /* UIApplication+Extensions.swift */; };
+		008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008769DE2D8BD5C400965C26 /* LoadingView.swift */; };
 		009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */; };
 		00CDC4252D845E8E003B18EB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC3DB2D845E8E003B18EB /* Preview Assets.xcassets */; };
 		00CDC4262D845E8E003B18EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC4222D845E8E003B18EB /* Assets.xcassets */; };
@@ -100,6 +102,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		003AF5D92D8BE9F60019B3AF /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
+		008769DE2D8BD5C400965C26 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseSetView.swift; sourceTree = "<group>"; };
 		00CDC3D02D845E8E003B18EB /* gymroutine_mobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gymroutine_mobileApp.swift; sourceTree = "<group>"; };
 		00CDC3D12D845E8E003B18EB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
@@ -216,6 +220,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		008769DD2D8BD5B200965C26 /* OverlayViews */ = {
+			isa = PBXGroup;
+			children = (
+				008769DE2D8BD5C400965C26 /* LoadingView.swift */,
+			);
+			path = OverlayViews;
+			sourceTree = "<group>";
+		};
 		009CE5D82D8B226800FD76FD /* ExerciseSearch */ = {
 			isa = PBXGroup;
 			children = (
@@ -238,6 +250,7 @@
 			isa = PBXGroup;
 			children = (
 				00CDC3D32D845E8E003B18EB /* View+Extensions.swift */,
+				003AF5D92D8BE9F60019B3AF /* UIApplication+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -353,6 +366,7 @@
 		00CDC4092D845E8E003B18EB /* ViewParts */ = {
 			isa = PBXGroup;
 			children = (
+				008769DD2D8BD5B200965C26 /* OverlayViews */,
 				00CDC3FD2D845E8E003B18EB /* Buttons */,
 				00CDC3FF2D845E8E003B18EB /* Cells */,
 				00CDC4042D845E8E003B18EB /* InputText */,
@@ -724,6 +738,7 @@
 				00CDC42A2D845E8E003B18EB /* View+Extensions.swift in Sources */,
 				00CDC42B2D845E8E003B18EB /* UserManager.swift in Sources */,
 				00CDC42C2D845E8E003B18EB /* ExcersiceModel.swift in Sources */,
+				008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */,
 				00CDC42D2D845E8E003B18EB /* UserModel.swift in Sources */,
 				00CDC42E2D845E8E003B18EB /* WorkoutModel.swift in Sources */,
 				00CDC42F2D845E8E003B18EB /* FollowRepository.swift in Sources */,
@@ -756,6 +771,7 @@
 				00CDC4492D845E8E003B18EB /* SecondaryButtonStyle.swift in Sources */,
 				00CDC44A2D845E8E003B18EB /* SecondaryCircleButtonStyle.swift in Sources */,
 				00CDC44B2D845E8E003B18EB /* SelectableButtonStyle.swift in Sources */,
+				003AF5DA2D8BE9F60019B3AF /* UIApplication+Extensions.swift in Sources */,
 				00CDC44C2D845E8E003B18EB /* WorkoutCell.swift in Sources */,
 				00CDC44D2D845E8E003B18EB /* DateInputField.swift in Sources */,
 				00CDC44E2D845E8E003B18EB /* EmailAddressField.swift in Sources */,
