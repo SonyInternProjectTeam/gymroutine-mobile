@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		003AF5DA2D8BE9F60019B3AF /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003AF5D92D8BE9F60019B3AF /* UIApplication+Extensions.swift */; };
+		003AF5EB2D8BF2720019B3AF /* BannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003AF5EA2D8BF2720019B3AF /* BannerView.swift */; };
 		008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008769DE2D8BD5C400965C26 /* LoadingView.swift */; };
 		009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */; };
 		00CDC4252D845E8E003B18EB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC3DB2D845E8E003B18EB /* Preview Assets.xcassets */; };
@@ -103,6 +104,7 @@
 
 /* Begin PBXFileReference section */
 		003AF5D92D8BE9F60019B3AF /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
+		003AF5EA2D8BF2720019B3AF /* BannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerView.swift; sourceTree = "<group>"; };
 		008769DE2D8BD5C400965C26 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseSetView.swift; sourceTree = "<group>"; };
 		00CDC3D02D845E8E003B18EB /* gymroutine_mobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gymroutine_mobileApp.swift; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 			isa = PBXGroup;
 			children = (
 				008769DE2D8BD5C400965C26 /* LoadingView.swift */,
+				003AF5EA2D8BF2720019B3AF /* BannerView.swift */,
 			);
 			path = OverlayViews;
 			sourceTree = "<group>";
@@ -741,6 +744,7 @@
 				008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */,
 				00CDC42D2D845E8E003B18EB /* UserModel.swift in Sources */,
 				00CDC42E2D845E8E003B18EB /* WorkoutModel.swift in Sources */,
+				003AF5EB2D8BF2720019B3AF /* BannerView.swift in Sources */,
 				00CDC42F2D845E8E003B18EB /* FollowRepository.swift in Sources */,
 				00CDC4302D845E8E003B18EB /* SnsRepository.swift in Sources */,
 				00CDC4312D845E8E003B18EB /* AuthService.swift in Sources */,
