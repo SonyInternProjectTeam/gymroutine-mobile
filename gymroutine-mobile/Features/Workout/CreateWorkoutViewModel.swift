@@ -93,6 +93,11 @@ final class CreateWorkoutViewModel: WorkoutExercisesManager {
             fatalError("[ERROR] ログインしていません")
         }
         
+        guard !self.workoutName.isEmpty else {
+            UIApplication.showBanner(type: .error, message: "ワークアウト名を入力してください")
+            return
+        }
+        
         // 週の順番にソート処理
         let sortedDays = selectedDays.sorted { lhs, rhs in
             Weekday.allCases.firstIndex(of: lhs)! < Weekday.allCases.firstIndex(of: rhs)!
