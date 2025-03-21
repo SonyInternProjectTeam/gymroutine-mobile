@@ -21,7 +21,6 @@ final class InitProfileSetupViewModel: ObservableObject {
     @Published var age: Int = 0
     @Published var gender: Gender? = nil
     @Published var birthday: Date = Date()
-    @Published var errorMessage: String? = nil
     @Published var isSignedUp: Bool = false
     @Published var currentStep: SetupStep = .nickname
 
@@ -66,7 +65,7 @@ final class InitProfileSetupViewModel: ObservableObject {
             case .success(_):
                 router.switchRootView(to: .main(user: user))
             case .failure(let error):
-                self.errorMessage = error.localizedDescription
+                UIApplication.showBanner(type: .error, message: error.localizedDescription)
             }
             UIApplication.hideLoading()
         }

@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 class SignupViewModel: ObservableObject {
     @Published var email: String = ""
@@ -16,7 +17,6 @@ class SignupViewModel: ObservableObject {
     @Published var age: Int = 0
     @Published var gender: String = ""
     @Published var birthday: Date = Date()
-    @Published var errorMessage: String? = nil
     @Published var userUID: String? = nil
     @Published var isSignedUp: Bool = false
 
@@ -31,17 +31,17 @@ class SignupViewModel: ObservableObject {
     /// Firebase Authentication - create account
     func signupWithEmailAndPassword(completion: @escaping (Bool) -> Void) {
         guard password == confirmPassword else {
-            self.errorMessage = "Passwords do not match"
+            UIApplication.showBanner(type: .error, message: "パスワードが一致していません。")
             completion(false)
             return
         }
 
         authService.createUser(email: email, password: password)
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completionResult in
+            .sink(receiveCompletion: { completionResult in
                 switch completionResult {
                 case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                    UIApplication.showBanner(type: .error, message: error.localizedDescription)
                     print("Error creating user: \(error.localizedDescription)")
                     completion(false)
                 case .finished:
@@ -50,7 +50,6 @@ class SignupViewModel: ObservableObject {
             }, receiveValue: { [weak self] userUID in
                 self?.userUID = userUID
                 print("User UID: \(userUID)") // 로그 추가
-                self?.errorMessage = nil
                 completion(true)
             })
             .store(in: &cancellables)

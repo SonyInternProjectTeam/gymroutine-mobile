@@ -44,10 +44,12 @@ class WorkoutExercisesManager: ObservableObject {
             part: exercise.part,
             sets: [ExerciseSet(reps: 0, weight: 0)])
         exercises.append(newWorkoutExercise)
+        UIApplication.showBanner(type: .success, message: "\(exercise.name)を追加しました")
     }
     
     func removeExercise(_ workoutExercise: WorkoutExercise) {
         exercises.removeAll { $0.id == workoutExercise.id }
+        UIApplication.showBanner(type: .notice, message: "\(workoutExercise.name)を削除しました")
     }
     
     func updateExerciseSet(for workoutExercise: WorkoutExercise) {
@@ -91,6 +93,11 @@ final class CreateWorkoutViewModel: WorkoutExercisesManager {
     func onClickedCreateWorkoutButton(completion: @escaping () -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else {
             fatalError("[ERROR] ログインしていません")
+        }
+        
+        guard !self.workoutName.isEmpty else {
+            UIApplication.showBanner(type: .error, message: "ワークアウト名を入力してください")
+            return
         }
         
         // 週の順番にソート処理

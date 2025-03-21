@@ -14,14 +14,6 @@ struct SignupView: View {
         VStack(alignment: .center, spacing: 0) {
             InputForm
 
-            if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .padding(.top, 8)
-                    .padding(.leading, 4)
-                    .hAlign(.leading)
-            }
-
             Spacer()
 
             Button(action: {
