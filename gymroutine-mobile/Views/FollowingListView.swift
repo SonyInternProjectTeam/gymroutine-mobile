@@ -1,5 +1,5 @@
 //
-//  FollowersListView.swift
+//  FollowingListView.swift
 //  gymroutine-mobile
 //
 //  Created by 조성화 on 2025/03/01.
@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct FollowersListView: View {
+struct FollowingListView: View {
     let userID: String
-    @State private var followers: [User] = []
+    @State private var following: [User] = []
     @State private var errorMessage: String? = nil
     private let followService = FollowService()
     
@@ -19,7 +19,7 @@ struct FollowersListView: View {
                 Text("Error: \(errorMessage)")
                     .foregroundColor(.red)
             } else {
-                ForEach(followers, id: \.uid) { user in
+                ForEach(following, id: \.uid) { user in
                     HStack {
                         if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
                             AsyncImage(url: url) { image in
@@ -43,17 +43,17 @@ struct FollowersListView: View {
                 }
             }
         }
-        .navigationTitle("フォロワー")
+        .navigationTitle("フォロー中")
         .task {
             UIApplication.showLoading()
-            print("DEBUG: Loading followers list for userID: \(userID)")
-            let result = await followService.getFollowers(for: userID)
+            print("DEBUG: Loading following list for userID: \(userID)")
+            let result = await followService.getFollowing(for: userID)
             switch result {
             case .success(let users):
-                print("DEBUG: Successfully fetched followers: \(users.map { $0.name })")
-                followers = users
+                print("DEBUG: Successfully fetched following users: \(users.map { $0.name })")
+                following = users
             case .failure(let error):
-                print("ERROR: Failed to fetch followers: \(error.localizedDescription)")
+                print("ERROR: Failed to fetch following users: \(error.localizedDescription)")
                 errorMessage = error.localizedDescription
             }
             UIApplication.hideLoading()

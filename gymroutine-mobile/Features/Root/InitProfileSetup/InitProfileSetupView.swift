@@ -96,13 +96,6 @@ extension InitProfileSetupView {
                 }
                 .bold()
                 .fieldBackground()
-
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .font(.callout)
-                        .padding(.horizontal, 8)
-                }
             }
         }
     }
