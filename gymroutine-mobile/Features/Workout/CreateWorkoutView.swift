@@ -200,7 +200,9 @@ extension CreateWorkoutView {
                 
                 
                 Button {
-                    viewModel.onClickedCreateWorkoutButton()
+                    viewModel.onClickedCreateWorkoutButton() {
+                        dismiss()
+                    }
                 } label: {
                     Label("作成する", systemImage: "plus")
                 }

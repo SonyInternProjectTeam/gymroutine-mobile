@@ -78,15 +78,15 @@ final class ProfileViewModel: ObservableObject {
     /// フォロワーとフォロー中の数を読み込む
     /// - Parameter userId: ユーザーのUID
     private func loadFollowerAndFollowingCounts(userId: String) {
-        // ※ここでは UserManager 経由でのカウント取得処理を使っていますが、
-        //    必要に応じて FollowService 経由でフォロワー一覧やフォロー中一覧を取得し、数を更新することも可能です。
         Task {
+            UIApplication.showLoading()
             let followers = await userManager.fetchFollowersCount(userId: userId)
             let following = await userManager.fetchFollowingCount(userId: userId)
             DispatchQueue.main.async {
                 self.followersCount = followers
                 self.followingCount = following
             }
+            UIApplication.hideLoading()
         }
     }
     
@@ -94,12 +94,14 @@ final class ProfileViewModel: ObservableObject {
     /// - Parameter image: アップロードするUIImage
     func uploadProfilePhoto(_ image: UIImage) {
         Task {
+            UIApplication.showLoading()
             guard let userID = userManager.currentUser?.uid else { return }
             if let newProfileURL = await userService.uploadProfilePhoto(userID: userID, image: image) {
                 DispatchQueue.main.async {
                     self.user?.profilePhoto = newProfileURL
                 }
             }
+            UIApplication.hideLoading()
         }
     }
     
@@ -108,6 +110,7 @@ final class ProfileViewModel: ObservableObject {
     /// 現在ログイン中のユーザーがこのプロフィールを既にフォローしているか確認する
     func updateFollowingStatus() {
         Task {
+            UIApplication.showLoading()
             guard let currentUserID = userManager.currentUser?.uid,
                   let profileUserID = user?.uid,
                   currentUserID != profileUserID else { return }
@@ -115,12 +118,14 @@ final class ProfileViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isFollowing = status
             }
+            UIApplication.hideLoading()
         }
     }
     
     /// フォローする処理
     func follow() {
         Task {
+            UIApplication.showLoading()
             guard let currentUserID = userManager.currentUser?.uid,
                   let profileUserID = user?.uid,
                   currentUserID != profileUserID else { return }
@@ -131,12 +136,14 @@ final class ProfileViewModel: ObservableObject {
                     self.followersCount += 1
                 }
             }
+            UIApplication.hideLoading()
         }
     }
     
     /// フォロー解除する処理
     func unfollow() {
         Task {
+            UIApplication.showLoading()
             guard let currentUserID = userManager.currentUser?.uid,
                   let profileUserID = user?.uid,
                   currentUserID != profileUserID else { return }
@@ -147,6 +154,7 @@ final class ProfileViewModel: ObservableObject {
                     self.followersCount -= 1
                 }
             }
+            UIApplication.hideLoading()
         }
     }
     
@@ -154,11 +162,13 @@ final class ProfileViewModel: ObservableObject {
     /// - Parameter newItem: 変更後のPhotosPickerItem
     func handleSelectedPhotoItemChange(_ newItem: PhotosPickerItem?) {
         Task {
+            UIApplication.showLoading()
             if let newItem = newItem,
                let data = try? await newItem.loadTransferable(type: Data.self),
                let image = UIImage(data: data) {
                 self.uploadProfilePhoto(image)
             }
+            UIApplication.hideLoading()
         }
     }
 }

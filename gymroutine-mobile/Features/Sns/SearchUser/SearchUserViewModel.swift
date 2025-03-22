@@ -1,4 +1,8 @@
+
+
+
 import Foundation
+import SwiftUI
 
 @MainActor
 final class SearchUserViewModel: ObservableObject {
@@ -11,6 +15,7 @@ final class SearchUserViewModel: ObservableObject {
     /// ユーザー名でユーザー検索を行い、結果を userDetails に設定する
     func fetchUsers() {
         Task {
+            UIApplication.showLoading()
             let result = await userService.searchUsersByName(name: searchName)
             switch result {
             case .success(let users):
@@ -19,6 +24,7 @@ final class SearchUserViewModel: ObservableObject {
             case .failure(let error):
                 errorMessage = error.localizedDescription
             }
+            UIApplication.hideLoading()
         }
     }
 }

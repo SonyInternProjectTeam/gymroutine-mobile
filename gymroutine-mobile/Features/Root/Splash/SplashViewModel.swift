@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import SwiftUI
 
 @MainActor
 final class SplashViewModel: ObservableObject {
@@ -29,7 +30,6 @@ final class SplashViewModel: ObservableObject {
         
         Task {
             await userManager.initializeUser()
-            //ローディングView表示
             let fetchResult = await authService.fetchUser(uid: currentUser.uid)
             switch fetchResult {
             case .success(let user):
@@ -38,7 +38,6 @@ final class SplashViewModel: ObservableObject {
                 print("[ERROR] \(error.localizedDescription)")
                 router.switchRootView(to: .initProfileSetup)
             }
-            //ローディングView非表示
         }
     }
 }

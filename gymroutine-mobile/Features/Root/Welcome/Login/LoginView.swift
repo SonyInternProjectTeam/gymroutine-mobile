@@ -25,13 +25,7 @@ struct LoginView: View {
             }
             .padding(.vertical, 16)
             .hAlign(.leading)
-
-            if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .hAlign(.leading)
-            }
-
+            
             Spacer()
 
             // TODO: disable対応

@@ -1,11 +1,15 @@
+
+
+
+
 import Foundation
 import FirebaseAuth
 import Combine
+import SwiftUI
 
 class PasswordResetViewModel: ObservableObject {
     @Published var email: String = ""
     @Published var birthday: Date = Date()
-    @Published var errorMessage: String? = nil
     @Published var isResetLinkSent: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
@@ -21,7 +25,7 @@ class PasswordResetViewModel: ObservableObject {
     func sendPasswordReset() {
         // 入力チェック
         guard !email.isEmpty else {
-            errorMessage = "メールアドレスを入力してください。"
+            UIApplication.showBanner(type: .error, message: "メールアドレスを入力してください。")
             return
         }
 
@@ -31,9 +35,8 @@ class PasswordResetViewModel: ObservableObject {
                 switch result {
                 case .success:
                     self?.isResetLinkSent = true
-                    self?.errorMessage = nil
                 case .failure(let error):
-                    self?.errorMessage = error.localizedDescription
+                    UIApplication.showBanner(type: .error, message: error.localizedDescription)
                 }
             }
         }

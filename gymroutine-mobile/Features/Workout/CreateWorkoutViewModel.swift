@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import SwiftUI
 
 enum Weekday: String, CaseIterable {
     case monday = "Monday"
@@ -43,10 +44,12 @@ class WorkoutExercisesManager: ObservableObject {
             part: exercise.part,
             sets: [ExerciseSet(reps: 0, weight: 0)])
         exercises.append(newWorkoutExercise)
+        UIApplication.showBanner(type: .success, message: "\(exercise.name)を追加しました")
     }
     
     func removeExercise(_ workoutExercise: WorkoutExercise) {
         exercises.removeAll { $0.id == workoutExercise.id }
+        UIApplication.showBanner(type: .notice, message: "\(workoutExercise.name)を削除しました")
     }
     
     func updateExerciseSet(for workoutExercise: WorkoutExercise) {
@@ -56,6 +59,7 @@ class WorkoutExercisesManager: ObservableObject {
     }
 }
 
+@MainActor
 final class CreateWorkoutViewModel: WorkoutExercisesManager {
     @Published var workoutName: String = ""
     @Published var notes: String = ""
@@ -86,9 +90,14 @@ final class CreateWorkoutViewModel: WorkoutExercisesManager {
     }
     
     // ワークアウト作成
-    func onClickedCreateWorkoutButton() {
+    func onClickedCreateWorkoutButton(completion: @escaping () -> Void) {
         guard let userId = Auth.auth().currentUser?.uid else {
             fatalError("[ERROR] ログインしていません")
+        }
+        
+        guard !self.workoutName.isEmpty else {
+            UIApplication.showBanner(type: .error, message: "ワークアウト名を入力してください")
+            return
         }
         
         // 週の順番にソート処理
@@ -105,15 +114,17 @@ final class CreateWorkoutViewModel: WorkoutExercisesManager {
             scheduledDays: sortedDays.map { $0.rawValue },
             exercises: self.exercises
         )
-        
         Task {
+            UIApplication.showLoading()
             let result = await service.createWorkout(workout: workout)
             switch result {
             case .success(_):
                 print("[DEBUG] ワークアウトの作成に成功しました！")
+                completion()    //View側にモーダル閉じを指示
             case .failure(let error):
                 print(error.localizedDescription)
             }
+            UIApplication.hideLoading()
         }
     }
 }
