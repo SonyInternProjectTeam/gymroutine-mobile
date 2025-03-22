@@ -13,6 +13,7 @@ struct HomeView: View {
     @EnvironmentObject var userManager: UserManager
     
     @State private var isShowTodayworkouts = true
+    @State private var createWorkoutFlg = false
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -34,13 +35,16 @@ struct HomeView: View {
                 .shadow(radius: 4)
                 .padding()
         }
+        .fullScreenCover(isPresented: $createWorkoutFlg) {
+            CreateWorkoutView()
+        }
     }
     
     private var header: some View {
         VStack(spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    // 左端に自分のプロファイル画像と名前を固定表示
+                    // 현재 사용자 프로필 이미지 및 이름 표시
                     if let currentUser = userManager.currentUser {
                         VStack(spacing: 4) {
                             if let url = URL(string: currentUser.profilePhoto), !currentUser.profilePhoto.isEmpty {
@@ -66,7 +70,7 @@ struct HomeView: View {
                                 .frame(width: 80)
                         }
                     }
-                    // フォロー中のユーザーの画像と名前を表示
+                    // 팔로우 중인 사용자들 표시
                     ForEach(viewModel.followingUsers, id: \.uid) { user in
                         VStack(spacing: 4) {
                             if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
@@ -111,8 +115,8 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: 200)
-        .background()
-        .clipShape(.rect(cornerRadius: 8))
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
     
     private var todaysWorkoutsBox: some View {
@@ -135,9 +139,16 @@ struct HomeView: View {
             .foregroundStyle(.primary)
             
             if isShowTodayworkouts {
-                // 仮表示
-                ForEach(0..<2) { _ in
-                    WorkoutCell()
+                if viewModel.todaysWorkouts.isEmpty {
+                    Text("今日のワークアウトはありません")
+                        .padding()
+                } else {
+                    ForEach(viewModel.todaysWorkouts, id: \.id) { workout in
+                        WorkoutCell(
+                            workoutName: workout.name,
+                            count: workout.exercises.count
+                        )
+                    }
                 }
             }
             
@@ -152,7 +163,7 @@ struct HomeView: View {
                     .font(.title2.bold())
                     .hAlign(.leading)
                 
-                // 仮情報
+                // 임시 정보
                 HStack {
                     VStack(spacing: 16) {
                         Text("累計トレーニング日数")
@@ -169,10 +180,9 @@ struct HomeView: View {
                         .hAlign(.trailing)
                     }
                     .padding()
-                    .hAlign(.center)
                     .frame(height: 108)
-                    .background()
-                    .clipShape(.rect(cornerRadius: 8))
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     
                     VStack {
                         Text("現在の体重")
@@ -189,10 +199,9 @@ struct HomeView: View {
                         .hAlign(.trailing)
                     }
                     .padding()
-                    .hAlign(.center)
                     .frame(height: 108)
-                    .background()
-                    .clipShape(.rect(cornerRadius: 8))
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             } else {
                 Text("ユーザー情報が読み込めません")
@@ -202,22 +211,24 @@ struct HomeView: View {
     
     private var buttonBox: some View {
         HStack {
-            // TODO : これを押した瞬間にはWorkoutsドキュメントが生成されたらだめ
-            
-            NavigationLink {
-                CreateWorkoutView()
+            Button {
+                createWorkoutFlg.toggle()
             } label: {
                 Label("ルーティーン追加", systemImage: "plus")
             }
             .buttonStyle(SecondaryButtonStyle())
             
-            
             Button {
-                
+                // 추가 액션 구현
             } label: {
                 Label("今すぐ始める", systemImage: "play")
             }
             .buttonStyle(PrimaryButtonStyle())
         }
     }
+}
+
+#Preview {
+    HomeView(viewModel: HomeViewModel())
+        .environmentObject(UserManager.shared)
 }

@@ -44,8 +44,8 @@ struct ProfileView: View {
                         label: { EmptyView() }
                     )
                 }
-                .frame(width: 0, height: 0)
-                .hidden()
+                    .frame(width: 0, height: 0)
+                    .hidden()
             )
         }
     }
@@ -134,29 +134,26 @@ struct ProfileView: View {
             case .analysis:
                 Text("分析")
             case .posts:
-                LazyVStack {
-                    ForEach(0..<10) { item in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("6 種目")
-                                    .font(.system(size: 10))
-                                    .foregroundStyle(.secondary)
-                                Text("一軍ワークアウト")
-                            }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
+                if viewModel.workouts.isEmpty {
+                    Text("まだワークアウトがありません")
+                        .padding()
+                } else {
+                    LazyVStack(spacing: 8) {
+                        ForEach(viewModel.workouts, id: \.id) { workout in
+                            // WorkoutCell을 사용하여 워크아웃 정보를 표시
+                            WorkoutCell(
+                                workoutName: workout.name,
+                                count: workout.exercises.count
+                            )
                         }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 16)
-                        .hAlign(.leading)
-                        .background(.white, in: RoundedRectangle(cornerRadius: 8))
                     }
                 }
             }
         }
         .padding(.horizontal, 16)
     }
+    
+    
 }
 
 // MARK: - profileHeader Components
