@@ -76,6 +76,7 @@
 		00CDC4882D87A699003B18EB /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4872D87A699003B18EB /* ExerciseDetailView.swift */; };
 		00CDC4902D87B17A003B18EB /* ExerciseGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */; };
 		00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */; };
+		277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */; };
 		27C5ED742CD90261005380EE /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED732CD90261005380EE /* FirebaseDatabase */; };
 		27C5ED762CD90261005380EE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED752CD90261005380EE /* FirebaseFirestore */; };
 		27C5ED782CD90261005380EE /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED772CD90261005380EE /* FirebaseFirestoreCombine-Community */; };
@@ -172,6 +173,7 @@
 		00CDC4872D87A699003B18EB /* ExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailView.swift; sourceTree = "<group>"; };
 		00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseGridCell.swift; sourceTree = "<group>"; };
 		00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseCell.swift; sourceTree = "<group>"; };
+		277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRepository.swift; sourceTree = "<group>"; };
 		27E5E5222CCEC9E9003E3E70 /* gymroutine-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gymroutine-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E5322CCEC9EA003E3E70 /* gymroutine-mobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -287,6 +289,7 @@
 		00CDC3DF2D845E8E003B18EB /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */,
 				00CDC3DD2D845E8E003B18EB /* FollowRepository.swift */,
 				00CDC3DE2D845E8E003B18EB /* SnsRepository.swift */,
 			);
@@ -769,6 +772,7 @@
 				00CDC4422D845E8E003B18EB /* SplashViewModel.swift in Sources */,
 				00CDC4442D845E8E003B18EB /* WorkoutProcessViewModel.swift in Sources */,
 				00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */,
+				277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */,
 				00CDC4462D845E8E003B18EB /* CircleButtonStyle.swift in Sources */,
 				00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */,
 				00CDC4482D845E8E003B18EB /* PrimaryButtonStyle.swift in Sources */,

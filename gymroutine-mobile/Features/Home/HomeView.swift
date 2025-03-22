@@ -141,7 +141,9 @@ struct HomeView: View {
             if isShowTodayworkouts {
                 // 仮表示
                 ForEach(0..<2) { _ in
-                    WorkoutCell()
+                    WorkoutCell(
+                        workoutName: "temp", count:1
+                    )
                 }
             }
             
