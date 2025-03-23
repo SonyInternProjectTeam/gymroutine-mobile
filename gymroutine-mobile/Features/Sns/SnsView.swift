@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct SnsView: View {
-    @State private var showSearchOverlay: Bool = false
-
-    // 테스트용 추천 사용자 데이터 (실제 데이터로 대체 가능)
+    // 테스트용 추천 사용자 데이터
     let testUsers: [User] = [
         User(uid: "5CKiKZmOzlhkEECu4VBDZGltkrn2",
              email: "wkk03240324@gmail.com",
@@ -46,59 +44,47 @@ struct SnsView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                // 메인 콘텐츠 (추천 사용자 영역 등)
-                VStack(alignment: .leading) {
-                    // 상단 검색 버튼 (누르면 오버레이 활성화)
-                    Button(action: {
-                        showSearchOverlay = true
-                    }) {
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                            Text("ユーザーを検索")
-                                .foregroundColor(.gray)
-                            Spacer()
-                        }
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(8)
-                        .padding(.horizontal)
+            VStack(alignment: .leading, spacing: 16) {
+                // NavigationLink를 사용해 SearchUserView로 이동
+                NavigationLink(destination: SearchUserView()) {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                        Text("ユーザーを検索")
+                            .foregroundColor(.gray)
+                        Spacer()
                     }
-                    .padding(.top)
-                    
-                    // 추천 사용자 영역
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Image(systemName: "person.2")
-                            Text("おすすめ")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                        }
-                        .padding(.leading, 16)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 10) {
-                                ForEach(testUsers, id: \.name) { user in
-                                    UserProfileView(user: user)
-                                }
-                            }
-                            .padding(.leading, 16)
-                        }
-                    }
-                    .padding(.top)
-                    
-                    Spacer()
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                    .padding(.horizontal)
                 }
                 
-                // 검색 오버레이: 오버레이가 활성화되면 SnsView의 콘텐츠를 완전히 가림
-                if showSearchOverlay {
-                    SearchUserView(showOverlay: $showSearchOverlay)
-                        .background(Color(.systemBackground)) // 불투명 배경
-                        .ignoresSafeArea(edges: .all)        // 전체 영역 덮음
-                        .transition(.opacity)
-                        .zIndex(1)
+                // 추천 사용자 영역
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Image(systemName: "person.2")
+                        Text("おすすめ")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                    }
+                    .padding(.leading, 16)
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(testUsers, id: \.uid) { user in
+                                // 실제 프로젝트에서는 UserCell, UserProfileView 등 사용
+                                UserCell(user: user)
+                            }
+                        }
+                        .padding(.leading, 16)
+                    }
                 }
+                
+                Spacer()
             }
+            .navigationTitle("SNS")
+            // Large Title을 쓰지 않고 상단 여백을 줄이려면 Inline Title
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

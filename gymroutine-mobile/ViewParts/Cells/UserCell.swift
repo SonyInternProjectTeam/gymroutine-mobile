@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UserProfileView: View {
+struct UserCell: View {
     
     var user: User 
     

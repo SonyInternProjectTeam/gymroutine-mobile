@@ -77,6 +77,8 @@
 		00CDC4902D87B17A003B18EB /* ExerciseGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */; };
 		00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */; };
 		277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */; };
+		277467872D8FF510004C25C3 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277467862D8FF510004C25C3 /* UserCell.swift */; };
+		277467892D8FF6CA004C25C3 /* UserSearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277467882D8FF6CA004C25C3 /* UserSearchField.swift */; };
 		27C5ED742CD90261005380EE /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED732CD90261005380EE /* FirebaseDatabase */; };
 		27C5ED762CD90261005380EE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED752CD90261005380EE /* FirebaseFirestore */; };
 		27C5ED782CD90261005380EE /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED772CD90261005380EE /* FirebaseFirestoreCombine-Community */; };
@@ -174,6 +176,8 @@
 		00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseGridCell.swift; sourceTree = "<group>"; };
 		00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseCell.swift; sourceTree = "<group>"; };
 		277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRepository.swift; sourceTree = "<group>"; };
+		277467862D8FF510004C25C3 /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
+		277467882D8FF6CA004C25C3 /* UserSearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSearchField.swift; sourceTree = "<group>"; };
 		27E5E5222CCEC9E9003E3E70 /* gymroutine-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gymroutine-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E5322CCEC9EA003E3E70 /* gymroutine-mobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -334,6 +338,7 @@
 		00CDC3FF2D845E8E003B18EB /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				277467862D8FF510004C25C3 /* UserCell.swift */,
 				00CDC3FE2D845E8E003B18EB /* WorkoutCell.swift */,
 				00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */,
 				00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */,
@@ -348,6 +353,7 @@
 				00CDC4012D845E8E003B18EB /* EmailAddressField.swift */,
 				00CDC4022D845E8E003B18EB /* ExerciseSearchField.swift */,
 				00CDC4032D845E8E003B18EB /* PasswordField.swift */,
+				277467882D8FF6CA004C25C3 /* UserSearchField.swift */,
 			);
 			path = InputText;
 			sourceTree = "<group>";
@@ -743,6 +749,8 @@
 				00CDC4292D845E8E003B18EB /* Router.swift in Sources */,
 				00CDC42A2D845E8E003B18EB /* View+Extensions.swift in Sources */,
 				00CDC42B2D845E8E003B18EB /* UserManager.swift in Sources */,
+				277467872D8FF510004C25C3 /* UserCell.swift in Sources */,
+				277467892D8FF6CA004C25C3 /* UserSearchField.swift in Sources */,
 				00CDC42C2D845E8E003B18EB /* ExcersiceModel.swift in Sources */,
 				008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */,
 				00CDC42D2D845E8E003B18EB /* UserModel.swift in Sources */,
