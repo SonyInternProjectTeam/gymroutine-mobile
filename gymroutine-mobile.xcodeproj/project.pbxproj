@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		003AF5DA2D8BE9F60019B3AF /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003AF5D92D8BE9F60019B3AF /* UIApplication+Extensions.swift */; };
 		003AF5EB2D8BF2720019B3AF /* BannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003AF5EA2D8BF2720019B3AF /* BannerView.swift */; };
+		0074075C2D9BC64C00808964 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0074075B2D9BC64C00808964 /* CalendarViewModel.swift */; };
 		0074075E2D9BC71000808964 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0074075D2D9BC70900808964 /* Date+Extensions.swift */; };
 		007407602D9BC75000808964 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0074075F2D9BC74A00808964 /* Array+Extensions.swift */; };
 		008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008769DE2D8BD5C400965C26 /* LoadingView.swift */; };
@@ -107,6 +108,7 @@
 /* Begin PBXFileReference section */
 		003AF5D92D8BE9F60019B3AF /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
 		003AF5EA2D8BF2720019B3AF /* BannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerView.swift; sourceTree = "<group>"; };
+		0074075B2D9BC64C00808964 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
 		0074075D2D9BC70900808964 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		0074075F2D9BC74A00808964 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		008769DE2D8BD5C400965C26 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -460,6 +462,7 @@
 			isa = PBXGroup;
 			children = (
 				00CDC4142D845E8E003B18EB /* CalendarView.swift */,
+				0074075B2D9BC64C00808964 /* CalendarViewModel.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -805,6 +808,7 @@
 				00CDC4612D845E8E003B18EB /* PasswordResetView.swift in Sources */,
 				00CDC4622D845E8E003B18EB /* RootView.swift in Sources */,
 				009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */,
+				0074075C2D9BC64C00808964 /* CalendarViewModel.swift in Sources */,
 				00CDC4632D845E8E003B18EB /* SearchUserView.swift in Sources */,
 				00CDC4642D845E8E003B18EB /* SignupView.swift in Sources */,
 				00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */,
