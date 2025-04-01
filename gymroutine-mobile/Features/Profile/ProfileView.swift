@@ -140,11 +140,12 @@ struct ProfileView: View {
                 } else {
                     LazyVStack(spacing: 8) {
                         ForEach(viewModel.workouts, id: \.id) { workout in
-                            // WorkoutCell을 사용하여 워크아웃 정보를 표시
-                            WorkoutCell(
-                                workoutName: workout.name,
-                                count: workout.exercises.count
-                            )
+                            NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
+                                WorkoutCell(
+                                    workoutName: workout.name,
+                                    count: workout.exercises.count
+                                )
+                            }
                         }
                     }
                 }
@@ -152,6 +153,7 @@ struct ProfileView: View {
         }
         .padding(.horizontal, 16)
     }
+
     
     
 }
