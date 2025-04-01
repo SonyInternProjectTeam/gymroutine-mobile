@@ -18,7 +18,8 @@ struct UserSearchField: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
             TextField("ユーザーを検索", text: $text)
-                .onChange(of: text) {
+                .onSubmit {
+                    onSubmit()
                 }
         }
         .fieldBackground()

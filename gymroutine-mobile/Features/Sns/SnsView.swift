@@ -7,7 +7,13 @@
 
 import SwiftUI
 
+
+
 struct SnsView: View {
+    @StateObject private var viewModel = SnsViewModel()
+    @FocusState private var isFocused: Bool
+    @State private var searchMode: Bool = false
+    
     // 테스트용 추천 사용자 데이터
     let testUsers: [User] = [
         User(uid: "5CKiKZmOzlhkEECu4VBDZGltkrn2",
@@ -19,7 +25,7 @@ struct SnsView: View {
              birthday: Date(timeIntervalSince1970: 1017570720),
              gender: "男",
              createdAt: Date(timeIntervalSince1970: 1735656838)
-        ),
+            ),
         User(uid: "7KSQ7Wlqr9OFa9j1CXdtBqbGkLU2",
              email: "kazusukechin@gmail.com",
              name: "Kazu",
@@ -29,7 +35,7 @@ struct SnsView: View {
              birthday: Date(timeIntervalSince1970: 1704182340),
              gender: "",
              createdAt: Date(timeIntervalSince1970: 1703839169)
-        ),
+            ),
         User(uid: "AIvdESvweDaVwEednWjk6oekzJQ2",
              email: "test4@test.com",
              name: "Test4",
@@ -39,44 +45,76 @@ struct SnsView: View {
              birthday: Date(timeIntervalSince1970: 1733775060),
              gender: "男性",
              createdAt: Date(timeIntervalSince1970: 1733071896)
-        )
+            )
     ]
     
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 16) {
-                // NavigationLink를 사용해 SearchUserView로 이동
-                NavigationLink(destination: SearchUserView()) {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                        Text("ユーザーを検索")
-                            .foregroundColor(.gray)
-                        Spacer()
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .padding(.horizontal)
-                }
-                
-                // 추천 사용자 영역
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack {
-                        Image(systemName: "person.2")
-                        Text("おすすめ")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                    }
-                    .padding(.leading, 16)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(testUsers, id: \.uid) { user in
-                                // 실제 프로젝트에서는 UserCell, UserProfileView 등 사용
-                                UserCell(user: user)
+                HStack {
+                    UserSearchField(text: $viewModel.searchName, onSubmit: {
+                        viewModel.fetchUsers()
+                    })
+                    .focused($isFocused)
+                    if searchMode {
+                        Button("キャンセル") {
+                            // NavigationStack을 닫음
+                            withAnimation {
+                                isFocused = false
+                                searchMode = false
+                                viewModel.searchName = ""
+                                viewModel.userDetails = []
                             }
                         }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .onChange(of: isFocused) { newValue in
+                    withAnimation {
+                        if searchMode == false {
+                            searchMode = newValue
+                        }
+                    }
+                }
+                
+                if searchMode {
+                    // 검색 결과 / 오류 / 결과 없음 표시
+                    if let errorMessage = viewModel.errorMessage {
+                        Text("Error: \(errorMessage)")
+                            .foregroundColor(.red)
+                            .padding()
+                    } else if viewModel.userDetails.isEmpty {
+                        Text("No results found")
+                            .foregroundColor(.gray)
+                            .padding()
+                    } else {
+                        List(viewModel.userDetails, id: \.uid) { user in
+                            NavigationLink(destination: ProfileView(user: user)) {
+                                userProfileView(for: user)
+                            }
+                        }
+                    }
+                }
+                else {
+                    // 추천 사용자 영역
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Image(systemName: "person.2")
+                            Text("おすすめ")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                        }
                         .padding(.leading, 16)
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 10) {
+                                ForEach(testUsers, id: \.uid) { user in
+                                    // 실제 프로젝트에서는 UserCell, UserProfileView 등 사용
+                                    UserCell(user: user)
+                                }
+                            }
+                            .padding(.leading, 16)
+                        }
                     }
                 }
                 
@@ -85,6 +123,29 @@ struct SnsView: View {
             .navigationTitle("SNS")
             // Large Title을 쓰지 않고 상단 여백을 줄이려면 Inline Title
             .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+    
+    /// 사용자의 프로필 정보를 표시하는 뷰 (필요에 따라 리팩토링)
+    private func userProfileView(for user: User) -> some View {
+        HStack {
+            if !user.profilePhoto.isEmpty, let url = URL(string: user.profilePhoto) {
+                AsyncImage(url: url) { image in
+                    image.resizable()
+                        .scaledToFill()
+                } placeholder: {
+                    ProgressView()
+                }
+                .frame(width: 50, height: 50)
+                .clipShape(Circle())
+            } else {
+                Image(systemName: "person.circle")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .foregroundColor(.gray)
+            }
+            Text(user.name)
+                .font(.headline)
         }
     }
 }
