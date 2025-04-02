@@ -86,6 +86,8 @@
 		27E5E5512CCECA57003E3E70 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5502CCECA57003E3E70 /* FirebaseAnalytics */; };
 		27E5E5532CCECA57003E3E70 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5522CCECA57003E3E70 /* FirebaseCore */; };
 		27E5E5632CCECB2A003E3E70 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5622CCECB2A003E3E70 /* FirebaseAuth */; };
+		79EE751A2D9CF23A004A5B27 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 79EE75192D9CF23A004A5B27 /* Localizable.xcstrings */; };
+		79EE75982D9D0932004A5B27 /* ExerciseImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EE75972D9D0932004A5B27 /* ExerciseImageCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -181,6 +183,8 @@
 		27E5E5222CCEC9E9003E3E70 /* gymroutine-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gymroutine-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E5322CCEC9EA003E3E70 /* gymroutine-mobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		79EE75192D9CF23A004A5B27 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		79EE75972D9D0932004A5B27 /* ExerciseImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseImageCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -341,6 +345,7 @@
 				00CDC3FE2D845E8E003B18EB /* WorkoutCell.swift */,
 				00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */,
 				00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */,
+				79EE75972D9D0932004A5B27 /* ExerciseImageCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -420,6 +425,7 @@
 				00CDC4212D845E8E003B18EB /* Views */,
 				00CDC3DC2D845E8E003B18EB /* Preview Content */,
 				00CDC4222D845E8E003B18EB /* Assets.xcassets */,
+				79EE75192D9CF23A004A5B27 /* Localizable.xcstrings */,
 				00CDC4232D845E8E003B18EB /* GoogleService-Info.plist */,
 			);
 			path = "gymroutine-mobile";
@@ -695,6 +701,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ja,
 			);
 			mainGroup = 27E5E5192CCEC9E9003E3E70;
 			minimizedProjectReferenceProxies = 1;
@@ -720,6 +727,7 @@
 			files = (
 				00CDC4252D845E8E003B18EB /* Preview Assets.xcassets in Resources */,
 				00CDC4262D845E8E003B18EB /* Assets.xcassets in Resources */,
+				79EE751A2D9CF23A004A5B27 /* Localizable.xcstrings in Resources */,
 				00CDC4272D845E8E003B18EB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -760,6 +768,7 @@
 				00CDC4322D845E8E003B18EB /* ExerciseService.swift in Sources */,
 				00CDC4332D845E8E003B18EB /* FollowService.swift in Sources */,
 				00CDC4342D845E8E003B18EB /* SnsService.swift in Sources */,
+				79EE75982D9D0932004A5B27 /* ExerciseImageCell.swift in Sources */,
 				00CDC4352D845E8E003B18EB /* UserService.swift in Sources */,
 				00CDC47F2D85C218003B18EB /* CreateWorkoutView.swift in Sources */,
 				00CDC4362D845E8E003B18EB /* WorkoutService.swift in Sources */,
@@ -906,6 +915,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -962,6 +972,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
