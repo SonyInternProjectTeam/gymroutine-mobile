@@ -59,41 +59,31 @@ class WorkoutService {
             }
         }
     }
-
     
-    /// 워크아웃 상세 정보를 불러오는 메서드 (exercises 필드도 디코딩)
-//    func fetchWorkoutDetails(workoutID: String, completion: @escaping (Result<Workout, Error>) -> Void) {
-//        db.collection("Workouts").document(workoutID).getDocument { document, error in
-//            if let error = error {
-//                completion(.failure(error))
-//            } else if let document = document, document.exists {
-//                let data = document.data() ?? [:]
-//                // exercises 필드를 디코딩 시도
-//                var exercises: [WorkoutExercise] = []
-//                if let exercisesData = data["exercises"] as? [[String: Any]] {
-//                    do {
-//                        let jsonData = try JSONSerialization.data(withJSONObject: exercisesData)
-//                        exercises = try JSONDecoder().decode([WorkoutExercise].self, from: jsonData)
-//                    } catch {
-//                        print("Error decoding exercises: \(error)")
-//                    }
-//                }
-//                let workout = Workout(
-//                    id: workoutID,
-//                    userId: data["userId"] as? String ?? "",
-//                    name: data["name"] as? String ?? "Unknown",
-//                    isRoutine: data["isRoutine"] as? Bool ?? false,
-//                    scheduledDays: data["ScheduledDays"] as? [String] ?? [],
-//                    exercises: exercises,
-//                    createdAt: (data["CreatedAt"] as? Timestamp)?.dateValue() ?? Date(),
-//                    notes: data["notes"] as? String ?? ""
-//                )
-//                completion(.success(workout))
-//            } else {
-//                completion(.failure(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])))
-//            }
-//        }
-//    }
+    /// 引数のユーザーが登録済みのワークアウトを全て取得
+    func fetchUserWorkouts(uid: String) async -> [Workout]? {
+        let db = Firestore.firestore()
+        let workoutsRef = db.collection("Workouts").whereField("userId", isEqualTo: uid)
+
+        do {
+            let snapshot = try await workoutsRef.getDocuments()
+            var workouts: [Workout] = []
+
+            for document in snapshot.documents {
+                do {
+                    let workout = try document.data(as: Workout.self)
+                    workouts.append(workout)
+                } catch {
+                    print("[ERROR] Workoutのデコードエラー: \(error)")
+                }
+            }
+            return workouts
+
+        } catch {
+            print("[ERROR] Firestore 取得エラー: \(error)")
+            return nil
+        }
+    }
 
     /// 운동 옵션(Trains 컬렉션) 불러오기
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
