@@ -83,6 +83,11 @@
 		27C5ED762CD90261005380EE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED752CD90261005380EE /* FirebaseFirestore */; };
 		27C5ED782CD90261005380EE /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED772CD90261005380EE /* FirebaseFirestoreCombine-Community */; };
 		27C5ED7A2CD90261005380EE /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 27C5ED792CD90261005380EE /* FirebaseStorage */; };
+		27D6A8652D9D9319004D3F2B /* WorkoutSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */; };
+		27D6A8672D9D9322004D3F2B /* WorkoutSessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */; };
+		27D6A8692D9D9A91004D3F2B /* GlobalWorkoutSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D6A8682D9D9A91004D3F2B /* GlobalWorkoutSessionView.swift */; };
+		27D6A86B2D9D9AA3004D3F2B /* AppWorkoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D6A86A2D9D9AA3004D3F2B /* AppWorkoutManager.swift */; };
+		27D6A86D2D9D9ABE004D3F2B /* MiniWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D6A86C2D9D9ABE004D3F2B /* MiniWorkoutView.swift */; };
 		27E5E5512CCECA57003E3E70 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5502CCECA57003E3E70 /* FirebaseAnalytics */; };
 		27E5E5532CCECA57003E3E70 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5522CCECA57003E3E70 /* FirebaseCore */; };
 		27E5E5632CCECB2A003E3E70 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5622CCECB2A003E3E70 /* FirebaseAuth */; };
@@ -180,6 +185,11 @@
 		27361FEB2D9B858100457D2C /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailView.swift; sourceTree = "<group>"; };
 		27361FED2D9B858800457D2C /* WorkoutDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewModel.swift; sourceTree = "<group>"; };
 		277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRepository.swift; sourceTree = "<group>"; };
+		27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionView.swift; sourceTree = "<group>"; };
+		27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionViewModel.swift; sourceTree = "<group>"; };
+		27D6A8682D9D9A91004D3F2B /* GlobalWorkoutSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalWorkoutSessionView.swift; sourceTree = "<group>"; };
+		27D6A86A2D9D9AA3004D3F2B /* AppWorkoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppWorkoutManager.swift; sourceTree = "<group>"; };
+		27D6A86C2D9D9ABE004D3F2B /* MiniWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniWorkoutView.swift; sourceTree = "<group>"; };
 		27E5E5222CCEC9E9003E3E70 /* gymroutine-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gymroutine-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E5322CCEC9EA003E3E70 /* gymroutine-mobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -271,6 +281,7 @@
 		00CDC3D62D845E8E003B18EB /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				27D6A86A2D9D9AA3004D3F2B /* AppWorkoutManager.swift */,
 				00CDC3D52D845E8E003B18EB /* UserManager.swift */,
 			);
 			path = Manager;
@@ -559,6 +570,10 @@
 		00CDC47D2D85C1FB003B18EB /* Workout */ = {
 			isa = PBXGroup;
 			children = (
+				27D6A8682D9D9A91004D3F2B /* GlobalWorkoutSessionView.swift */,
+				27D6A86C2D9D9ABE004D3F2B /* MiniWorkoutView.swift */,
+				27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */,
+				27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */,
 				27361FED2D9B858800457D2C /* WorkoutDetailViewModel.swift */,
 				27361FEB2D9B858100457D2C /* WorkoutDetailView.swift */,
 				00CDC4802D85C3FC003B18EB /* CreateWorkoutViewModel.swift */,
@@ -765,7 +780,9 @@
 				00CDC42F2D845E8E003B18EB /* FollowRepository.swift in Sources */,
 				00CDC4302D845E8E003B18EB /* SnsRepository.swift in Sources */,
 				00CDC4312D845E8E003B18EB /* AuthService.swift in Sources */,
+				27D6A86D2D9D9ABE004D3F2B /* MiniWorkoutView.swift in Sources */,
 				00CDC4322D845E8E003B18EB /* ExerciseService.swift in Sources */,
+				27D6A8652D9D9319004D3F2B /* WorkoutSessionView.swift in Sources */,
 				00CDC4332D845E8E003B18EB /* FollowService.swift in Sources */,
 				00CDC4342D845E8E003B18EB /* SnsService.swift in Sources */,
 				79EE75982D9D0932004A5B27 /* ExerciseImageCell.swift in Sources */,
@@ -779,10 +796,12 @@
 				00CDC43B2D845E8E003B18EB /* InitProfileSetupViewModel.swift in Sources */,
 				00CDC4882D87A699003B18EB /* ExerciseDetailView.swift in Sources */,
 				00CDC43C2D845E8E003B18EB /* LoginViewModel.swift in Sources */,
+				27D6A8672D9D9322004D3F2B /* WorkoutSessionViewModel.swift in Sources */,
 				00CDC43D2D845E8E003B18EB /* MainViewModel.swift in Sources */,
 				00CDC4812D85C408003B18EB /* CreateWorkoutViewModel.swift in Sources */,
 				00CDC43E2D845E8E003B18EB /* PasswordResetViewModel.swift in Sources */,
 				00CDC43F2D845E8E003B18EB /* ProfileViewModel.swift in Sources */,
+				27D6A8692D9D9A91004D3F2B /* GlobalWorkoutSessionView.swift in Sources */,
 				00CDC4402D845E8E003B18EB /* SearchUserViewModel.swift in Sources */,
 				00CDC4412D845E8E003B18EB /* SignupViewModel.swift in Sources */,
 				00CDC4422D845E8E003B18EB /* SplashViewModel.swift in Sources */,
@@ -823,6 +842,7 @@
 				00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */,
 				00CDC4662D845E8E003B18EB /* SplashView.swift in Sources */,
 				00CDC4672D845E8E003B18EB /* WelcomeView.swift in Sources */,
+				27D6A86B2D9D9AA3004D3F2B /* AppWorkoutManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
