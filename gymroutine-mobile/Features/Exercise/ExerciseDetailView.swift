@@ -41,7 +41,7 @@ struct ExerciseDetailView: View {
         .background(Color.gray.opacity(0.1))
         .contentMargins(.top, 16)
         .contentMargins(.bottom, 80)
-        .navigationTitle(exercise.name)
+        .navigationTitle(LocalizedStringKey(exercise.name))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -59,7 +59,7 @@ extension ExerciseDetailView {
             Text("部位")
                 .font(.headline)
             
-            Text(exercise.part)
+            Text(LocalizedStringKey(exercise.part))
                 .padding(.vertical, 8)
                 .padding(.horizontal)
                 .background()

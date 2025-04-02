@@ -1,0 +1,1248 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    ":" : {
+
+    },
+    "%@" : {
+
+    },
+    "%@の情報" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld 種目" : {
+
+    },
+    "%lld:%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld:%2$@"
+          }
+        }
+      }
+    },
+    "%lld/%lld セット完了" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld セット完了"
+          }
+        }
+      }
+    },
+    "%lld歳 %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld歳 %2$@"
+          }
+        }
+      }
+    },
+    "64" : {
+
+    },
+    "128" : {
+
+    },
+    "Ab Wheel Rollout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アブホイールロールアウト"
+          }
+        }
+      }
+    },
+    "Add Set" : {
+
+    },
+    "arm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arm"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "腕"
+          }
+        }
+      }
+    },
+    "Arnold Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アーノルドプレス"
+          }
+        }
+      }
+    },
+    "back" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "背中"
+          }
+        }
+      }
+    },
+    "Barbell Curl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バーベルカール"
+          }
+        }
+      }
+    },
+    "Barbell Front Raise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バーベルフロントレイズ"
+          }
+        }
+      }
+    },
+    "Barbell Row" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バーベルロー"
+          }
+        }
+      }
+    },
+    "Bench Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ベンチプレス"
+          }
+        }
+      }
+    },
+    "Bicycle Crunch" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バイシクルクランチ"
+          }
+        }
+      }
+    },
+    "Body Part: %@" : {
+
+    },
+    "Box Jump" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ボックスジャンプ"
+          }
+        }
+      }
+    },
+    "Bulgarian Split Squat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ブルガリアンスプリットスクワット"
+          }
+        }
+      }
+    },
+    "Cable Crossover" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ケーブルクロスオーバー"
+          }
+        }
+      }
+    },
+    "Cable Crunch" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ケーブルクランチ"
+          }
+        }
+      }
+    },
+    "Cable Curl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ケーブルカール"
+          }
+        }
+      }
+    },
+    "Cable Lateral Raise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ケーブルラテラルレイズ"
+          }
+        }
+      }
+    },
+    "Cable Overhead Extension" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ケーブルオーバーヘッドエクステンション"
+          }
+        }
+      }
+    },
+    "Calendar" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カレンダー"
+          }
+        }
+      }
+    },
+    "Calf Raise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カーフレイズ"
+          }
+        }
+      }
+    },
+    "chest" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chest"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "胸"
+          }
+        }
+      }
+    },
+    "Chest Dip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チェストディップ"
+          }
+        }
+      }
+    },
+    "Chest Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チェストプレス"
+          }
+        }
+      }
+    },
+    "Chin-up" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "チンアップ"
+          }
+        }
+      }
+    },
+    "Close-Grip Bench Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クローズグリップベンチプレス"
+          }
+        }
+      }
+    },
+    "Concentration Curl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンセントレーションカール"
+          }
+        }
+      }
+    },
+    "Crunch" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クランチ"
+          }
+        }
+      }
+    },
+    "Deadlift" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デッドリフト"
+          }
+        }
+      }
+    },
+    "Decline Bench Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デクラインベンチプレス"
+          }
+        }
+      }
+    },
+    "Dips (Bench Dip)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ディップス（ベンチディップ）"
+          }
+        }
+      }
+    },
+    "Done" : {
+
+    },
+    "Dumbbell Curl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダンベルカール"
+          }
+        }
+      }
+    },
+    "Dumbbell Fly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダンベルフライ"
+          }
+        }
+      }
+    },
+    "Dumbbell Front Raise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダンベルフロントレイズ"
+          }
+        }
+      }
+    },
+    "Dumbbell Lateral Raise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダンベルラテラルレイズ"
+          }
+        }
+      }
+    },
+    "Dumbbell Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダンベルプレス"
+          }
+        }
+      }
+    },
+    "Dumbbell Row" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダンベルロー"
+          }
+        }
+      }
+    },
+    "Error: %@" : {
+
+    },
+    "Exercise: %@" : {
+
+    },
+    "Face Pull" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フェイスプル"
+          }
+        }
+      }
+    },
+    "Front Squat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フロントスクワット"
+          }
+        }
+      }
+    },
+    "Glute Bridge" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グルートブリッジ"
+          }
+        }
+      }
+    },
+    "Goblet Squat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ゴブレットスクワット"
+          }
+        }
+      }
+    },
+    "Hammer Curl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ハンマーカール"
+          }
+        }
+      }
+    },
+    "Hanging Leg Raise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ハンギングレッグレイズ"
+          }
+        }
+      }
+    },
+    "Hip Thrust" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヒップスラスト"
+          }
+        }
+      }
+    },
+    "Home" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ホーム"
+          }
+        }
+      }
+    },
+    "Incline Bench Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インクラインベンチプレス"
+          }
+        }
+      }
+    },
+    "Incline Dumbbell Curl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インクラインダンベルカール"
+          }
+        }
+      }
+    },
+    "Incline Dumbbell Fly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インクラインダンベルフライ"
+          }
+        }
+      }
+    },
+    "Inverted Row" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インバーテッドロー"
+          }
+        }
+      }
+    },
+    "kg" : {
+
+    },
+    "Lat Pulldown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ラットプルダウン"
+          }
+        }
+      }
+    },
+    "Leg Curl (Hamstring Curl)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レッグカール (ハムストリングカール)"
+          }
+        }
+      }
+    },
+    "Leg Extension" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レッグエクステンション"
+          }
+        }
+      }
+    },
+    "Leg Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レッグプレス"
+          }
+        }
+      }
+    },
+    "legs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legs"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "脚"
+          }
+        }
+      }
+    },
+    "Lying Leg Raise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ライイングレッグレイズ"
+          }
+        }
+      }
+    },
+    "Machine Shoulder Press" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マシンショルダープレス"
+          }
+        }
+      }
+    },
+    "Mountain Climber" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マウンテンクライマー"
+          }
+        }
+      }
+    },
+    "Next" : {
+
+    },
+    "No exercise at index %lld" : {
+
+    },
+    "No results found" : {
+
+    },
+    "Overhead Triceps Extension" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オーバーヘッドトライセプスエクステンション"
+          }
+        }
+      }
+    },
+    "Plank" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プランク"
+          }
+        }
+      }
+    },
+    "Preacher Curl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリーチャーカール"
+          }
+        }
+      }
+    },
+    "Previous" : {
+
+    },
+    "Profile" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プロフィール"
+          }
+        }
+      }
+    },
+    "Pull-up" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プルアップ"
+          }
+        }
+      }
+    },
+    "Push-up" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プッシュアップ"
+          }
+        }
+      }
+    },
+    "Rack Pull" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ラックプル"
+          }
+        }
+      }
+    },
+    "Rear Delt Fly" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リアデルトフライ"
+          }
+        }
+      }
+    },
+    "Reps" : {
+
+    },
+    "Reset" : {
+
+    },
+    "Romanian Deadlift" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ルーマニアンデッドリフト"
+          }
+        }
+      }
+    },
+    "Russian Twist" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロシアンツイスト"
+          }
+        }
+      }
+    },
+    "Search" : {
+
+    },
+    "Search by name" : {
+
+    },
+    "Search Users" : {
+
+    },
+    "Seated Cable Row" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シーテッドケーブルロー"
+          }
+        }
+      }
+    },
+    "Seated Calf Raise" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シーテッドカーフレイズ"
+          }
+        }
+      }
+    },
+    "Set %lld" : {
+
+    },
+    "Shoulder Press (Overhead Press)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ショルダープレス (オーバーヘッドプレス)"
+          }
+        }
+      }
+    },
+    "Shrug" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シュラッグ"
+          }
+        }
+      }
+    },
+    "Side Plank" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サイドプランク"
+          }
+        }
+      }
+    },
+    "Sit-up" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シットアップ"
+          }
+        }
+      }
+    },
+    "Skull Crusher" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スカルクラッシャー"
+          }
+        }
+      }
+    },
+    "SNS" : {
+
+    },
+    "Squat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクワット"
+          }
+        }
+      }
+    },
+    "Start" : {
+
+    },
+    "Step-up" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ステップアップ"
+          }
+        }
+      }
+    },
+    "Stiff-Leg Deadlift" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スティッフレッグデッドリフト"
+          }
+        }
+      }
+    },
+    "Stop" : {
+
+    },
+    "Sumo Squat" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "相撲スクワット"
+          }
+        }
+      }
+    },
+    "T-Bar Row" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tバーロー"
+          }
+        }
+      }
+    },
+    "Timer: %lld seconds" : {
+
+    },
+    "Triceps Pushdown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トライセプスプッシュダウン"
+          }
+        }
+      }
+    },
+    "Upright Row" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アップライトロー"
+          }
+        }
+      }
+    },
+    "V-up" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vアップ"
+          }
+        }
+      }
+    },
+    "Walking Lunge" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウォーキングランジ"
+          }
+        }
+      }
+    },
+    "Wall Sit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウォールシット"
+          }
+        }
+      }
+    },
+    "Weight" : {
+
+    },
+    "エクササイズ" : {
+
+    },
+    "エクササイズがありません" : {
+
+    },
+    "エクササイズを検索" : {
+
+    },
+    "エクササイズを追加する" : {
+
+    },
+    "おすすめ" : {
+
+    },
+    "カテゴリ" : {
+
+    },
+    "カレンダー" : {
+
+    },
+    "キャンセル" : {
+
+    },
+    "ジムルーティーン" : {
+
+    },
+    "ジムルーティーンへようこそ！" : {
+
+    },
+    "スキップ" : {
+
+    },
+    "セット" : {
+
+    },
+    "セットを追加する" : {
+
+    },
+    "タイム" : {
+
+    },
+    "ニックネームを入力してください" : {
+
+    },
+    "パスワード" : {
+
+    },
+    "パスワードのリセット" : {
+
+    },
+    "パスワードを忘れた方はこちら" : {
+
+    },
+    "フォローする" : {
+
+    },
+    "フォロー中" : {
+
+    },
+    "フォロワー" : {
+
+    },
+    "ブックマークのみ" : {
+
+    },
+    "プロフィール情報がありません" : {
+
+    },
+    "プロフィール編集" : {
+
+    },
+    "まだワークアウトがありません" : {
+
+    },
+    "メールアドレス" : {
+
+    },
+    "メニュー" : {
+
+    },
+    "メモ" : {
+
+    },
+    "ユーザー情報が読み込めません" : {
+
+    },
+    "リスト表示" : {
+
+    },
+    "リセットリンクを送信" : {
+
+    },
+    "リセットリンクを送信しました。メールを確認してください。" : {
+
+    },
+    "ルーティーン化する" : {
+
+    },
+    "ルーティーン化すると、指定された曜日に毎週設定されます" : {
+
+    },
+    "ルーティーン追加" : {
+
+    },
+    "レップ数" : {
+
+    },
+    "ログイン" : {
+
+    },
+    "ログインする" : {
+
+    },
+    "ワークアウト" : {
+
+    },
+    "ワークアウト作成" : {
+
+    },
+    "ワークアウト名" : {
+
+    },
+    "ワークアウト詳細" : {
+
+    },
+    "今すぐ始める" : {
+
+    },
+    "今日のワークアウト" : {
+
+    },
+    "今日のワークアウトはありません" : {
+
+    },
+    "休憩時間" : {
+
+    },
+    "作成する" : {
+
+    },
+    "入力してください" : {
+
+    },
+    "最小化" : {
+
+    },
+    "分析" : {
+
+    },
+    "始める" : {
+
+    },
+    "完了" : {
+
+    },
+    "後から変更できます" : {
+
+    },
+    "性別を教えてください" : {
+
+    },
+    "新規登録" : {
+
+    },
+    "日" : {
+
+    },
+    "状態" : {
+
+    },
+    "現在%lld人が筋トレしています！" : {
+
+    },
+    "現在の体重" : {
+
+    },
+    "生年月日を教えてください" : {
+
+    },
+    "生年月日を選択してください" : {
+
+    },
+    "秒" : {
+
+    },
+    "簡易カレンダーView" : {
+
+    },
+    "累計トレーニング日数" : {
+
+    },
+    "終了" : {
+
+    },
+    "編集" : {
+
+    },
+    "詳細表示" : {
+
+    },
+    "説明" : {
+
+    },
+    "追加する" : {
+
+    },
+    "追加情報を入力する..." : {
+
+    },
+    "部位" : {
+
+    }
+  },
+  "version" : "1.0"
+}
