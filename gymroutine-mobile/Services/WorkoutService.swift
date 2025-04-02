@@ -38,6 +38,39 @@ class WorkoutService {
         }
     }
     
+    /// 워크아웃의 exercises 필드를 업데이트하는 메서드
+    func updateWorkoutExercises(workoutID: String, exercises: [WorkoutExercise]) async -> Result<Void, Error> {
+        do {
+            // Convert WorkoutExercise objects to Firestore-compatible dictionaries
+            let exercisesData = exercises.map { exercise -> [String: Any] in
+                var exerciseDict: [String: Any] = [
+                    "id": exercise.id,
+                    "name": exercise.name,
+                    "part": exercise.part
+                ]
+                
+                // Convert sets to array of dictionaries
+                let setsArray = exercise.sets.map { set -> [String: Any] in
+                    return [
+                        "reps": set.reps,
+                        "weight": set.weight
+                    ]
+                }
+                
+                exerciseDict["sets"] = setsArray
+                return exerciseDict
+            }
+            
+            try await db.collection("Workouts").document(workoutID).updateData([
+                "exercises": exercisesData
+            ])
+            return .success(())
+        } catch {
+            print("🔥 워크아웃 exercises 업데이트 에러: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+    
     /// 워크아웃에 운동을 추가하는 메서드 (새로운 운동 구조: name, part, 그리고 빈 Sets 배열)
     func addExerciseToWorkout(workoutID: String, exercise: WorkoutExercise, completion: @escaping (Bool) -> Void) {
         let exerciseData: [String: Any] = [
@@ -60,40 +93,24 @@ class WorkoutService {
         }
     }
     
-    
     /// 워크아웃 상세 정보를 불러오는 메서드 (exercises 필드도 디코딩)
-    //    func fetchWorkoutDetails(workoutID: String, completion: @escaping (Result<Workout, Error>) -> Void) {
-    //        db.collection("Workouts").document(workoutID).getDocument { document, error in
-    //            if let error = error {
-    //                completion(.failure(error))
-    //            } else if let document = document, document.exists {
-    //                let data = document.data() ?? [:]
-    //                // exercises 필드를 디코딩 시도
-    //                var exercises: [WorkoutExercise] = []
-    //                if let exercisesData = data["exercises"] as? [[String: Any]] {
-    //                    do {
-    //                        let jsonData = try JSONSerialization.data(withJSONObject: exercisesData)
-    //                        exercises = try JSONDecoder().decode([WorkoutExercise].self, from: jsonData)
-    //                    } catch {
-    //                        print("Error decoding exercises: \(error)")
-    //                    }
-    //                }
-    //                let workout = Workout(
-    //                    id: workoutID,
-    //                    userId: data["userId"] as? String ?? "",
-    //                    name: data["name"] as? String ?? "Unknown",
-    //                    isRoutine: data["isRoutine"] as? Bool ?? false,
-    //                    scheduledDays: data["ScheduledDays"] as? [String] ?? [],
-    //                    exercises: exercises,
-    //                    createdAt: (data["CreatedAt"] as? Timestamp)?.dateValue() ?? Date(),
-    //                    notes: data["notes"] as? String ?? ""
-    //                )
-    //                completion(.success(workout))
-    //            } else {
-    //                completion(.failure(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])))
-    //            }
-    //        }
-    //    }
+    func fetchWorkoutById(workoutID: String) async throws -> Workout {
+        let documentSnapshot = try await db.collection("Workouts").document(workoutID).getDocument()
+        
+        guard documentSnapshot.exists else {
+            throw NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])
+        }
+        
+        // Firestore 문서를 Workout 모델로 변환
+        do {
+            var workout = try documentSnapshot.data(as: Workout.self)
+            workout.id = documentSnapshot.documentID
+            return workout
+        } catch {
+            print("🔥 워크아웃 디코딩 에러: \(error.localizedDescription)")
+            throw error
+        }
+    }
     
     /// 운동 옵션(Trains 컬렉션) 불러오기
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {

@@ -54,6 +54,14 @@ struct WorkoutDetailView: View {
                 }
             }
         }
+        .sheet(isPresented: $viewModel.searchExercisesFlg) {
+            ExerciseSearchView(exercisesManager: viewModel)
+                .presentationDragIndicator(.visible)
+        }
+        .onAppear {
+            // 뷰가 나타날 때마다 최신 데이터를 불러옴
+            viewModel.refreshWorkoutData()
+        }
     }
     
     private var workoutInfoBox: some View {
@@ -72,8 +80,57 @@ struct WorkoutDetailView: View {
     
     private var exercisesBox: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ForEach(viewModel.exercises, id: \.id) { exercise in
-                WorkoutExerciseCell(workoutExercise: exercise)
+            Text("エクササイズ")
+                .font(.headline)
+            
+            ForEach(Array(viewModel.exercises.enumerated()), id: \.element.id) { index, workoutExercise in
+                HStack {
+                    VStack {
+                        Text("\(index + 1)")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .padding()
+                            .background(.main)
+                            .clipShape(Circle())
+                        
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(.main)
+                            .frame(width: 4)
+                    }
+                    
+                    WorkoutExerciseCell(workoutExercise: workoutExercise)
+                        .onTapGesture {
+                            viewModel.onClickedExerciseSets(index: index)
+                        }
+                        .overlay(alignment: .topTrailing) {
+                            Button(action: {
+                                viewModel.removeExercise(workoutExercise)
+                            }, label: {
+                                Image(systemName: "xmark")
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                                    .padding(8)
+                                    .background(.red .opacity(0.5))
+                                    .clipShape(Circle())
+                                    .padding(10)
+                            })
+                        }
+                }
+            }
+            .sheet(isPresented: $viewModel.editExerciseSetsFlg) {
+                if let index = viewModel.selectedIndex {
+                    EditExerciseSetView(
+                        order: (index + 1),
+                        workoutExercise: $viewModel.exercises[index])
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+                    .onDisappear {
+                        // 세트 편집 모달이 닫힐 때 변경사항 저장
+                        if let index = viewModel.selectedIndex {
+                            viewModel.updateExerciseSetAndSave(for: viewModel.exercises[index])
+                        }
+                    }
+                }
             }
         }
     }
