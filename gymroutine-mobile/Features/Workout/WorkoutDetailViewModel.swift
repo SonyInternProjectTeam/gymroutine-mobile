@@ -7,13 +7,19 @@
 
 import SwiftUI
 
+@MainActor
 final class WorkoutDetailViewModel: WorkoutExercisesManager {
     @Published var workout: Workout
     @Published var searchExercisesFlg = false
     @Published var editExerciseSetsFlg = false
     @Published var selectedIndex: Int? = nil
+    @Published var showWorkoutSession = false  // 워크아웃 세션 화면 표시 여부
+    @Published var isWorkoutInProgress = false // 워크아웃 진행 중 여부
+    @Published var workoutSessionViewModel: WorkoutSessionViewModel? // 워크아웃 세션 뷰모델 참조
+    @Published var showMiniWorkoutSession = false // 최소화된 워크아웃 세션 표시 여부
     
     private let service = WorkoutService()
+    private let workoutManager = AppWorkoutManager.shared
     
     init(workout: Workout) {
         self.workout = workout
@@ -59,8 +65,8 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     /// 워크아웃 시작 액션
     func startWorkout() {
-        // 워크아웃 시작에 관한 처리 (예: 워크아웃 타이머 시작, 기록 화면 전환 등)
-        print("Start workout tapped")
+        print("📱 워크아웃 시작 버튼이 클릭되었습니다.")
+        workoutManager.startWorkout(workout: workout)
     }
     
     /// CreateWorkoutViewModel에서 상속받은 appendExercise 메서드를 오버라이드하여 
