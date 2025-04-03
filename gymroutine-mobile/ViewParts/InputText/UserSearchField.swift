@@ -14,7 +14,7 @@ struct UserSearchField: View {
     var onSubmit: () -> Void = { }
     
     var body: some View {
-        HStack {
+        HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
             TextField("ユーザーを検索", text: $text)
@@ -22,6 +22,16 @@ struct UserSearchField: View {
                     onSubmit()
                 }
         }
-        .fieldBackground()
+        .padding(.horizontal,16)
+        .frame(height: 40)
+        .background(
+            Capsule()
+                .fill(Color(UIColor.systemGray6))
+        )
     }
+}
+
+#Preview {
+    @Previewable @State var text: String = ""
+    UserSearchField(text: $text)
 }
