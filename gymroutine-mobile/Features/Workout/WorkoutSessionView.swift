@@ -389,12 +389,6 @@ struct WorkoutSessionView: View {
                 }
                 
                 Spacer()
-                
-                // 즐겨찾기 버튼
-                Button(action: {}) {
-                    Image(systemName: "heart")
-                        .foregroundStyle(.secondary)
-                }
             }
             .padding()
             
