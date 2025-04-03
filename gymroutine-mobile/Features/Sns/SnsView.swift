@@ -69,11 +69,10 @@ struct SnsView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .onChange(of: isFocused) { newValue in
+            .onChange(of: isFocused) {
+                // サーチモードOFFのときにフォーカスON → サーチモードON
                 withAnimation {
-                    if searchMode == false {
-                        searchMode = newValue
-                    }
+                    if !searchMode && isFocused { searchMode = true }
                 }
             }
 
