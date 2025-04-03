@@ -50,78 +50,92 @@ struct SnsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 8) {
-                UserSearchField(text: $viewModel.searchName, onSubmit: {
-                    viewModel.fetchUsers()
-                })
-                .focused($isFocused)
-
-                if searchMode {
-                    Button("キャンセル") {
-                        // NavigationStack을 닫음
-                        withAnimation {
-                            isFocused = false
-                            searchMode = false
-                            viewModel.searchName = ""
-                            viewModel.userDetails = []
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .onChange(of: isFocused) {
-                // サーチモードOFFのときにフォーカスON → サーチモードON
-                withAnimation {
-                    if !searchMode && isFocused { searchMode = true }
-                }
-            }
+            searchBarView
 
             if searchMode {
-                // 검색 결과 / 오류 / 결과 없음 표시
-                if let errorMessage = viewModel.errorMessage {
-                    Text("Error: \(errorMessage)")
-                        .foregroundColor(.red)
-                        .padding()
-                } else if viewModel.userDetails.isEmpty {
-                    Text("No results found")
-                        .foregroundColor(.gray)
-                        .padding()
-                } else {
-                    List(viewModel.userDetails, id: \.uid) { user in
-                        NavigationLink(destination: ProfileView(user: user)) {
-                            userProfileView(for: user)
-                        }
-                    }
-                }
+                searchResultsView
             }
             else {
-                // 추천 사용자 영역
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack {
-                        Image(systemName: "person.2")
-                        Text("おすすめ")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                    }
-                    .padding(.leading, 16)
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(testUsers, id: \.uid) { user in
-                                // 실제 프로젝트에서는 UserCell, UserProfileView 등 사용
-                                UserCell(user: user)
-                            }
-                        }
-                        .padding(.leading, 16)
-                    }
-                }
+                recommendedUsersView
             }
 
             Spacer()
         }
+        .onChange(of: isFocused) {
+            // サーチモードOFFのときにフォーカスON → サーチモードON
+            withAnimation {
+                if !searchMode && isFocused { searchMode = true }
+            }
+        }
         .navigationTitle("SNS")
         // Large Title을 쓰지 않고 상단 여백을 줄이려면 Inline Title
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var searchBarView: some View {
+        HStack(spacing: 8) {
+            UserSearchField(text: $viewModel.searchName, onSubmit: {
+                viewModel.fetchUsers()
+            })
+            .focused($isFocused)
+
+            if searchMode {
+                Button("キャンセル") {
+                    // NavigationStack을 닫음
+                    withAnimation {
+                        isFocused = false
+                        searchMode = false
+                        viewModel.searchName = ""
+                        viewModel.userDetails = []
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+
+    private var searchResultsView: some View {
+        Group {
+            // 검색 결과 / 오류 / 결과 없음 표시
+            if let errorMessage = viewModel.errorMessage {
+                Text("Error: \(errorMessage)")
+                    .foregroundColor(.red)
+                    .padding()
+            } else if viewModel.userDetails.isEmpty {
+                Text("No results found")
+                    .foregroundColor(.gray)
+                    .padding()
+            } else {
+                List(viewModel.userDetails, id: \.uid) { user in
+                    NavigationLink(destination: ProfileView(user: user)) {
+                        userProfileView(for: user)
+                    }
+                }
+            }
+        }
+    }
+
+    private var recommendedUsersView: some View {
+        // 추천 사용자 영역
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: "person.2")
+                Text("おすすめ")
+                    .font(.title2)
+                    .fontWeight(.bold)
+            }
+            .padding(.leading, 16)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(testUsers, id: \.uid) { user in
+                        // 실제 프로젝트에서는 UserCell, UserProfileView 등 사용
+                        UserCell(user: user)
+                    }
+                }
+                .padding(.leading, 16)
+            }
+        }
     }
 
     /// 사용자의 프로필 정보를 표시하는 뷰 (필요에 따라 리팩토링)
