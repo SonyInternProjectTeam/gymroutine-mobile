@@ -49,7 +49,7 @@ struct SnsView: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(spacing: 16) {
             searchBarView
 
             if searchMode {
@@ -58,8 +58,6 @@ struct SnsView: View {
             else {
                 recommendedUsersView
             }
-
-            Spacer()
         }
         .onChange(of: isFocused) {
             // サーチモードOFFのときにフォーカスON → サーチモードON
@@ -101,10 +99,12 @@ struct SnsView: View {
                 Text("Error: \(errorMessage)")
                     .foregroundColor(.red)
                     .padding()
+                    .vAlign(.top)
             } else if viewModel.userDetails.isEmpty {
                 Text("No results found")
                     .foregroundColor(.gray)
                     .padding()
+                    .vAlign(.top)
             } else {
                 List(viewModel.userDetails, id: \.uid) { user in
                     NavigationLink(destination: ProfileView(user: user)) {
@@ -135,6 +135,8 @@ struct SnsView: View {
                 }
                 .padding(.leading, 16)
             }
+
+            Spacer()
         }
     }
 
