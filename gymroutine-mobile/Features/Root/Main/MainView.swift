@@ -44,7 +44,7 @@ struct MainView: View {
             
             // Profile 탭
             NavigationStack {
-                ProfileView(viewModel: ProfileViewModel())
+                ProfileView()
             }
             .tabItem {
                 Label("Profile", systemImage: "person.circle")

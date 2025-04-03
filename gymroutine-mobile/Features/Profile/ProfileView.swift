@@ -9,12 +9,16 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @StateObject var viewModel: ProfileViewModel
     @Namespace var namespace
     
     // フォロワーとフォロー中の一覧画面に遷移するための状態変数
     @State private var showFollowers: Bool = false
     @State private var showFollowing: Bool = false
+    
+    init (user:User? = nil) {
+        self._viewModel = StateObject(wrappedValue: .init(user: user))
+    }
     
     var body: some View {
         ZStack {
@@ -267,5 +271,5 @@ extension ProfileView {
 }
 
 #Preview {
-    ProfileView(viewModel: ProfileViewModel())
+    ProfileView()
 }

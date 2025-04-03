@@ -1,11 +1,15 @@
-
-
+//
+//  SnsViewModel.swift
+//  gymroutine-mobile
+//
+//  Created by 堀壮吾 on 2025/04/01.
+//
 
 import Foundation
 import SwiftUI
 
 @MainActor
-final class SearchUserViewModel: ObservableObject {
+final class SnsViewModel: ObservableObject {
     @Published var userDetails: [User] = []       // User 型の配列に変更
     @Published var searchName: String = ""
     @Published var errorMessage: String? = nil
