@@ -9,9 +9,10 @@ import Foundation
 import FirebaseFirestore
 import Firebase
 
-class ExerciseService {
+final class ExerciseService {
+    private let db = Firestore.firestore()
+    
     func fetchAllExercises(for options: [String], completion: @escaping ([Exercise]) -> Void) {
-        let db = Firestore.firestore()
         var exercises: [Exercise] = []
         let group = DispatchGroup() // ✅ 여러 Firestore 요청을 동기적으로 관리
 
@@ -40,18 +41,31 @@ class ExerciseService {
             completion(exercises)
         }
     }
-
     
-    func fetchTrainParts(completion: @escaping ([String]) -> Void) {
-        let db = Firestore.firestore()
-        db.collection("Trains").getDocuments { (snapshot, error) in
-            guard let documents = snapshot?.documents, error == nil else {
-                print("Error fetching train options: \(String(describing: error))")
-                completion([])
-                return
+    // エクササイズのフェッチ、名前と部位で絞り込み可能
+    func fetchExercises(name: String? = nil, part: ExercisePart? = nil, limit: Int = 20 ) async -> Result<[Exercise], Error> {
+        var query: Query = db.collection("Exercises")
+        
+        if let name, !name.isEmpty {
+            // 前方一致
+            query = query.whereField("name", isGreaterThanOrEqualTo: name).whereField("name", isLessThanOrEqualTo: name + "\u{f8ff}")
+        }
+        
+        if let part {
+            query = query.whereField("part", isEqualTo: part.rawValue)
+        }
+        
+        query = query.limit(to: limit)
+        
+        do {
+            let snapshot = try await query.getDocuments()
+            let exercises = try snapshot.documents.compactMap { doc in
+                try doc.data(as: Exercise.self)
             }
-            let options = documents.map { $0.documentID }
-            completion(options)
+            
+            return .success(exercises)
+        } catch {
+            return .failure(error)
         }
     }
 }
