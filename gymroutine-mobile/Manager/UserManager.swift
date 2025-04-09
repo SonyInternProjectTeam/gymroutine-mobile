@@ -8,6 +8,7 @@ import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 
+@MainActor
 class UserManager: ObservableObject {
     @Published var currentUser: User? = nil
     @Published var isLoggedIn: Bool = false
@@ -26,12 +27,12 @@ class UserManager: ObservableObject {
         
         do {
             let user = try await fetchUserInfo(uid: authUser.uid)
-            DispatchQueue.main.async {
-                self.currentUser = user
-                self.isLoggedIn = true
-            }
+            self.currentUser = user
+            self.isLoggedIn = true
         } catch {
             print("Failed to fetch user info: \(error)")
+            self.currentUser = nil
+            self.isLoggedIn = false
         }
     }
     

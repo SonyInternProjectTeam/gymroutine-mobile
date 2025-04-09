@@ -4,11 +4,24 @@
     "" : {
 
     },
+    "-15s" : {
+
+    },
     ":" : {
 
     },
     "%@" : {
 
+    },
+    "%@ kg x %lld reps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ kg x %2$lld reps"
+          }
+        }
+      }
     },
     "%@の情報" : {
 
@@ -48,6 +61,9 @@
           }
         }
       }
+    },
+    "+15s" : {
+
     },
     "64" : {
 
@@ -461,6 +477,9 @@
     "Exercise: %@" : {
 
     },
+    "Exercises" : {
+
+    },
     "Face Pull" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -850,6 +869,9 @@
     "Set %lld" : {
 
     },
+    "Set %lld:" : {
+
+    },
     "Shoulder Press (Overhead Press)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -893,6 +915,9 @@
           }
         }
       }
+    },
+    "Skip" : {
+
     },
     "Skull Crusher" : {
       "extractionState" : "manual",
@@ -947,6 +972,9 @@
     "Stop" : {
 
     },
+    "Summary" : {
+
+    },
     "Sumo Squat" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -970,6 +998,9 @@
       }
     },
     "Timer: %lld seconds" : {
+
+    },
+    "Total Time: %@" : {
 
     },
     "Triceps Pushdown" : {
@@ -1030,6 +1061,30 @@
     "Weight" : {
 
     },
+    "Workout Completed!" : {
+
+    },
+    "Workout Name: %@" : {
+
+    },
+    "Workout Result" : {
+
+    },
+    "결과 데이터를 로딩 중이거나 오류가 발생했습니다." : {
+
+    },
+    "닫기" : {
+
+    },
+    "보존" : {
+
+    },
+    "워크아웃 세션 정보를 불러올 수 없습니다." : {
+
+    },
+    "휴식 중..." : {
+
+    },
     "エクササイズ" : {
 
     },
@@ -1058,9 +1113,6 @@
 
     },
     "ジムルーティーンへようこそ！" : {
-
-    },
-    "スキップ" : {
 
     },
     "セット" : {
@@ -1147,10 +1199,16 @@
     "ワークアウト" : {
 
     },
+    "ワークアウトを完了しますか？" : {
+
+    },
     "ワークアウト作成" : {
 
     },
     "ワークアウト名" : {
+
+    },
+    "ワークアウト完了" : {
 
     },
     "ワークアウト詳細" : {
@@ -1163,9 +1221,6 @@
 
     },
     "今日のワークアウトはありません" : {
-
-    },
-    "休憩時間" : {
 
     },
     "作成する" : {
@@ -1211,9 +1266,6 @@
 
     },
     "生年月日を選択してください" : {
-
-    },
-    "秒" : {
 
     },
     "簡易カレンダーView" : {
