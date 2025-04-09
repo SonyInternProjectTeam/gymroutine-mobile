@@ -137,4 +137,34 @@ class WorkoutService {
             completion(exercises)
         }
     }
+    
+    // MARK: - Workout Result Saving
+    
+    /// 워크아웃 결과를 Firestore에 저장하는 함수
+    /// - Parameters:
+    ///   - userId: 사용자 ID
+    ///   - result: 저장할 WorkoutResultModel 데이터
+    func saveWorkoutResult(userId: String, result: WorkoutResultModel) async -> Result<Void, Error> {
+        // 월별 서브 컬렉션 경로 생성 (YYYYMM)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMM"
+        let monthCollectionId = dateFormatter.string(from: result.createdAt.dateValue())
+        
+        // Firestore 경로 설정 - 문서 ID 자동 생성
+        let resultDocRef = db.collection("Result")
+                           .document(userId)
+                           .collection(monthCollectionId)
+                           .document() // << 문서 ID 자동 생성을 위해 인자 없이 호출
+        
+        do {
+            // WorkoutResultModel을 Firestore에 직접 인코딩하여 저장
+            // 자동 생성된 ID를 모델에 저장할 필요는 없지만, 필요 시 resultDocRef.documentID로 접근 가능
+            try resultDocRef.setData(from: result) // merge는 새 문서이므로 불필요
+            print("✅ 워크아웃 결과 저장 성공: \(userId) / \(monthCollectionId) / \(resultDocRef.documentID)") // 자동 생성 ID 로그 출력
+            return .success(())
+        } catch {
+            print("🔥 워크아웃 결과 저장 실패: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
 }

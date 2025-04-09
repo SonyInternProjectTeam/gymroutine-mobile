@@ -1,4 +1,6 @@
 import SwiftUI
+import FirebaseAuth // 사용자 ID 가져오기 위해 추가
+import FirebaseFirestore // Timestamp 사용 위해 추가
 
 // 워크아웃 세션 모델 (결과 저장 및 표시에 사용)
 struct WorkoutSessionModel {
@@ -41,6 +43,9 @@ class AppWorkoutManager: ObservableObject {
         get { isWorkoutSessionActive && !isWorkoutSessionMaximized && !showResultView } // 결과 화면 표시 중에는 미니뷰 숨김
         // set은 직접 사용하지 않으므로 제거하거나 로직 검토
     }
+    
+    // WorkoutService 인스턴스 추가
+    private let workoutService = WorkoutService()
     
     private init() {
         print("📱 AppWorkoutManager 초기화됨")
@@ -110,20 +115,62 @@ class AppWorkoutManager: ObservableObject {
 
     // MARK: - Workout Result Handling
     // 워크아웃 결과 저장 (WorkoutResultView에서 호출됨)
-    func saveWorkoutResult(session: WorkoutSessionModel?) {
+    func saveWorkoutResult(session: WorkoutSessionModel?, notes: String) {
         guard let session = session else {
             print("🔥 저장할 워크아웃 세션 데이터가 없습니다.")
             return
         }
+        guard let userId = Auth.auth().currentUser?.uid else {
+            print("🔥 사용자 ID를 가져올 수 없습니다. 로그인이 필요합니다.")
+            return
+        }
+        
         print("💾 AppWorkoutManager: 워크아웃 결과 저장 요청 - \(session.workout.name)")
-        print("   - 시작 시간: \(session.startTime)")
-        print("   - 소요 시간: \(session.elapsedTime)초")
-        print("   - 완료 세트: \(session.completedSets.count)개")
-        // TODO: 실제 데이터베이스 또는 로컬 저장소에 저장하는 로직 구현
-        // 예: WorkoutRepository.shared.saveWorkoutResult(session)
-
-        // 저장이 완료되면 결과 화면 닫기 (선택 사항, 버튼에서 직접 닫을 수도 있음)
-        // dismissResultView()
+        print("   - 노트: \(notes)")
+        
+        // WorkoutSessionModel -> WorkoutResultModel 변환
+        let now = Date()
+        let exercisesResult: [ExerciseResultModel] = session.workout.exercises.enumerated().compactMap { exerciseIndex, workoutExercise in
+            let setsResult: [SetResultModel] = workoutExercise.sets.map { setInfo in
+                return SetResultModel(Reps: setInfo.reps, Weight: setInfo.weight)
+            }
+            
+            let completedSetsCount = workoutExercise.sets.indices.filter { setIndex in
+                session.completedSets.contains("\(exerciseIndex)-\(setIndex)")
+            }.count
+            
+            return ExerciseResultModel(exerciseName: workoutExercise.name,
+                                       setsCompleted: completedSetsCount,
+                                       sets: setsResult)
+        }
+        
+        let workoutResult = WorkoutResultModel(
+            duration: Int(session.elapsedTime),
+            restTime: nil,
+            workoutID: session.workout.id,
+            exercises: exercisesResult,
+            notes: notes.isEmpty ? nil : notes,
+            createdAt: Timestamp(date: now)
+        )
+        
+        // WorkoutService를 사용하여 Firestore에 저장
+        Task {
+            UIApplication.showLoading()
+            let saveTaskResult = await workoutService.saveWorkoutResult(userId: userId, result: workoutResult)
+            UIApplication.hideLoading()
+            
+            switch saveTaskResult {
+            case .success():
+                print("✅ AppWorkoutManager: 워크아웃 결과 저장 완료")
+                await MainActor.run {
+                    dismissResultView()
+                    UIApplication.showBanner(type: .success, message: "ワークアウト結果を保存しました")
+                }
+            case .failure(let error):
+                print("🔥 AppWorkoutManager: 워크아웃 결과 저장 실패: \(error.localizedDescription)")
+                UIApplication.showBanner(type: .error, message: "ワークアウト結果の保存に失敗しました")
+            }
+        }
     }
 
     // 결과 화면 닫기 (WorkoutResultView에서 호출됨)
