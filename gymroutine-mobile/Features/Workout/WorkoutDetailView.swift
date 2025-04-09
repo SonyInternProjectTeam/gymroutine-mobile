@@ -155,7 +155,7 @@ struct WorkoutDetailView: View {
                 } label: {
                     Label("始める", systemImage: "play")
                 }
-                .buttonStyle(PrimaryButtonStyle())
+                .buttonStyle(PrimaryButtonStyle()) 
             }
             .padding()
         }
