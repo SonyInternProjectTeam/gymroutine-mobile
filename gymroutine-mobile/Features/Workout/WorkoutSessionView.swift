@@ -103,6 +103,14 @@ struct WorkoutSessionView: View {
                     .transition(.opacity)
             }
         }
+        .alert("ワークアウト完了", isPresented: $viewModel.showCompletionAlert) {
+            Button("キャンセル", role: .cancel) { }
+            Button("完了") {
+                viewModel.confirmWorkoutCompletion()
+            }
+        } message: {
+            Text("ワークアウトを完了しますか？")
+        }
         .animation(.easeInOut, value: viewModel.isRestTimerActive)
         .animation(.easeInOut, value: viewModel.isDetailView)
         .animation(.easeInOut, value: viewModel.currentExerciseIndex)
@@ -118,25 +126,31 @@ struct WorkoutSessionView: View {
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text("\(viewModel.minutes)")
                     .font(.system(size: 40, weight: .bold))
+                    .contentTransition(.numericText())
                 Text(":")
                     .font(.system(size: 40, weight: .bold))
                 Text("\(String(format: "%02d", viewModel.seconds))")
                     .font(.system(size: 40, weight: .bold))
+                    .contentTransition(.numericText())
             }
             
             // 진행 표시 - 점 대신 진행 바와 체크 표시로 변경
             if viewModel.isDetailView {
                 exerciseProgressIndicator
+                    .padding(.top, 8)
             }
         }
         .padding()
         .background(Color(UIColor.systemBackground))
+        .animation(.default, value: viewModel.minutes)
+        .animation(.default, value: viewModel.seconds)
     }
     
     // 진행 바 너비 계산
     private func getProgressWidth(totalWidth: CGFloat) -> CGFloat {
         // 전체 운동 진행률을 기반으로 너비 계산
-        return CGFloat(viewModel.totalWorkoutProgress) * totalWidth
+        let progress = viewModel.totalWorkoutProgress
+        return CGFloat(progress) * totalWidth
     }
     
     // 운동 진행 표시기 - 진행 바와 체크 표시
@@ -155,12 +169,14 @@ struct WorkoutSessionView: View {
                                 // 체크 표시 또는 숫자
                                 if isExerciseCompleted(index: index) {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .font(.system(size: 24))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 28, height: 28)
                                         .foregroundStyle(.green)
                                 } else {
                                     ZStack {
                                         Circle()
-                                            .fill(index == viewModel.currentExerciseIndex ? .blue : .gray.opacity(0.3))
+                                            .fill(index == viewModel.currentExerciseIndex ? .blue : Color(.systemGray4))
                                             .frame(width: 28, height: 28)
                                         
                                         Text("\(index + 1)")
@@ -175,9 +191,9 @@ struct WorkoutSessionView: View {
                                     .font(.caption)
                                     .foregroundStyle(index == viewModel.currentExerciseIndex ? .primary : .secondary)
                                     .lineLimit(1)
+                                    .frame(maxWidth: 60)
                             }
                             .id(index)
-                            .frame(width: 70)
                             .padding(.vertical, 4)
                             .padding(.horizontal, 8)
                             .background(index == viewModel.currentExerciseIndex ? Color.blue.opacity(0.1) : Color.clear)
@@ -185,58 +201,52 @@ struct WorkoutSessionView: View {
                             .onTapGesture {
                                 withAnimation {
                                     viewModel.currentExerciseIndex = index
+                                    viewModel.currentSetIndex = 0
+                                    viewModel.stopRestTimer()
                                 }
                             }
                         }
                     }
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal)
                 }
+                .coordinateSpace(name: scrollNamespace)
                 .padding(.vertical, 4)
                 .onAppear {
-                    // 현재 운동 인덱스로 스크롤
-                    withAnimation {
-                        proxy.scrollTo(viewModel.currentExerciseIndex, anchor: .center)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation(.easeInOut) {
+                            proxy.scrollTo(viewModel.currentExerciseIndex, anchor: .center)
+                        }
                     }
                 }
                 .onChange(of: viewModel.currentExerciseIndex) { newIndex in
-                    // 인덱스가 변경될 때 해당 위치로 스크롤
-                    withAnimation {
+                    withAnimation(.easeInOut) {
                         proxy.scrollTo(newIndex, anchor: .center)
                     }
                 }
             }
         }
-        .padding(.top, 8)
     }
     
     // 진행 바 컴포넌트
     private var progressBar: some View {
         GeometryReader { geometry in
+            let totalWidth = geometry.size.width
             ZStack(alignment: .leading) {
                 // 배경 바
                 Rectangle()
-                    .foregroundColor(.gray.opacity(0.2))
+                    .foregroundColor(Color(.systemGray5))
                     .frame(height: 6)
                     .cornerRadius(3)
                 
                 // 전체 진행 바
                 Rectangle()
                     .foregroundColor(.blue)
-                    .frame(width: getProgressWidth(totalWidth: geometry.size.width), height: 6)
+                    .frame(width: getProgressWidth(totalWidth: totalWidth), height: 6)
                     .cornerRadius(3)
-                
-                // 현재 위치 표시
-                let currentPosition = geometry.size.width * CGFloat(viewModel.progressUpToExercise(index: viewModel.currentExerciseIndex) + 
-                                                             viewModel.currentExerciseProgress / CGFloat(viewModel.exercises.count))
-                Circle()
-                    .fill(.blue)
-                    .frame(width: 12, height: 12)
-                    .offset(x: currentPosition - 6) // 원 중앙에 위치하도록 보정
             }
         }
-        .frame(height: 12) // 원이 들어갈 공간 고려
-        .animation(.easeInOut, value: viewModel.currentExerciseIndex)
-        .animation(.easeInOut, value: viewModel.currentExerciseProgress)
+        .frame(height: 10)
+        .padding(.horizontal)
         .animation(.easeInOut, value: viewModel.totalWorkoutProgress)
     }
     
@@ -245,14 +255,14 @@ struct WorkoutSessionView: View {
         // 해당 운동의 모든 세트가 완료되었는지 확인
         guard index < viewModel.exercises.count else { return false }
         let exercise = viewModel.exercises[index]
-        
+        if exercise.sets.isEmpty { return true }
+
         for setIndex in 0..<exercise.sets.count {
             if !viewModel.isSetCompleted(exerciseIndex: index, setIndex: setIndex) {
                 return false
             }
         }
-        
-        return exercise.sets.count > 0
+        return true
     }
     
     // 단일 운동 상세 화면
@@ -309,7 +319,7 @@ struct WorkoutSessionView: View {
                                     .frame(width: 60, alignment: .leading)
                                 
                                 Button(action: {
-                                    viewModel.toggleSetCompletionWithAutoAdvance(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex)
+                                    viewModel.toggleSetCompletion(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex)
                                 }) {
                                     Image(systemName: viewModel.isSetCompleted(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex) ? "checkmark.circle.fill" : "circle")
                                         .foregroundStyle(viewModel.isSetCompleted(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex) ? .green : .secondary)
@@ -489,38 +499,87 @@ struct WorkoutSessionView: View {
     }
     
     private var restTimerOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.7)
-                .edgesIgnoringSafeArea(.all)
+        VStack {
+            Spacer()
             
-            VStack(spacing: 16) {
-                Text("休憩時間")
-                    .font(.title2)
-                    .foregroundStyle(.white)
+            HStack {
+                Spacer()
                 
-                Text("\(viewModel.remainingRestSeconds)")
-                    .font(.system(size: 70, weight: .bold))
-                    .foregroundStyle(.white)
-                
-                Text("秒")
-                    .font(.title3)
-                    .foregroundStyle(.white)
-                
-                Button(action: {
-                    viewModel.stopRestTimer()
-                }) {
-                    Text("スキップ")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 32)
-                        .padding(.vertical, 12)
-                        .background(.blue)
-                        .clipShape(Capsule())
+                VStack(spacing: 15) {
+                    Text("휴식 중...")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    
+                    ZStack {
+                        Circle()
+                            .stroke(lineWidth: 8)
+                            .opacity(0.3)
+                            .foregroundColor(.gray)
+                        
+                        Circle()
+                            .trim(from: 0.0, to: CGFloat(viewModel.remainingRestSeconds) / CGFloat(viewModel.restSeconds))
+                            .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
+                            .foregroundColor(.blue)
+                            .rotationEffect(Angle(degrees: 270.0))
+                            .animation(.linear, value: viewModel.remainingRestSeconds)
+                        
+                        Text("\(viewModel.remainingRestSeconds)")
+                            .font(.largeTitle)
+                            .bold()
+                            .contentTransition(.numericText())
+                    }
+                    .frame(width: 100, height: 100)
+                    
+                    HStack(spacing: 20) {
+                        Button {
+                            viewModel.updateRestTime(seconds: viewModel.restSeconds + 15)
+                        } label: {
+                            Text("+15s")
+                                .font(.caption)
+                                .padding(8)
+                                .background(Color.blue.opacity(0.2))
+                                .clipShape(Circle())
+                        }
+                        
+                        Button {
+                            viewModel.stopRestTimer()
+                            viewModel.moveToNextSet()
+                        } label: {
+                            Text("Skip")
+                                .padding(.horizontal)
+                                .padding(.vertical, 8)
+                                .background(.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(15)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Button {
+                            viewModel.updateRestTime(seconds: max(15, viewModel.restSeconds - 15))
+                        } label: {
+                            Text("-15s")
+                                .font(.caption)
+                                .padding(8)
+                                .background(Color.blue.opacity(0.2))
+                                .clipShape(Circle())
+                        }
+                        .disabled(viewModel.restSeconds <= 15)
+                    }
                 }
+                .padding(30)
+                .background(.ultraThickMaterial)
+                .cornerRadius(20)
+                .shadow(radius: 10)
+                
+                Spacer()
             }
-            .padding(32)
-            .background(.black.opacity(0.5))
-            .clipShape(RoundedRectangle(cornerRadius: 20))
+            
+            Spacer()
+        }
+        .background(Color.black.opacity(0.4))
+        .edgesIgnoringSafeArea(.all)
+        .onTapGesture {
+            // 배경 탭 시 특별한 동작 없음
         }
     }
     
