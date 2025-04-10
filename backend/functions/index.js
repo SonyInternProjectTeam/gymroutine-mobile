@@ -7,13 +7,24 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { initializeApp } = require("firebase-admin/app");
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+// Import handlers
+const storyHandler = require("./handlers/storyHandler");
+const cronHandler = require("./handlers/cronHandler");
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// Initialize Firebase Admin
+initializeApp();
+
+// Export Firestore trigger function
+exports.createStoryFromWorkoutResult = onDocumentCreated(
+  "Result/{userId}/{month}/{resultId}",
+  storyHandler.createStoryFromWorkoutResult
+);
+
+// Export scheduled function
+exports.expireStories = onSchedule("every 24 hours", cronHandler.expireStories);
+
+// TODO: Add other function triggers and handlers as needed
