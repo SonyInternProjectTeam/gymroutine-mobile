@@ -58,6 +58,9 @@ struct WorkoutDetailView: View {
             ExerciseSearchView(exercisesManager: viewModel)
                 .presentationDragIndicator(.visible)
         }
+        .onChange(of: viewModel.showWorkoutSession) { newValue in
+            print("📱 showWorkoutSession 값이 변경되었습니다: \(newValue)")
+        }
         .onAppear {
             // 뷰가 나타날 때마다 최신 데이터를 불러옴
             viewModel.refreshWorkoutData()
@@ -147,6 +150,7 @@ struct WorkoutDetailView: View {
                 .buttonStyle(SecondaryButtonStyle())
                 
                 Button {
+                    print("📱 始める 버튼이 클릭되었습니다.")
                     viewModel.startWorkout()
                 } label: {
                     Label("始める", systemImage: "play")

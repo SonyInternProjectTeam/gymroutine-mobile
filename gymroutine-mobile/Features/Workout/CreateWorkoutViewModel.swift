@@ -34,6 +34,7 @@ enum Weekday: String, CaseIterable {
 }
 
 // エクササイズのCRUDを管理
+@MainActor
 class WorkoutExercisesManager: ObservableObject {
     @Published var exercises: [WorkoutExercise] = []
     
