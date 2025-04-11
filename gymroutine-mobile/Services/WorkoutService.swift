@@ -111,7 +111,32 @@ class WorkoutService {
             throw error
         }
     }
-    
+
+    /// 引数のユーザーが登録済みのワークアウトを全て取得
+    func fetchUserWorkouts(uid: String) async -> [Workout]? {
+        let db = Firestore.firestore()
+        let workoutsRef = db.collection("Workouts").whereField("userId", isEqualTo: uid)
+
+        do {
+            let snapshot = try await workoutsRef.getDocuments()
+            var workouts: [Workout] = []
+
+            for document in snapshot.documents {
+                do {
+                    let workout = try document.data(as: Workout.self)
+                    workouts.append(workout)
+                } catch {
+                    print("[ERROR] Workoutのデコードエラー: \(error)")
+                }
+            }
+            return workouts
+
+        } catch {
+            print("[ERROR] Firestore 取得エラー: \(error)")
+            return nil
+        }
+    }
+
     /// 운동 옵션(Trains 컬렉션) 불러오기
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
         db.collection("Trains").getDocuments { (snapshot, error) in
