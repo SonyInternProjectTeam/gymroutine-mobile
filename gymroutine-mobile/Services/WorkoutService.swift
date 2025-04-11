@@ -192,4 +192,34 @@ class WorkoutService {
             return .failure(error)
         }
     }
+    
+    // MARK: - Workout Result Fetching
+
+    /// 특정 사용자의 특정 월의 특정 운동 결과를 ID로 가져오는 함수
+    /// - Parameters:
+    ///   - userId: 사용자 ID
+    ///   - month: 조회할 월 (YYYYMM 형식 문자열)
+    ///   - resultId: 가져올 결과의 문서 ID
+    func fetchWorkoutResultById(userId: String, month: String, resultId: String) async throws -> WorkoutResultModel {
+        let resultDocRef = db.collection("Result") // Base collection is "Result"
+            .document(userId)
+            .collection(month) // Subcollection is "YYYYMM"
+            .document(resultId)
+
+        do {
+            let documentSnapshot = try await resultDocRef.getDocument()
+            guard documentSnapshot.exists else {
+                throw NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout result not found for ID: \(resultId) in month \(month)"])
+            }
+            
+            let result = try documentSnapshot.data(as: WorkoutResultModel.self)
+            print("✅ Successfully fetched workout result: \(resultId)")
+            return result
+        } catch {
+            print("🔥 Error fetching workout result \(resultId): \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+    // TODO: Consider adding a function to fetch all results for a given month or date range if needed for Calendar view etc.
 }

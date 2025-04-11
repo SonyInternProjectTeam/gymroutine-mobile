@@ -7,7 +7,8 @@
 
 import Foundation
 
-struct User: Decodable {
+struct User: Decodable, Identifiable {
+    var id: String { uid }
     var uid: String
     var email: String
     var name: String = ""
@@ -17,4 +18,16 @@ struct User: Decodable {
     var birthday: Date? = nil // birthday
     var gender: String = "" // gender
     var createdAt: Date = Date()
+
+    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date()) {
+        self.uid = uid
+        self.email = email
+        self.name = name
+        self.profilePhoto = profilePhoto
+        self.visibility = visibility
+        self.isActive = isActive
+        self.birthday = birthday
+        self.gender = gender
+        self.createdAt = createdAt
+    }
 }

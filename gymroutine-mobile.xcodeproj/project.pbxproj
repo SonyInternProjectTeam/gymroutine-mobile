@@ -79,6 +79,11 @@
 		00CDC4882D87A699003B18EB /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4872D87A699003B18EB /* ExerciseDetailView.swift */; };
 		00CDC4902D87B17A003B18EB /* ExerciseGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */; };
 		00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */; };
+		272779E82DA8BAD700166807 /* StoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272779E52DA8BAD700166807 /* StoryView.swift */; };
+		272779E92DA8BAD700166807 /* StoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272779E62DA8BAD700166807 /* StoryViewModel.swift */; };
+		272779ED2DA8BD6E00166807 /* StoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272779EC2DA8BD6E00166807 /* StoryModel.swift */; };
+		272779EF2DA8BDF600166807 /* StoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272779EE2DA8BDF600166807 /* StoryRepository.swift */; };
+		272779F12DA8C30700166807 /* StoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272779F02DA8C30700166807 /* StoryService.swift */; };
 		27361FEC2D9B858200457D2C /* WorkoutDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27361FEB2D9B858100457D2C /* WorkoutDetailView.swift */; };
 		27361FEE2D9B858800457D2C /* WorkoutDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27361FED2D9B858800457D2C /* WorkoutDetailViewModel.swift */; };
 		277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */; };
@@ -190,6 +195,11 @@
 		00CDC4872D87A699003B18EB /* ExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailView.swift; sourceTree = "<group>"; };
 		00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseGridCell.swift; sourceTree = "<group>"; };
 		00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseCell.swift; sourceTree = "<group>"; };
+		272779E52DA8BAD700166807 /* StoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryView.swift; sourceTree = "<group>"; };
+		272779E62DA8BAD700166807 /* StoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryViewModel.swift; sourceTree = "<group>"; };
+		272779EC2DA8BD6E00166807 /* StoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryModel.swift; sourceTree = "<group>"; };
+		272779EE2DA8BDF600166807 /* StoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryRepository.swift; sourceTree = "<group>"; };
+		272779F02DA8C30700166807 /* StoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryService.swift; sourceTree = "<group>"; };
 		27361FEB2D9B858100457D2C /* WorkoutDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailView.swift; sourceTree = "<group>"; };
 		27361FED2D9B858800457D2C /* WorkoutDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutDetailViewModel.swift; sourceTree = "<group>"; };
 		277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRepository.swift; sourceTree = "<group>"; };
@@ -305,6 +315,7 @@
 				00CDC3D72D845E8E003B18EB /* ExcersiceModel.swift */,
 				00CDC3D82D845E8E003B18EB /* UserModel.swift */,
 				277739FD2DA605420006397D /* WorkoutResultModel.swift */,
+				272779EC2DA8BD6E00166807 /* StoryModel.swift */,
 				00CDC3D92D845E8E003B18EB /* WorkoutModel.swift */,
 			);
 			path = Models;
@@ -321,6 +332,7 @@
 		00CDC3DF2D845E8E003B18EB /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
+				272779EE2DA8BDF600166807 /* StoryRepository.swift */,
 				277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */,
 				00CDC3DD2D845E8E003B18EB /* FollowRepository.swift */,
 				00CDC3DE2D845E8E003B18EB /* SnsRepository.swift */,
@@ -331,6 +343,7 @@
 		00CDC3E62D845E8E003B18EB /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				272779F02DA8C30700166807 /* StoryService.swift */,
 				00CDC3E02D845E8E003B18EB /* AuthService.swift */,
 				00CDC3E12D845E8E003B18EB /* ExerciseService.swift */,
 				00CDC3E22D845E8E003B18EB /* FollowService.swift */,
@@ -465,6 +478,7 @@
 				00CDC46B2D846045003B18EB /* Calendar */,
 				00CDC46C2D846083003B18EB /* Sns */,
 				00CDC4742D8464B5003B18EB /* Profile */,
+				272779E72DA8BAD700166807 /* Story */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -605,6 +619,15 @@
 				009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */,
 			);
 			path = Exercise;
+			sourceTree = "<group>";
+		};
+		272779E72DA8BAD700166807 /* Story */ = {
+			isa = PBXGroup;
+			children = (
+				272779E52DA8BAD700166807 /* StoryView.swift */,
+				272779E62DA8BAD700166807 /* StoryViewModel.swift */,
+			);
+			path = Story;
 			sourceTree = "<group>";
 		};
 		27E5E5192CCEC9E9003E3E70 = {
@@ -823,6 +846,7 @@
 				00CDC4412D845E8E003B18EB /* SignupViewModel.swift in Sources */,
 				00CDC4422D845E8E003B18EB /* SplashViewModel.swift in Sources */,
 				00CDC4442D845E8E003B18EB /* WorkoutProcessViewModel.swift in Sources */,
+				272779ED2DA8BD6E00166807 /* StoryModel.swift in Sources */,
 				00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */,
 				277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */,
 				00CDC4462D845E8E003B18EB /* CircleButtonStyle.swift in Sources */,
@@ -857,8 +881,12 @@
 				277739FE2DA605420006397D /* WorkoutResultModel.swift in Sources */,
 				009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */,
 				0074075C2D9BC64C00808964 /* CalendarViewModel.swift in Sources */,
+				272779F12DA8C30700166807 /* StoryService.swift in Sources */,
 				00CDC4632D845E8E003B18EB /* SearchUserView.swift in Sources */,
 				00CDC4642D845E8E003B18EB /* SignupView.swift in Sources */,
+				272779EF2DA8BDF600166807 /* StoryRepository.swift in Sources */,
+				272779E82DA8BAD700166807 /* StoryView.swift in Sources */,
+				272779E92DA8BAD700166807 /* StoryViewModel.swift in Sources */,
 				00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */,
 				00CDC4662D845E8E003B18EB /* SplashView.swift in Sources */,
 				00CDC4672D845E8E003B18EB /* WelcomeView.swift in Sources */,
