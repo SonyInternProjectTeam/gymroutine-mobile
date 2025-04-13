@@ -55,6 +55,29 @@ class UserManager: ObservableObject {
         )
     }
     
+    // 사용자의 운동 활성 상태(isActive) 업데이트
+    func updateUserActiveStatus(isActive: Bool) async -> Result<Void, Error> {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return .failure(NSError(domain: "UserError", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not logged in"]))
+        }
+        
+        do {
+            try await db.collection("Users").document(uid).updateData(["isActive": isActive])
+            
+            // 로컬 currentUser 객체도 업데이트
+            if var updatedUser = self.currentUser {
+                updatedUser.isActive = isActive
+                self.currentUser = updatedUser
+            }
+            
+            print("[UserManager] 사용자 isActive 상태를 \(isActive)로 업데이트 완료")
+            return .success(())
+        } catch {
+            print("[UserManager] 사용자 isActive 상태 업데이트 실패: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+    
     // TODO : Service or Repoに移動するべき
     // follower
     func fetchFollowersCount(userId: String) async -> Int {

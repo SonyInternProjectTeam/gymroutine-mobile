@@ -46,6 +46,8 @@ class AppWorkoutManager: ObservableObject {
     
     // WorkoutService 인스턴스 추가
     private let workoutService = WorkoutService()
+    // UserManager 인스턴스 추가
+    private let userManager = UserManager.shared
     
     private init() {
         print("📱 AppWorkoutManager 초기화됨")
@@ -68,6 +70,14 @@ class AppWorkoutManager: ObservableObject {
         self.isWorkoutSessionMaximized = true // 시작 시 전체 화면으로 표시
         self.showResultView = false // 결과 화면 숨김
         self.completedWorkoutSession = nil
+        
+        // 사용자 isActive 상태를 true로 업데이트
+        Task {
+            let result = await userManager.updateUserActiveStatus(isActive: true)
+            if case .failure(let error) = result {
+                print("⚠️ 사용자 isActive 상태 업데이트 실패: \(error.localizedDescription)")
+            }
+        }
     }
     
     // 워크아웃 세션 최소화 (모달 닫기)
@@ -97,7 +107,14 @@ class AppWorkoutManager: ObservableObject {
         self.isWorkoutSessionMaximized = false
         self.workoutSessionViewModel = nil
         self.currentWorkout = nil
-         // 필요하다면 여기서 추가적인 정리 작업 수행
+        
+        // 사용자 isActive 상태를 false로 업데이트
+        Task {
+            let result = await userManager.updateUserActiveStatus(isActive: false)
+            if case .failure(let error) = result {
+                print("⚠️ 사용자 isActive 상태 업데이트 실패: \(error.localizedDescription)")
+            }
+        }
     }
     
     // 워크아웃 강제 종료 (사용자가 '종료' 버튼 탭 시)
@@ -110,7 +127,14 @@ class AppWorkoutManager: ObservableObject {
         currentWorkout = nil
         showResultView = false
         completedWorkoutSession = nil
-         // TODO: 필요 시 사용자에게 종료 확인 알림 표시 로직 추가
+        
+        // 사용자 isActive 상태를 false로 업데이트
+        Task {
+            let result = await userManager.updateUserActiveStatus(isActive: false)
+            if case .failure(let error) = result {
+                print("⚠️ 사용자 isActive 상태 업데이트 실패: \(error.localizedDescription)")
+            }
+        }
     }
 
     // MARK: - Workout Result Handling
@@ -157,6 +181,13 @@ class AppWorkoutManager: ObservableObject {
         Task {
             UIApplication.showLoading()
             let saveTaskResult = await workoutService.saveWorkoutResult(userId: userId, result: workoutResult)
+            
+            // 저장 완료 후에 isActive 상태를 false로 업데이트 (이미 false여도 한번 더 확인)
+            let activeResult = await userManager.updateUserActiveStatus(isActive: false)
+            if case .failure(let error) = activeResult {
+                print("⚠️ 사용자 isActive 상태 업데이트 실패: \(error.localizedDescription)")
+            }
+            
             UIApplication.hideLoading()
             
             switch saveTaskResult {
