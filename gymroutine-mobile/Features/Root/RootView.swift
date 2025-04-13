@@ -25,8 +25,8 @@ struct RootView: View {
                 viewModel: InitProfileSetupViewModel(router: router)
             )
             
-        case .main(let user):
-            MainView(viewModel: MainViewModel(router: router), homeViewModel: HomeViewModel()).environmentObject(UserManager.shared)
+        case .main(_):
+            MainView().environmentObject(UserManager.shared)
             // import UserManger
         }
     }
