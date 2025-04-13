@@ -44,7 +44,7 @@ struct MiniWorkoutView: View {
                     }
                     
                     if let sessionViewModel = workoutManager.workoutSessionViewModel {
-                        Text("\(sessionViewModel.completedSetsCount)/\(sessionViewModel.currentExerciseSetsCount) セット完了")
+                        Text("\(sessionViewModel.completedSetsCountForCurrentExercise)/\(sessionViewModel.currentExerciseSetsCount) セット完了")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

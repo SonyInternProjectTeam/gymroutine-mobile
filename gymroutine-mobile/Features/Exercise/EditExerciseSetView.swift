@@ -14,7 +14,23 @@ struct EditExerciseSetView: View {
     let order: Int
     @Binding var workoutExercise: WorkoutExercise
     
+    // 문자열로 변환된 값을 저장하기 위한 상태 변수
+    @State private var repsStrings: [String] = []
+    @State private var weightStrings: [String] = []
+    
     private let exerciseDetailOptions = ["セット", "レップ数", "重さ"]
+    
+    // 초기화 시 렙수와 무게 값을 문자열로 변환
+    init(order: Int, workoutExercise: Binding<WorkoutExercise>) {
+        self.order = order
+        self._workoutExercise = workoutExercise
+        
+        // 초기 문자열 값 설정
+        let reps = workoutExercise.wrappedValue.sets.map { "\($0.reps)" }
+        let weights = workoutExercise.wrappedValue.sets.map { String(format: "%.1f", $0.weight) }
+        self._repsStrings = State(initialValue: reps)
+        self._weightStrings = State(initialValue: weights)
+    }
     
     var body: some View {
         VStack {
@@ -82,32 +98,87 @@ extension EditExerciseSetView {
             }
             
             ScrollView(showsIndicators: false) {
-                ForEach($workoutExercise.sets, id: \.id) { $set in
+                ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { index, set in
                     HStack {
-                        Text("\(workoutExercise.sets.firstIndex(where: { $0.id == set.id })! + 1)")
+                        Text("\(index + 1)")
                             .hAlign(.center)
                             .font(.headline)
 
-                        TextField("", value: $set.reps, format: .number)
-                            .multilineTextAlignment(.center)
-                            .keyboardType(.numberPad)
-                            .fieldBackground()
-                            .clipped()
-                            .shadow(radius: 1)
-                            .padding(4)
+                        // 렙수 입력 필드 (문자열 기반)
+                        TextField("0", text: Binding(
+                            get: {
+                                if index < repsStrings.count {
+                                    return repsStrings[index]
+                                }
+                                return "0"
+                            },
+                            set: { newValue in
+                                // 문자열 배열 업데이트
+                                if index < repsStrings.count {
+                                    repsStrings[index] = newValue
+                                } else if index == repsStrings.count {
+                                    repsStrings.append(newValue)
+                                }
+                                
+                                // 실제 모델 업데이트
+                                if let intValue = Int(newValue) {
+                                    workoutExercise.sets[index].reps = intValue
+                                } else if newValue.isEmpty {
+                                    // 비어있으면 0으로 설정
+                                    workoutExercise.sets[index].reps = 0
+                                }
+                            }
+                        ))
+                        .multilineTextAlignment(.center)
+                        .keyboardType(.numberPad)
+                        .fieldBackground()
+                        .clipped()
+                        .shadow(radius: 1)
+                        .padding(4)
 
-                        TextField("", value: $set.weight, format: .number)
-                            .multilineTextAlignment(.center)
-                            .keyboardType(.decimalPad)
-                            .fieldBackground()
-                            .clipped()
-                            .shadow(radius: 1)
-                            .padding(4)
+                        // 무게 입력 필드 (문자열 기반)
+                        TextField("0.0", text: Binding(
+                            get: {
+                                if index < weightStrings.count {
+                                    return weightStrings[index]
+                                }
+                                return "0.0"
+                            },
+                            set: { newValue in
+                                // 문자열 배열 업데이트
+                                if index < weightStrings.count {
+                                    weightStrings[index] = newValue
+                                } else if index == weightStrings.count {
+                                    weightStrings.append(newValue)
+                                }
+                                
+                                // 실제 모델 업데이트
+                                if let doubleValue = Double(newValue.replacingOccurrences(of: ",", with: ".")) {
+                                    workoutExercise.sets[index].weight = doubleValue
+                                } else if newValue.isEmpty {
+                                    // 비어있으면 0으로 설정
+                                    workoutExercise.sets[index].weight = 0
+                                }
+                            }
+                        ))
+                        .multilineTextAlignment(.center)
+                        .keyboardType(.decimalPad)
+                        .fieldBackground()
+                        .clipped()
+                        .shadow(radius: 1)
+                        .padding(4)
                     }
                     .overlay(alignment: .leading) {
                         if workoutExercise.sets.count > 1, workoutExercise.sets.last?.id == set.id {
                             Button(action: {
                                 workoutExercise.sets.removeAll { $0.id == set.id }
+                                // 배열도 함께 조정
+                                if repsStrings.count > workoutExercise.sets.count {
+                                    repsStrings.removeLast()
+                                }
+                                if weightStrings.count > workoutExercise.sets.count {
+                                    weightStrings.removeLast()
+                                }
                             }) {
                                 Image(systemName: "xmark")
                                     .foregroundStyle(.white)
@@ -124,8 +195,14 @@ extension EditExerciseSetView {
                 Button {
                     if let lastSet = workoutExercise.sets.last {
                         workoutExercise.sets.append(ExerciseSet(reps: lastSet.reps, weight: lastSet.weight))
+                        // 배열도 함께 업데이트
+                        repsStrings.append("\(lastSet.reps)")
+                        weightStrings.append(String(format: "%.1f", lastSet.weight))
                     } else {
                         workoutExercise.sets.append(ExerciseSet(reps: 0, weight: 0))
+                        // 배열도 함께 업데이트
+                        repsStrings.append("0")
+                        weightStrings.append("0.0")
                     }
                 } label: {
                     Label("セットを追加する", systemImage: "plus")

@@ -29,6 +29,16 @@ struct HomeView: View {
         .background(Color.gray.opacity(0.1))
         .contentMargins(.top, 16)
         .contentMargins(.bottom, 80)
+        .refreshable {
+            // 스크롤 당겨서 새로고침 시 스토리 데이터 업데이트
+            viewModel.refreshStories()
+            // 기타 필요한 데이터 업데이트
+            viewModel.loadFollowingUsers()
+            viewModel.loadTodaysWorkouts()
+        }
+        .sheet(item: $viewModel.selectedUserForStory) { user in
+            StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
+        }
         .overlay(alignment: .bottom) {
             buttonBox
                 .clipped()
@@ -44,57 +54,20 @@ struct HomeView: View {
         VStack(spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    // 현재 사용자 프로필 이미지 및 이름 표시
+                    // 현재 사용자 프로필 이미지 및 이름 표시 (Use FollowingUserIcon)
                     if let currentUser = userManager.currentUser {
-                        VStack(spacing: 4) {
-                            if let url = URL(string: currentUser.profilePhoto), !currentUser.profilePhoto.isEmpty {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 80, height: 80)
-                                        .clipShape(Circle())
-                                } placeholder: {
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.3))
-                                        .frame(width: 80, height: 80)
-                                }
-                            } else {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(width: 80, height: 80)
+                        FollowingUserIcon(user: currentUser, hasActiveStory: viewModel.userHasActiveStory(userId: currentUser.uid))
+                            .onTapGesture {
+                                viewModel.showStories(for: currentUser)
                             }
-                            Text(currentUser.name)
-                                .font(.caption)
-                                .lineLimit(1)
-                                .frame(width: 80)
-                        }
                     }
-                    // 팔로우 중인 사용자들 표시
+                    
+                    // 팔로우 중인 사용자들 표시 (Keep as is)
                     ForEach(viewModel.followingUsers, id: \.uid) { user in
-                        VStack(spacing: 4) {
-                            if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 80, height: 80)
-                                        .clipShape(Circle())
-                                } placeholder: {
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.3))
-                                        .frame(width: 80, height: 80)
-                                }
-                            } else {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(width: 80, height: 80)
+                        FollowingUserIcon(user: user, hasActiveStory: viewModel.userHasActiveStory(userId: user.uid))
+                            .onTapGesture {
+                                viewModel.showStories(for: user)
                             }
-                            Text(user.name)
-                                .font(.caption)
-                                .lineLimit(1)
-                                .frame(width: 80)
-                        }
                     }
                 }
             }
@@ -225,6 +198,45 @@ struct HomeView: View {
                 Label("今すぐ始める", systemImage: "play")
             }
             .buttonStyle(PrimaryButtonStyle())
+        }
+    }
+}
+
+// MARK: - Subviews (Add FollowingUserIcon if missing)
+
+struct FollowingUserIcon: View {
+    let user: User
+    let hasActiveStory: Bool
+
+    var body: some View {
+        VStack {
+            ZStack {
+                // Placeholder or AsyncImage for profile photo
+                if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
+                    AsyncImage(url: url) { image in
+                        image.resizable().aspectRatio(contentMode: .fill).frame(width: 60, height: 60).clipShape(Circle())
+                    } placeholder: {
+                        Circle().fill(Color.gray.opacity(0.3)).frame(width: 60, height: 60)
+                    }
+                } else {
+                    Image(systemName: "person.circle.fill") // Fallback icon
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 60, height: 60)
+                        .foregroundColor(.gray.opacity(0.5))
+                }
+
+                // Story Border (Burning Effect)
+                if hasActiveStory {
+                    Circle()
+                        .stroke(LinearGradient(gradient: Gradient(colors: [.yellow, .orange, .red]), startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 3)
+                        .frame(width: 65, height: 65)
+                }
+            }
+            Text(user.name)
+                .font(.caption)
+                .lineLimit(1)
+                .frame(width: 60) // Adjust width if needed
         }
     }
 }
