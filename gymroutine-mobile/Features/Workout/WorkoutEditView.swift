@@ -152,7 +152,7 @@ struct WorkoutEditView: View {
         }
     }
     
-    // エクササイズリスト（ドラッグ可能）
+    // エクササイズリスト（ドラッグで順序変更可能）
     private var exercisesBox: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("エクササイズ")
@@ -175,7 +175,7 @@ struct WorkoutEditView: View {
                         WorkoutListCell(
                             index: index + 1,
                             exercise: exercise,
-                            showDragHandle: true
+                            showDragHandle: false
                         )
                     }
                     .onMove { from, to in
@@ -215,3 +215,21 @@ struct WorkoutEditView: View {
         }
     }
 }
+
+// プレビュー
+struct WorkoutEditView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            WorkoutEditView(workout: Workout(
+                id: "preview",
+                userId: "user1",
+                name: "プレビューワークアウト",
+                createdAt: Date(),
+                notes: "プレビュー用メモ",
+                isRoutine: true,
+                scheduledDays: ["Monday", "Wednesday", "Friday"],
+                exercises: [.mock(), .mock()]
+            ))
+        }
+    }
+} 
