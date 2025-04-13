@@ -11,6 +11,9 @@ import FirebaseAuth
 class ExerciseSearchViewModel: ObservableObject {
     @Published var trainOptions: [String] = []
     @Published var allExercises: [Exercise] = []
+@MainActor
+final class ExerciseSearchViewModel: ObservableObject {
+    @Published var recommendedExercises: [Exercise] = []
     @Published var filterExercises: [Exercise] = []
     @Published var searchWord: String = ""
     @Published var selectedExerciseParts: [ExercisePart] = []
@@ -18,6 +21,7 @@ class ExerciseSearchViewModel: ObservableObject {
     private var service = ExerciseService()
     private let workoutService = WorkoutService()
     
+    private let recommendExeciseIds: [String] = ["qO1BfPHJXlHcoRhzh24n","qX8qffKedwHds0qMI44H"]
     
     
     @Published var isBoolmarkOnly: Bool = false
@@ -33,6 +37,7 @@ class ExerciseSearchViewModel: ObservableObject {
                 self.fetchAllExercises(options: self.trainOptions)
             }
         }
+        fetchRecommendExercise()
     }
     
     func fetchAllExercises(options: [String]) {
@@ -65,10 +70,32 @@ class ExerciseSearchViewModel: ObservableObject {
             allExercises.forEach { exercise in
                 if exercise.part.contains(selectedExercisePart!.rawValue) {
                     filteredExercises.append(exercise)
+    //事前に指定したエクササイズをおすすめとして取得
+    func fetchRecommendExercise() {
+        Task {
+            isLoading = true
+            var fetchedExercises: [Exercise] = []
+            
+            await withTaskGroup(of: Result<Exercise, Error>.self) { group in
+                for id in recommendExeciseIds {
+                    group.addTask {
+                        return await self.service.fetchExerciseById(id: id)
+                    }
+                }
+
+                for await result in group {
+                    switch result {
+                    case .success(let exercise):
+                        fetchedExercises.append(exercise)
+                    case .failure(let error):
+                        print("[ERROR] おすすめエクササイズ取得失敗: \(error.localizedDescription)")
+                    }
                 }
             }
+
+            self.recommendedExercises = fetchedExercises
+            isLoading = false
         }
-        filterExercises = filteredExercises
     }
     
     func toggleExercisePart(part: ExercisePart) {

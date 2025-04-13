@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 struct Exercise: Codable, Hashable {
+    @DocumentID var id: String?
     var name: String = ""
     var description: String = ""
     var img: String = ""

@@ -68,4 +68,16 @@ final class ExerciseService {
             return .failure(error)
         }
     }
+    
+    // idからエクササイズを取得
+    func fetchExerciseById(id: String) async -> Result<Exercise, Error> {
+        let docRef = db.collection("Exercises").document(id)
+        
+        do {
+            let exercise = try await docRef.getDocument(as: Exercise.self)
+            return .success(exercise)
+        } catch {
+            return .failure(error)
+        }
+    }
 }
