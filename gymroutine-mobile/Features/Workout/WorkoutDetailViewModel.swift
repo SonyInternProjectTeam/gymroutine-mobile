@@ -18,6 +18,9 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     @Published var workoutSessionViewModel: WorkoutSessionViewModel? // 워크아웃 세션 뷰모델 참조
     @Published var showMiniWorkoutSession = false // 최소화된 워크아웃 세션 표시 여부
     
+    // 편집 화면 표시 플래그
+    @Published var showEditView = false
+    
     private let service = WorkoutService()
     private let workoutManager = AppWorkoutManager.shared
     
@@ -53,8 +56,8 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     /// 워크아웃 편집 액션 (예: 편집 화면으로 이동)
     func editWorkout() {
-        // 실제 편집 로직 구현 (예: 편집 모드 전환 혹은 편집 화면으로 푸시)
-        print("Edit workout tapped")
+        // 편집 화면 표시
+        showEditView = true
     }
     
     /// 새 운동 추가 액션
