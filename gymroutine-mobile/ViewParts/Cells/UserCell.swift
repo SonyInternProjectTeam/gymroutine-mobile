@@ -16,9 +16,11 @@ struct UserCell: View {
             HStack {
                 ProfilePhoto(photourl: user.profilePhoto)
                 VStack {
-                    Text("\(user.age)歳 \(user.gender)")
-                        .font(.caption)
-                        .fontWeight(.thin)
+                    if user.birthday != nil || !user.gender.isEmpty {
+                        Text(getAgeAndGenderText())
+                            .font(.caption)
+                            .fontWeight(.thin)
+                    }
                     Text(user.name)
                         .font(.subheadline)
                         .fontWeight(.bold)
@@ -32,6 +34,26 @@ struct UserCell: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+    }
+    
+    private func getAgeAndGenderText() -> String {
+        var result = ""
+        
+        // 생일이 있으면 나이 계산
+        if let birthday = user.birthday {
+            let calendar = Calendar.current
+            let ageComponents = calendar.dateComponents([.year], from: birthday, to: Date())
+            if let age = ageComponents.year {
+                result += "\(age)歳 "
+            }
+        }
+        
+        // 성별 추가
+        if !user.gender.isEmpty {
+            result += user.gender
+        }
+        
+        return result.trimmingCharacters(in: .whitespaces)
     }
 }
 
@@ -47,13 +69,35 @@ struct UserListView:View {
                 Text(user.name)
                     .font(.subheadline)
                     .fontWeight(.bold)
-                Text("\(user.age)歳 \(user.gender)")
-                    .font(.caption)
-                    .fontWeight(.thin)
+                if user.birthday != nil || !user.gender.isEmpty {
+                    Text(getAgeAndGenderText())
+                        .font(.caption)
+                        .fontWeight(.thin)
+                }
             }
             Spacer()
         }
         .background(Color.white)
+    }
+    
+    private func getAgeAndGenderText() -> String {
+        var result = ""
+        
+        // 생일이 있으면 나이 계산
+        if let birthday = user.birthday {
+            let calendar = Calendar.current
+            let ageComponents = calendar.dateComponents([.year], from: birthday, to: Date())
+            if let age = ageComponents.year {
+                result += "\(age)歳 "
+            }
+        }
+        
+        // 성별 추가
+        if !user.gender.isEmpty {
+            result += user.gender
+        }
+        
+        return result.trimmingCharacters(in: .whitespaces)
     }
 }
 
