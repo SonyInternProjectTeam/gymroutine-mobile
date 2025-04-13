@@ -29,6 +29,13 @@ struct HomeView: View {
         .background(Color.gray.opacity(0.1))
         .contentMargins(.top, 16)
         .contentMargins(.bottom, 80)
+        .refreshable {
+            // 스크롤 당겨서 새로고침 시 스토리 데이터 업데이트
+            viewModel.refreshStories()
+            // 기타 필요한 데이터 업데이트
+            viewModel.loadFollowingUsers()
+            viewModel.loadTodaysWorkouts()
+        }
         .sheet(item: $viewModel.selectedUserForStory) { user in
             StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
         }

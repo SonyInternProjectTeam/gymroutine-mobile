@@ -28,6 +28,11 @@ final class HomeViewModel: ObservableObject {
         loadTodaysWorkouts()
     }
     
+    deinit {
+        // ViewModel이 해제될 때 실시간 업데이트 중지
+        storyService.stopRealtimeUpdates()
+    }
+    
     private func setupSubscribers() {
         // Subscribe to StoryService's friendsStories updates
         storyService.$friendsStories
@@ -56,8 +61,8 @@ final class HomeViewModel: ObservableObject {
             switch result {
             case .success(let users):
                 self.followingUsers = users
-                // Fetch stories for the current user (which includes friends)
-                storyService.fetchFriendsStories(userId: currentUserID)
+                // 기존 일회성 로드 대신 실시간 업데이트 시작
+                storyService.startRealtimeUpdates(userId: currentUserID)
             case .failure(let error):
                 print("팔로잉ユーザーの読み込みに失敗しました: \(error.localizedDescription)")
             }
@@ -85,6 +90,12 @@ final class HomeViewModel: ObservableObject {
             self.storiesForSelectedUser = []
             self.selectedUserForStory = nil
         }
+    }
+    
+    // 실시간 업데이트 수동 새로고침
+    func refreshStories() {
+        guard let currentUserID = UserManager.shared.currentUser?.uid else { return }
+        storyService.startRealtimeUpdates(userId: currentUserID)
     }
     
     /// WorkoutRepository에서 워크아웃을 불러와 오늘의 워크아웃만 필터링
