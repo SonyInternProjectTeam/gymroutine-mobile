@@ -60,9 +60,30 @@ struct MainView: View {
                         .padding(.bottom, 49) // タブバーの高さ
                 }
             }
-            
-            // ワークアウトセッションモーダルの表示
-            GlobalWorkoutSessionView()
+        }
+        .sheet(isPresented: Binding<Bool>(
+            get: { workoutManager.isWorkoutSessionActive && workoutManager.isWorkoutSessionMaximized },
+            set: { newValue in
+                if !newValue && workoutManager.isWorkoutSessionActive {
+                    workoutManager.minimizeWorkoutSession()
+                }
+            }
+        )) {
+            if let sessionViewModel = workoutManager.workoutSessionViewModel {
+                WorkoutSessionView(
+                    viewModel: sessionViewModel,
+                    onEndWorkout: {
+                        workoutManager.endWorkout()
+                    }
+                )
+                .presentationDragIndicator(.visible)
+                .interactiveDismissDisabled(false)
+                .onDisappear {
+                    if workoutManager.isWorkoutSessionActive {
+                        workoutManager.minimizeWorkoutSession()
+                    }
+                }
+            }
         }
     }
 }

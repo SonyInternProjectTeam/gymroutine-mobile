@@ -1,10 +1,14 @@
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> SP9-3Workout
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
 
     },
+<<<<<<< HEAD
     "-15s" : {
 
     },
@@ -27,15 +31,26 @@
         }
       }
     },
+=======
+    ":" : {
+
+    },
+    "%@" : {
+
+    },
+>>>>>>> SP9-3Workout
     "%@の情報" : {
 
     },
     "%lld" : {
 
     },
+<<<<<<< HEAD
     "%lld reps" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "%lld 種目" : {
 
     },
@@ -69,12 +84,15 @@
         }
       }
     },
+<<<<<<< HEAD
     "•" : {
 
     },
     "+15s" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "64" : {
 
     },
@@ -481,18 +499,24 @@
         }
       }
     },
+<<<<<<< HEAD
     "Error loading content" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "Error: %@" : {
 
     },
     "Exercise: %@" : {
 
     },
+<<<<<<< HEAD
     "Exercises" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "Face Pull" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -688,9 +712,12 @@
         }
       }
     },
+<<<<<<< HEAD
     "Loading..." : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "Lying Leg Raise" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -733,12 +760,15 @@
     "No results found" : {
 
     },
+<<<<<<< HEAD
     "No workout data available" : {
 
     },
     "Notes" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "Overhead Triceps Extension" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -891,9 +921,12 @@
     "Set %lld" : {
 
     },
+<<<<<<< HEAD
     "Set %lld:" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "Shoulder Press (Overhead Press)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -938,9 +971,12 @@
         }
       }
     },
+<<<<<<< HEAD
     "Skip" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "Skull Crusher" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -994,9 +1030,12 @@
     "Stop" : {
 
     },
+<<<<<<< HEAD
     "Summary" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "Sumo Squat" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1022,12 +1061,15 @@
     "Timer: %lld seconds" : {
 
     },
+<<<<<<< HEAD
     "Total Duration: %@" : {
 
     },
     "Total Time: %@" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "Triceps Pushdown" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1086,6 +1128,7 @@
     "Weight" : {
 
     },
+<<<<<<< HEAD
     "Workout" : {
 
     },
@@ -1110,6 +1153,8 @@
     "휴식 중..." : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "エクササイズ" : {
 
     },
@@ -1128,6 +1173,12 @@
     "カテゴリ" : {
 
     },
+<<<<<<< HEAD
+=======
+    "カレンダー" : {
+
+    },
+>>>>>>> SP9-3Workout
     "キャンセル" : {
 
     },
@@ -1137,6 +1188,12 @@
     "ジムルーティーンへようこそ！" : {
 
     },
+<<<<<<< HEAD
+=======
+    "スキップ" : {
+
+    },
+>>>>>>> SP9-3Workout
     "セット" : {
 
     },
@@ -1209,9 +1266,12 @@
     "ルーティーン追加" : {
 
     },
+<<<<<<< HEAD
     "ルーティーン追加画面を\nここに作成" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "レップ数" : {
 
     },
@@ -1224,21 +1284,27 @@
     "ワークアウト" : {
 
     },
+<<<<<<< HEAD
     "ワークアウトなし" : {
 
     },
     "ワークアウトを完了しますか？" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "ワークアウト作成" : {
 
     },
     "ワークアウト名" : {
 
     },
+<<<<<<< HEAD
     "ワークアウト完了" : {
 
     },
+=======
+>>>>>>> SP9-3Workout
     "ワークアウト詳細" : {
 
     },
@@ -1251,6 +1317,7 @@
     "今日のワークアウトはありません" : {
 
     },
+<<<<<<< HEAD
     "作成する" : {
 
     },
@@ -1263,6 +1330,17 @@
     "共有" : {
 
     },
+=======
+    "休憩時間" : {
+
+    },
+    "作成する" : {
+
+    },
+    "入力してください" : {
+
+    },
+>>>>>>> SP9-3Workout
     "最小化" : {
 
     },
@@ -1302,6 +1380,12 @@
     "生年月日を選択してください" : {
 
     },
+<<<<<<< HEAD
+=======
+    "秒" : {
+
+    },
+>>>>>>> SP9-3Workout
     "簡易カレンダーView" : {
 
     },
@@ -1331,6 +1415,7 @@
     }
   },
   "version" : "1.0"
+<<<<<<< HEAD
 }
 =======
     "sourceLanguage" : "en",
@@ -2525,5 +2610,8 @@
         }
     },
     "version" : "1.0"
+}
+>>>>>>> SP9-3Workout
+=======
 }
 >>>>>>> SP9-3Workout
