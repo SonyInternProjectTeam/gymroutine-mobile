@@ -55,7 +55,12 @@ class AuthService {
         do {
             let documentRef = db.collection("Users").document(user.uid)
             
-            let userData: [String: Any] = [
+            // Convert weightHistory to an array of dictionaries for Firestore
+            let weightHistoryData = user.weightHistory.map { entry -> [String: Any] in
+                return ["weight": entry.weight, "date": entry.date] // entry.date is already a Timestamp
+            }
+
+            var userData: [String: Any] = [
                 "uid": user.uid,
                 "email": user.email,
                 "name": user.name,
@@ -65,13 +70,22 @@ class AuthService {
                 // birthday가 nil이 아니면 Timestamp로 변환, nil이면 NSNull() 또는 필드 제거
                 "birthday": user.birthday != nil ? Timestamp(date: user.birthday!) : NSNull(),
                 "gender": user.gender,
-                "createdAt": Timestamp(date: user.createdAt)
+                "createdAt": Timestamp(date: user.createdAt),
+                // Add new fields
+                "totalWorkoutDays": user.totalWorkoutDays,
+                "currentWeight": user.currentWeight as Any, // Handle potential nil
+                "consecutiveWorkoutDays": user.consecutiveWorkoutDays,
+                "weightHistory": weightHistoryData
             ]
             
             // NSNull 대신 필드를 제거하는 방법
             // if let birthday = user.birthday {
             //     userData["birthday"] = Timestamp(date: birthday)
             // }
+            // Handle optional currentWeight (remove if nil)
+            if user.currentWeight == nil {
+                userData.removeValue(forKey: "currentWeight")
+            }
             
             try await documentRef.setData(userData, merge: true)
             

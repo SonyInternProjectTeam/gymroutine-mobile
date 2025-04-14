@@ -6,6 +6,13 @@
 //
 
 import Foundation
+import FirebaseFirestore // Import for Timestamp
+
+// Structure for weight history entries
+struct WeightEntry: Codable, Hashable { // Codable and Hashable for potential future use
+    var weight: Double
+    var date: Timestamp // Use Timestamp for Firestore compatibility
+}
 
 struct User: Decodable, Identifiable {
     var id: String { uid }
@@ -19,7 +26,13 @@ struct User: Decodable, Identifiable {
     var gender: String = "" // gender
     var createdAt: Date = Date()
 
-    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date()) {
+    // New fields
+    var totalWorkoutDays: Int = 0
+    var currentWeight: Double? = nil // Optional, as user might not enter it initially
+    var consecutiveWorkoutDays: Int = 0
+    var weightHistory: [WeightEntry] = [] // Array of WeightEntry
+
+    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date(), totalWorkoutDays: Int = 0, currentWeight: Double? = nil, consecutiveWorkoutDays: Int = 0, weightHistory: [WeightEntry] = []) {
         self.uid = uid
         self.email = email
         self.name = name
@@ -29,5 +42,10 @@ struct User: Decodable, Identifiable {
         self.birthday = birthday
         self.gender = gender
         self.createdAt = createdAt
+        // Initialize new fields
+        self.totalWorkoutDays = totalWorkoutDays
+        self.currentWeight = currentWeight
+        self.consecutiveWorkoutDays = consecutiveWorkoutDays
+        self.weightHistory = weightHistory
     }
 }
