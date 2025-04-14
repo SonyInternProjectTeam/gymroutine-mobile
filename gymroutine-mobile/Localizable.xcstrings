@@ -4,16 +4,35 @@
     "" : {
 
     },
+    "-15s" : {
+
+    },
     ":" : {
+
+    },
+    "%.1f kg" : {
 
     },
     "%@" : {
 
     },
+    "%@ kg x %lld reps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ kg x %2$lld reps"
+          }
+        }
+      }
+    },
     "%@の情報" : {
 
     },
     "%lld" : {
+
+    },
+    "%lld reps" : {
 
     },
     "%lld 種目" : {
@@ -48,6 +67,18 @@
           }
         }
       }
+    },
+    "•" : {
+
+    },
+    "+15s" : {
+
+    },
+    "0" : {
+
+    },
+    "0.0" : {
+
     },
     "64" : {
 
@@ -455,10 +486,16 @@
         }
       }
     },
+    "Error loading content" : {
+
+    },
     "Error: %@" : {
 
     },
     "Exercise: %@" : {
+
+    },
+    "Exercises" : {
 
     },
     "Face Pull" : {
@@ -656,6 +693,9 @@
         }
       }
     },
+    "Loading..." : {
+
+    },
     "Lying Leg Raise" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -696,6 +736,12 @@
 
     },
     "No results found" : {
+
+    },
+    "No workout data available" : {
+
+    },
+    "Notes" : {
 
     },
     "Overhead Triceps Extension" : {
@@ -850,6 +896,9 @@
     "Set %lld" : {
 
     },
+    "Set %lld:" : {
+
+    },
     "Shoulder Press (Overhead Press)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -893,6 +942,9 @@
           }
         }
       }
+    },
+    "Skip" : {
+
     },
     "Skull Crusher" : {
       "extractionState" : "manual",
@@ -947,6 +999,9 @@
     "Stop" : {
 
     },
+    "Summary" : {
+
+    },
     "Sumo Squat" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -970,6 +1025,12 @@
       }
     },
     "Timer: %lld seconds" : {
+
+    },
+    "Total Duration: %@" : {
+
+    },
+    "Total Time: %@" : {
 
     },
     "Triceps Pushdown" : {
@@ -1030,6 +1091,30 @@
     "Weight" : {
 
     },
+    "Workout" : {
+
+    },
+    "Workout Completed!" : {
+
+    },
+    "Workout Name: %@" : {
+
+    },
+    "Workout Result" : {
+
+    },
+    "결과 데이터를 로딩 중이거나 오류가 발생했습니다." : {
+
+    },
+    "닫기" : {
+
+    },
+    "워크아웃 세션 정보를 불러올 수 없습니다." : {
+
+    },
+    "휴식 중..." : {
+
+    },
     "エクササイズ" : {
 
     },
@@ -1048,9 +1133,6 @@
     "カテゴリ" : {
 
     },
-    "カレンダー" : {
-
-    },
     "キャンセル" : {
 
     },
@@ -1058,9 +1140,6 @@
 
     },
     "ジムルーティーンへようこそ！" : {
-
-    },
-    "スキップ" : {
 
     },
     "セット" : {
@@ -1135,6 +1214,9 @@
     "ルーティーン追加" : {
 
     },
+    "ルーティーン追加画面を\nここに作成" : {
+
+    },
     "レップ数" : {
 
     },
@@ -1147,10 +1229,19 @@
     "ワークアウト" : {
 
     },
+    "ワークアウトなし" : {
+
+    },
+    "ワークアウトを完了しますか？" : {
+
+    },
     "ワークアウト作成" : {
 
     },
     "ワークアウト名" : {
+
+    },
+    "ワークアウト完了" : {
 
     },
     "ワークアウト詳細" : {
@@ -1165,13 +1256,16 @@
     "今日のワークアウトはありません" : {
 
     },
-    "休憩時間" : {
-
-    },
     "作成する" : {
 
     },
+    "保存" : {
+
+    },
     "入力してください" : {
+
+    },
+    "共有" : {
 
     },
     "最小化" : {
@@ -1211,9 +1305,6 @@
 
     },
     "生年月日を選択してください" : {
-
-    },
-    "秒" : {
 
     },
     "簡易カレンダーView" : {
