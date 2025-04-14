@@ -392,35 +392,3 @@ struct ExerciseCard: View {
         .cornerRadius(10)
     }
 }
-
-// Preview Provider
-struct StoryView_Previews: PreviewProvider {
-    static var previews: some View {
-        let mockUser = User(uid: "previewUser1", email: "preview@example.com", name: "Preview User")
-        
-        // Create mock workout result data
-        let mockSet1 = SetResultModel(Reps: 10, Weight: 50.0)
-        let mockSet2 = SetResultModel(Reps: 8, Weight: 55.0)
-        let mockExercise1 = ExerciseResultModel(exerciseName: "ベンチプレス", setsCompleted: 2, sets: [mockSet1, mockSet2])
-        let mockExercise2 = ExerciseResultModel(exerciseName: "ショルダープレス", setsCompleted: 3, sets: [mockSet1, mockSet1, mockSet1])
-        let mockWorkoutResult = WorkoutResultModel(
-            id: "mockResult1",
-            duration: 2700,
-            restTime: nil,
-            workoutID: "origWorkout1",
-            exercises: [mockExercise1, mockExercise2],
-            notes: "今日のトレーニングは順調でした！",
-            createdAt: Timestamp(date: Date())
-        )
-        
-        let mockStories = [
-            Story(id: "story1", userId: "previewUser1", photo: nil, expireAt: Timestamp(date: Date(timeIntervalSinceNow: 3600)), isExpired: false, visibility: 1, workoutId: "mockResult1", createdAt: Timestamp(date: Date())),
-            Story(id: "story2", userId: "previewUser1", photo: nil, expireAt: Timestamp(date: Date(timeIntervalSinceNow: 7200)), isExpired: false, visibility: 1, workoutId: "anotherResultId", createdAt: Timestamp(date: Date()))
-        ]
-        
-        let viewModel = StoryViewModel(user: mockUser, stories: mockStories)
-        viewModel.workoutResult = mockWorkoutResult
-        
-        return StoryView(viewModel: viewModel)
-    }
-} 
