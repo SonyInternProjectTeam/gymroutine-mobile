@@ -8,6 +8,7 @@
 import Foundation
 import PhotosUI
 import SwiftUI
+import FirebaseFunctions
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
@@ -15,12 +16,14 @@ final class ProfileViewModel: ObservableObject {
     @Published var followersCount: Int = 0
     @Published var followingCount: Int = 0
     @Published var selectedPhotoItem: PhotosPickerItem?
-    @Published var isFollowing: Bool = false  // 現在ログイン中のユーザーがこのプロフィールをフォローしているかどうか
+    @Published var isFollowing: Bool = false
     @Published var selectedTab: ProfileTab = .analysis
+    @Published var workoutStats: WorkoutStats? = nil
 
     private let userManager = UserManager.shared
     private let userService = UserService()
     private let followService = FollowService()
+    private let functions: FirebaseFunctions.Functions = Functions.functions()
 
     enum ProfileTab: String, CaseIterable {
         case analysis = "分析"
@@ -30,7 +33,6 @@ final class ProfileViewModel: ObservableObject {
             rawValue
         }
 
-        // TODO: 画像追加
         func imageName() -> String {
             switch self {
             case .analysis:
@@ -41,19 +43,24 @@ final class ProfileViewModel: ObservableObject {
         }
     }
 
-
-    /// プロフィールビューモデル生成時に表示するユーザーを渡すことができます。
-    /// ユーザーが渡されない場合は、現在ログインしているユーザーの情報を使用します。
     init(user: User? = nil) {
-        if let user = user {
-            self.user = user
-            loadFollowerAndFollowingCounts(userId: user.uid)
-            // 自分のプロフィールでない場合、フォロー状態を確認
-            if !isCurrentUser {
-                updateFollowingStatus()
+        self.user = user
+        // 初期化後に非同期処理を実行するために、DispatchQueue.mainを使用
+        DispatchQueue.main.async {
+            self.setupInitialData()
+        }
+    }
+    
+    private func setupInitialData() {
+        Task {
+            if let user = self.user {
+                await loadFollowerAndFollowingCounts(userId: user.uid)
+                if !isCurrentUser {
+                    await updateFollowingStatus()
+                }
+            } else {
+                await loadUserData()
             }
-        } else {
-            loadUserData()
         }
     }
     
@@ -66,10 +73,10 @@ final class ProfileViewModel: ObservableObject {
     }
     
     /// ログイン中のユーザー情報を読み込む
-    func loadUserData() {
+    func loadUserData() async {
         if let currentUser = userManager.currentUser {
             self.user = currentUser
-            loadFollowerAndFollowingCounts(userId: currentUser.uid)
+            await loadFollowerAndFollowingCounts(userId: currentUser.uid)
         } else {
             print("UserManagerからユーザー情報を読み込めませんでした")
         }
@@ -77,19 +84,30 @@ final class ProfileViewModel: ObservableObject {
     
     /// フォロワーとフォロー中の数を読み込む
     /// - Parameter userId: ユーザーのUID
-    private func loadFollowerAndFollowingCounts(userId: String) {
-        Task {
-            UIApplication.showLoading()
-            let followers = await userManager.fetchFollowersCount(userId: userId)
-            let following = await userManager.fetchFollowingCount(userId: userId)
-            DispatchQueue.main.async {
-                self.followersCount = followers
-                self.followingCount = following
-            }
-            UIApplication.hideLoading()
+    private func loadFollowerAndFollowingCounts(userId: String) async {
+        UIApplication.showLoading()
+        let followers = await userManager.fetchFollowersCount(userId: userId)
+        let following = await userManager.fetchFollowingCount(userId: userId)
+        DispatchQueue.main.async {
+            self.followersCount = followers
+            self.followingCount = following
         }
+        UIApplication.hideLoading()
     }
     
+    /// 現在ログイン中のユーザーがこのプロフィールを既にフォローしているか確認する
+    func updateFollowingStatus() async {
+        UIApplication.showLoading()
+        guard let currentUserID = userManager.currentUser?.uid,
+              let profileUserID = user?.uid,
+              currentUserID != profileUserID else { return }
+        let status = await followService.checkFollowingStatus(currentUserID: currentUserID, profileUserID: profileUserID)
+        DispatchQueue.main.async {
+            self.isFollowing = status
+        }
+        UIApplication.hideLoading()
+    }
+
     /// プロフィール写真をアップロードする処理
     /// - Parameter image: アップロードするUIImage
     func uploadProfilePhoto(_ image: UIImage) {
@@ -100,23 +118,6 @@ final class ProfileViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.user?.profilePhoto = newProfileURL
                 }
-            }
-            UIApplication.hideLoading()
-        }
-    }
-    
-    // MARK: - フォロー関連の機能（FollowService 経由）
-    
-    /// 現在ログイン中のユーザーがこのプロフィールを既にフォローしているか確認する
-    func updateFollowingStatus() {
-        Task {
-            UIApplication.showLoading()
-            guard let currentUserID = userManager.currentUser?.uid,
-                  let profileUserID = user?.uid,
-                  currentUserID != profileUserID else { return }
-            let status = await followService.checkFollowingStatus(currentUserID: currentUserID, profileUserID: profileUserID)
-            DispatchQueue.main.async {
-                self.isFollowing = status
             }
             UIApplication.hideLoading()
         }
@@ -169,6 +170,65 @@ final class ProfileViewModel: ObservableObject {
                 self.uploadProfilePhoto(image)
             }
             UIApplication.hideLoading()
+        }
+    }
+    
+    /// ワークアウト統計データを取得
+func fetchWorkoutStats() {
+    Task {
+        UIApplication.showLoading()
+        do {
+            print("Fetching workout stats...")
+            let result = try await functions.httpsCallable("getWorkoutStats").call()
+            print("Received result: \(result)")
+            
+            if let data = result.data as? [String: Any] {
+                print("Parsing data: \(data)")
+                DispatchQueue.main.async {
+                    self.workoutStats = WorkoutStats(
+                        totalWorkouts: data["totalWorkouts"] as? Int ?? 0,
+                        partFrequency: data["partFrequency"] as? [String: Int] ?? [:],
+                        weightProgress: data["weightProgress"] as? [String: [Double]] ?? [:]
+                    )
+                    print("Updated workoutStats: \(String(describing: self.workoutStats))")
+                }
+            } else {
+                print("Failed to parse result data")
+                // テスト用のモックデータを設定
+                DispatchQueue.main.async {
+                    self.workoutStats = WorkoutStats(
+                        totalWorkouts: 10,
+                        partFrequency: [
+                            "arm": 5,
+                            "chest": 3,
+                            "back": 2
+                        ],
+                        weightProgress: [
+                            "ベンチプレス": [60.0, 65.0, 70.0],
+                            "スクワット": [80.0, 85.0, 90.0]
+                        ]
+                    )
+                }
+            }
+        } catch {
+            print("Error fetching workout stats: \(error.localizedDescription)")
+            // エラー時もモックデータを設定
+            DispatchQueue.main.async {
+                self.workoutStats = WorkoutStats(
+                    totalWorkouts: 10,
+                    partFrequency: [
+                        "arm": 5,
+                        "chest": 3,
+                        "back": 2
+                    ],
+                    weightProgress: [
+                        "ベンチプレス": [60.0, 65.0, 70.0],
+                        "スクワット": [80.0, 85.0, 90.0]
+                    ]
+                )
+            }
+        }
+        UIApplication.hideLoading()
         }
     }
 }

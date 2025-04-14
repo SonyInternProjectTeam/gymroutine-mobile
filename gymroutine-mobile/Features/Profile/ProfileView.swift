@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+import FirebaseFunctions
 
 struct ProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
@@ -132,7 +133,7 @@ struct ProfileView: View {
         Group {
             switch viewModel.selectedTab {
             case .analysis:
-                Text("分析")
+                analysisView
             case .posts:
                 LazyVStack {
                     ForEach(0..<10) { item in
@@ -156,6 +157,103 @@ struct ProfileView: View {
             }
         }
         .padding(.horizontal, 16)
+    }
+    
+    private var analysisView: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                if let stats = viewModel.workoutStats {
+                    // 総ワークアウト回数
+                    VStack(spacing: 8) {
+                        Text("\(stats.totalWorkouts)")
+                            .font(.system(size: 36, weight: .bold))
+                        Text("総ワークアウト回数")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white, in: RoundedRectangle(cornerRadius: 12))
+                    
+                    // 部位別トレーニング頻度
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("部位別トレーニング頻度")
+                            .font(.headline)
+                        
+                        ForEach(stats.sortedPartFrequency, id: \.0) { part, count in
+                            HStack {
+                                Text(part)
+                                    .font(.subheadline)
+                                Spacer()
+                                Text("\(count)回")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                    .padding()
+                    .background(Color.white, in: RoundedRectangle(cornerRadius: 12))
+                    
+                    // エクササイズ別重量推移
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("エクササイズ別重量推移")
+                            .font(.headline)
+                        
+                        ForEach(stats.sortedWeightProgress, id: \.0) { exercise, weights in
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(exercise)
+                                    .font(.subheadline)
+                                
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        Text("最大: \(String(format: "%.1f", stats.maxWeight(for: exercise)))kg")
+                                        Text("最小: \(String(format: "%.1f", stats.minWeight(for: exercise)))kg")
+                                        Text("平均: \(String(format: "%.1f", stats.averageWeight(for: exercise)))kg")
+                                    }
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    
+                                    Spacer()
+                                    
+                                    // 簡易的なグラフ表示
+                                    HStack(spacing: 2) {
+                                        ForEach(weights.indices, id: \.self) { index in
+                                            Rectangle()
+                                                .fill(Color.blue)
+                                                .frame(width: 8, height: CGFloat(weights[index] / stats.maxWeight(for: exercise) * 50))
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                    .padding()
+                    .background(Color.white, in: RoundedRectangle(cornerRadius: 12))
+                } else {
+                    VStack {
+                        ProgressView()
+                        Text("データを読み込み中...")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            .padding()
+        }
+        .onAppear {
+            // タブが選択されたときにデータを取得
+            if viewModel.selectedTab == .analysis {
+                viewModel.fetchWorkoutStats()
+            }
+        }
+        .onChange(of: viewModel.selectedTab) { newTab in
+            if newTab == .analysis {
+                viewModel.fetchWorkoutStats()
+            }
+        }
     }
 }
 
