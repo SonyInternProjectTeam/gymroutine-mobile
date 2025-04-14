@@ -26,13 +26,13 @@ struct User: Decodable, Identifiable {
     var gender: String = "" // gender
     var createdAt: Date = Date()
 
-    // New fields
-    var totalWorkoutDays: Int = 0
-    var currentWeight: Double? = nil // Optional, as user might not enter it initially
-    var consecutiveWorkoutDays: Int = 0
-    var weightHistory: [WeightEntry] = [] // Array of WeightEntry
+    // New fields - Make fields potentially missing in Firestore optional
+    var totalWorkoutDays: Int? = 0 // Changed to Optional Int
+    var currentWeight: Double? = nil // Already Optional
+    var consecutiveWorkoutDays: Int? = 0 // Changed to Optional Int
+    var weightHistory: [WeightEntry]? = [] // Changed to Optional Array, default empty array still handles missing data upon creation
 
-    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date(), totalWorkoutDays: Int = 0, currentWeight: Double? = nil, consecutiveWorkoutDays: Int = 0, weightHistory: [WeightEntry] = []) {
+    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date(), totalWorkoutDays: Int? = 0, currentWeight: Double? = nil, consecutiveWorkoutDays: Int? = 0, weightHistory: [WeightEntry]? = []) {
         self.uid = uid
         self.email = email
         self.name = name

@@ -26,9 +26,19 @@ class AuthService {
                 .collection("Users")
                 .document(uid)
                 .getDocument()
-            return try .success(snapshot.data(as: User.self))
+            
+            // Attempt to decode User
+            let user = try snapshot.data(as: User.self)
+            print("✅ Successfully decoded User: \(user.email)") // Add success log
+            return .success(user)
         } catch {
-            return .failure(NSError(domain: "FetchUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not found"]))
+            // Log the specific decoding error
+            print("🔥 Failed to decode User for uid: \(uid). Error: \(error)")
+            // You might want to check the specific error type, e.g., DecodingError
+            if let decodingError = error as? DecodingError {
+                print("   Decoding Error Details: \(decodingError)")
+            }
+            return .failure(NSError(domain: "FetchUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not found or failed to decode."]))
         }
     }
     
@@ -56,7 +66,8 @@ class AuthService {
             let documentRef = db.collection("Users").document(user.uid)
             
             // Convert weightHistory to an array of dictionaries for Firestore
-            let weightHistoryData = user.weightHistory.map { entry -> [String: Any] in
+            // Use nil-coalescing to handle optional user.weightHistory
+            let weightHistoryData = (user.weightHistory ?? []).map { entry -> [String: Any] in
                 return ["weight": entry.weight, "date": entry.date] // entry.date is already a Timestamp
             }
 
@@ -67,26 +78,26 @@ class AuthService {
                 "profilePhoto": user.profilePhoto,
                 "visibility": user.visibility,
                 "isActive": user.isActive,
-                // birthday가 nil이 아니면 Timestamp로 변환, nil이면 NSNull() 또는 필드 제거
-                "birthday": user.birthday != nil ? Timestamp(date: user.birthday!) : NSNull(),
                 "gender": user.gender,
                 "createdAt": Timestamp(date: user.createdAt),
-                // Add new fields
-                "totalWorkoutDays": user.totalWorkoutDays,
-                "currentWeight": user.currentWeight as Any, // Handle potential nil
-                "consecutiveWorkoutDays": user.consecutiveWorkoutDays,
-                "weightHistory": weightHistoryData
+                "weightHistory": weightHistoryData // Always include weightHistory (potentially empty array)
             ]
             
-            // NSNull 대신 필드를 제거하는 방법
-            // if let birthday = user.birthday {
-            //     userData["birthday"] = Timestamp(date: birthday)
-            // }
-            // Handle optional currentWeight (remove if nil)
-            if user.currentWeight == nil {
-                userData.removeValue(forKey: "currentWeight")
+            // Add optional fields only if they are not nil
+            if let birthday = user.birthday {
+                userData["birthday"] = Timestamp(date: birthday)
             }
-            
+            if let totalDays = user.totalWorkoutDays {
+                userData["totalWorkoutDays"] = totalDays
+            }
+            if let weight = user.currentWeight {
+                userData["currentWeight"] = weight
+            }
+            if let consecutiveDays = user.consecutiveWorkoutDays {
+                userData["consecutiveWorkoutDays"] = consecutiveDays
+            }
+
+            // Set data (merge is true, so existing fields won't be overwritten unnecessarily)
             try await documentRef.setData(userData, merge: true)
             
             // Initialize UserManager after saving - @MainActor 컨텍스트에서 호출 필요
