@@ -117,11 +117,14 @@ struct HomeView: View {
                         .padding()
                 } else {
                     ForEach(viewModel.todaysWorkouts, id: \.id) { workout in
-                        WorkoutCell(
-                            workoutName: workout.name,
-                            exerciseImageName: workout.exercises.first?.name,
-                            count: workout.exercises.count
-                        )
+                        NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
+                            WorkoutCell(
+                                workoutName: workout.name,
+                                exerciseImageName: workout.exercises.first?.name,
+                                count: workout.exercises.count
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }

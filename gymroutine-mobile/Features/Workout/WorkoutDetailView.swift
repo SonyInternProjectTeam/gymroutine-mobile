@@ -72,6 +72,18 @@ struct WorkoutDetailView: View {
             Text(viewModel.workout.name)
                 .font(.title2.bold())
             
+            // Display scheduled days if it's a routine
+            if viewModel.workout.isRoutine && !viewModel.workout.scheduledDays.isEmpty {
+                HStack {
+                    Image(systemName: "repeat.circle.fill")
+                    Text("毎週：") // "毎週：" (Weekly:) prefix
+                    Text(viewModel.workout.scheduledDays.joined(separator: ", "))
+                }
+                .font(.caption)
+                .foregroundStyle(.blue)
+                .padding(.vertical, 4)
+            }
+            
             if let notes = viewModel.workout.notes, !notes.isEmpty {
                 Text(notes)
                     .font(.body)
