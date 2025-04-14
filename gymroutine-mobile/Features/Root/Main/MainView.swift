@@ -42,7 +42,7 @@ struct MainView: View {
                 .tag(2)
                 
                 NavigationStack {
-                    ProfileView()
+                    ProfileView(viewModel: ProfileViewModel())
                 }
                 .tabItem {
                     Image(systemName: "person.circle.fill")
@@ -60,30 +60,10 @@ struct MainView: View {
                         .padding(.bottom, 49) // タブバーの高さ
                 }
             }
-        }
-        .sheet(isPresented: Binding<Bool>(
-            get: { workoutManager.isWorkoutSessionActive && workoutManager.isWorkoutSessionMaximized },
-            set: { newValue in
-                if !newValue && workoutManager.isWorkoutSessionActive {
-                    workoutManager.minimizeWorkoutSession()
-                }
-            }
-        )) {
-            if let sessionViewModel = workoutManager.workoutSessionViewModel {
-                WorkoutSessionView(
-                    viewModel: sessionViewModel,
-                    onEndWorkout: {
-                        workoutManager.endWorkout()
-                    }
-                )
-                .presentationDragIndicator(.visible)
-                .interactiveDismissDisabled(false)
-                .onDisappear {
-                    if workoutManager.isWorkoutSessionActive {
-                        workoutManager.minimizeWorkoutSession()
-                    }
-                }
-            }
+
+            // Add GlobalWorkoutSessionView to manage session and result modals
+            GlobalWorkoutSessionView()
         }
     }
 }
+
