@@ -36,4 +36,4 @@ struct RecommendedUser: Identifiable {
     var matchPercentage: Int {
         return min(max(score, 10), 99) // 最小10%、最大99%で表示
     }
-} 
+}
