@@ -84,30 +84,4 @@ class WorkoutService {
             return nil
         }
     }
-
-    /// 운동 옵션(Trains 컬렉션) 불러오기
-    func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
-        db.collection("Trains").getDocuments { (snapshot, error) in
-            guard let documents = snapshot?.documents, error == nil else {
-                print("Error fetching train options: \(String(describing: error))")
-                completion([])
-                return
-            }
-            let options = documents.map { $0.documentID }
-            completion(options)
-        }
-    }
-
-    /// 특정 트레인의 운동 목록 불러오기
-    func fetchExercises(for train: String, completion: @escaping ([String]) -> Void) {
-        db.collection("Trains").document(train).collection("exercises").getDocuments { (snapshot, error) in
-            guard let documents = snapshot?.documents, error == nil else {
-                print("Error fetching exercises: \(String(describing: error))")
-                completion([])
-                return
-            }
-            let exercises = documents.map { $0.documentID }
-            completion(exercises)
-        }
-    }
 }
