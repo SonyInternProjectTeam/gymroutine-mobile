@@ -237,7 +237,7 @@ async function getCandidateUsers(userId) {
     logger.info(`Total following users (including self): ${following.length}`);
     
     // 3. アクティブユーザーリストを取得
-    const activeUsersSnapshot = await db.collection('Users').where('Visibility', '!=', 0).get();
+    const activeUsersSnapshot = await db.collection('Users').where("Visibility", "in", [1, 2]).get();
     logger.info(`Found ${activeUsersSnapshot.size} total users in database`);
     
     // 4. フォローしていないアクティブユーザーをフィルタリング
