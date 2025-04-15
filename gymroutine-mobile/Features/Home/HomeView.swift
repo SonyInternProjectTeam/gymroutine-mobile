@@ -35,6 +35,8 @@ struct HomeView: View {
             // 기타 필요한 데이터 업데이트
             viewModel.loadFollowingUsers()
             viewModel.loadTodaysWorkouts()
+            // 히트맵 데이터도 업데이트
+            viewModel.loadHeatmapData()
         }
         .sheet(item: $viewModel.selectedUserForStory) { user in
             StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
@@ -83,13 +85,8 @@ struct HomeView: View {
     }
     
     private var calendarBox: some View {
-        VStack {
-            Text("簡易カレンダーView")
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 200)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        HeatmapCalendarView(heatmapData: viewModel.heatmapData, startDate: Date(), numberOfMonths: 1)
+            .frame(height: 200)
     }
     
     private var todaysWorkoutsBox: some View {
