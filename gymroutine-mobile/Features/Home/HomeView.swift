@@ -29,6 +29,16 @@ struct HomeView: View {
         .background(Color.gray.opacity(0.1))
         .contentMargins(.top, 16)
         .contentMargins(.bottom, 80)
+        .refreshable {
+            // 스크롤 당겨서 새로고침 시 스토리 데이터 업데이트
+            viewModel.refreshStories()
+            // 기타 필요한 데이터 업데이트
+            viewModel.loadFollowingUsers()
+            viewModel.loadTodaysWorkouts()
+        }
+        .sheet(item: $viewModel.selectedUserForStory) { user in
+            StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
+        }
         .overlay(alignment: .bottom) {
             buttonBox
                 .clipped()
@@ -44,57 +54,20 @@ struct HomeView: View {
         VStack(spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    // 左端に自分のプロファイル画像と名前を固定表示
+                    // 현재 사용자 프로필 이미지 및 이름 표시 (Use FollowingUserIcon)
                     if let currentUser = userManager.currentUser {
-                        VStack(spacing: 4) {
-                            if let url = URL(string: currentUser.profilePhoto), !currentUser.profilePhoto.isEmpty {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 80, height: 80)
-                                        .clipShape(Circle())
-                                } placeholder: {
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.3))
-                                        .frame(width: 80, height: 80)
-                                }
-                            } else {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(width: 80, height: 80)
+                        FollowingUserIcon(user: currentUser, hasActiveStory: viewModel.userHasActiveStory(userId: currentUser.uid))
+                            .onTapGesture {
+                                viewModel.showStories(for: currentUser)
                             }
-                            Text(currentUser.name)
-                                .font(.caption)
-                                .lineLimit(1)
-                                .frame(width: 80)
-                        }
                     }
-                    // フォロー中のユーザーの画像と名前を表示
+                    
+                    // 팔로우 중인 사용자들 표시 (Keep as is)
                     ForEach(viewModel.followingUsers, id: \.uid) { user in
-                        VStack(spacing: 4) {
-                            if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
-                                AsyncImage(url: url) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 80, height: 80)
-                                        .clipShape(Circle())
-                                } placeholder: {
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.3))
-                                        .frame(width: 80, height: 80)
-                                }
-                            } else {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(width: 80, height: 80)
+                        FollowingUserIcon(user: user, hasActiveStory: viewModel.userHasActiveStory(userId: user.uid))
+                            .onTapGesture {
+                                viewModel.showStories(for: user)
                             }
-                            Text(user.name)
-                                .font(.caption)
-                                .lineLimit(1)
-                                .frame(width: 80)
-                        }
                     }
                 }
             }
@@ -115,8 +88,8 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: 200)
-        .background()
-        .clipShape(.rect(cornerRadius: 8))
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
     
     private var todaysWorkoutsBox: some View {
@@ -139,9 +112,20 @@ struct HomeView: View {
             .foregroundStyle(.primary)
             
             if isShowTodayworkouts {
-                // 仮表示
-                ForEach(0..<2) { _ in
-                    WorkoutCell()
+                if viewModel.todaysWorkouts.isEmpty {
+                    Text("今日のワークアウトはありません")
+                        .padding()
+                } else {
+                    ForEach(viewModel.todaysWorkouts, id: \.id) { workout in
+                        NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
+                            WorkoutCell(
+                                workoutName: workout.name,
+                                exerciseImageName: workout.exercises.first?.name,
+                                count: workout.exercises.count
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
             
@@ -156,7 +140,7 @@ struct HomeView: View {
                     .font(.title2.bold())
                     .hAlign(.leading)
                 
-                // 仮情報
+                // 임시 정보
                 HStack {
                     VStack(spacing: 16) {
                         Text("累計トレーニング日数")
@@ -173,10 +157,9 @@ struct HomeView: View {
                         .hAlign(.trailing)
                     }
                     .padding()
-                    .hAlign(.center)
                     .frame(height: 108)
-                    .background()
-                    .clipShape(.rect(cornerRadius: 8))
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     
                     VStack {
                         Text("現在の体重")
@@ -193,10 +176,9 @@ struct HomeView: View {
                         .hAlign(.trailing)
                     }
                     .padding()
-                    .hAlign(.center)
                     .frame(height: 108)
-                    .background()
-                    .clipShape(.rect(cornerRadius: 8))
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             } else {
                 Text("ユーザー情報が読み込めません")
@@ -213,13 +195,51 @@ struct HomeView: View {
             }
             .buttonStyle(SecondaryButtonStyle())
             
-            
             Button {
-                
+                // 추가 액션 구현
             } label: {
                 Label("今すぐ始める", systemImage: "play")
             }
             .buttonStyle(PrimaryButtonStyle())
+        }
+    }
+}
+
+// MARK: - Subviews (Add FollowingUserIcon if missing)
+
+struct FollowingUserIcon: View {
+    let user: User
+    let hasActiveStory: Bool
+
+    var body: some View {
+        VStack {
+            ZStack {
+                // Placeholder or AsyncImage for profile photo
+                if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
+                    AsyncImage(url: url) { image in
+                        image.resizable().aspectRatio(contentMode: .fill).frame(width: 60, height: 60).clipShape(Circle())
+                    } placeholder: {
+                        Circle().fill(Color.gray.opacity(0.3)).frame(width: 60, height: 60)
+                    }
+                } else {
+                    Image(systemName: "person.circle.fill") // Fallback icon
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 60, height: 60)
+                        .foregroundColor(.gray.opacity(0.5))
+                }
+
+                // Story Border (Burning Effect)
+                if hasActiveStory {
+                    Circle()
+                        .stroke(LinearGradient(gradient: Gradient(colors: [.yellow, .orange, .red]), startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 3)
+                        .frame(width: 65, height: 65)
+                }
+            }
+            Text(user.name)
+                .font(.caption)
+                .lineLimit(1)
+                .frame(width: 60) // Adjust width if needed
         }
     }
 }

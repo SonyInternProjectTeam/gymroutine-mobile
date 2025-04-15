@@ -15,22 +15,23 @@ final class ProfileViewModel: ObservableObject {
     @Published var followersCount: Int = 0
     @Published var followingCount: Int = 0
     @Published var selectedPhotoItem: PhotosPickerItem?
-    @Published var isFollowing: Bool = false  // 現在ログイン中のユーザーがこのプロフィールをフォローしているかどうか
+    @Published var isFollowing: Bool = false  // 현재 로그인 중인 사용자가 이 프로필을 팔로우 중인지
     @Published var selectedTab: ProfileTab = .analysis
-
+    @Published var workouts: [Workout] = []   // 추가: 워크아웃 목록
+    
     private let userManager = UserManager.shared
     private let userService = UserService()
     private let followService = FollowService()
-
+    private let workoutRepository = WorkoutRepository()  // Repository 인스턴스
+    
     enum ProfileTab: String, CaseIterable {
         case analysis = "分析"
-        case posts = "投稿"
-
+        case posts = "ワークアウト"
+        
         func toString() -> String {
             rawValue
         }
-
-        // TODO: 画像追加
+        
         func imageName() -> String {
             switch self {
             case .analysis:
@@ -40,24 +41,23 @@ final class ProfileViewModel: ObservableObject {
             }
         }
     }
-
-
-    /// プロフィールビューモデル生成時に表示するユーザーを渡すことができます。
-    /// ユーザーが渡されない場合は、現在ログインしているユーザーの情報を使用します。
+    
     init(user: User? = nil) {
         if let user = user {
             self.user = user
             loadFollowerAndFollowingCounts(userId: user.uid)
-            // 自分のプロフィールでない場合、フォロー状態を確認
             if !isCurrentUser {
                 updateFollowingStatus()
+            }
+            // 워크아웃 데이터 불러오기
+            Task {
+                await fetchWorkouts()
             }
         } else {
             loadUserData()
         }
     }
     
-    /// 現在のプロフィールがログイン中のユーザーのものかどうかを判定
     var isCurrentUser: Bool {
         if let user = user, let currentUser = userManager.currentUser {
             return user.uid == currentUser.uid
@@ -65,18 +65,18 @@ final class ProfileViewModel: ObservableObject {
         return false
     }
     
-    /// ログイン中のユーザー情報を読み込む
     func loadUserData() {
         if let currentUser = userManager.currentUser {
             self.user = currentUser
             loadFollowerAndFollowingCounts(userId: currentUser.uid)
+            Task {
+                await fetchWorkouts()
+            }
         } else {
             print("UserManagerからユーザー情報を読み込めませんでした")
         }
     }
     
-    /// フォロワーとフォロー中の数を読み込む
-    /// - Parameter userId: ユーザーのUID
     private func loadFollowerAndFollowingCounts(userId: String) {
         Task {
             UIApplication.showLoading()
@@ -90,8 +90,6 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    /// プロフィール写真をアップロードする処理
-    /// - Parameter image: アップロードするUIImage
     func uploadProfilePhoto(_ image: UIImage) {
         Task {
             UIApplication.showLoading()
@@ -105,9 +103,6 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    // MARK: - フォロー関連の機能（FollowService 経由）
-    
-    /// 現在ログイン中のユーザーがこのプロフィールを既にフォローしているか確認する
     func updateFollowingStatus() {
         Task {
             UIApplication.showLoading()
@@ -122,7 +117,6 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    /// フォローする処理
     func follow() {
         Task {
             UIApplication.showLoading()
@@ -140,7 +134,6 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    /// フォロー解除する処理
     func unfollow() {
         Task {
             UIApplication.showLoading()
@@ -158,8 +151,6 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    /// PhotosPickerで選択された写真の変更を処理する
-    /// - Parameter newItem: 変更後のPhotosPickerItem
     func handleSelectedPhotoItemChange(_ newItem: PhotosPickerItem?) {
         Task {
             UIApplication.showLoading()
@@ -169,6 +160,19 @@ final class ProfileViewModel: ObservableObject {
                 self.uploadProfilePhoto(image)
             }
             UIApplication.hideLoading()
+        }
+    }
+    
+    /// Repository를 통해 워크아웃 데이터를 불러옵니다.
+    func fetchWorkouts() async {
+        guard let userID = user?.uid else { return }
+        do {
+            let fetchedWorkouts = try await workoutRepository.fetchWorkouts(for: userID)
+            DispatchQueue.main.async {
+                self.workouts = fetchedWorkouts
+            }
+        } catch {
+            print("Failed to fetch workouts: \(error)")
         }
     }
 }

@@ -27,26 +27,31 @@ struct ProfileView: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
-            .onChange(of: viewModel.selectedPhotoItem) { newItem in
-                viewModel.handleSelectedPhotoItemChange(newItem)
+            // iOS 17 이상 대응 onChange 수정
+            .onChange(of: viewModel.selectedPhotoItem) {
+                viewModel.handleSelectedPhotoItemChange(viewModel.selectedPhotoItem)
             }
-            // 隠しNavigationLinkをoverlayで配置（影響を与えない0サイズ）
+            // 隠しNavigationLink를 overlay로 배치（영향을 주지 않는 0 사이즈）
             .overlay(
                 Group {
-                    NavigationLink(
-                        destination: FollowersListView(userID: viewModel.user?.uid ?? ""),
-                        isActive: $showFollowers,
-                        label: { EmptyView() }
-                    )
-                    NavigationLink(
-                        destination: FollowingListView(userID: viewModel.user?.uid ?? ""),
-                        isActive: $showFollowing,
-                        label: { EmptyView() }
-                    )
+                    // Deprecated NavigationLink 수정
+                    NavigationLink(value: "followers") {
+                        EmptyView()
+                    }
+                    NavigationLink(value: "following") {
+                        EmptyView()
+                    }
                 }
-                    .frame(width: 0, height: 0)
-                    .hidden()
+                .frame(width: 0, height: 0)
+                .hidden()
             )
+             // Navigation Destination 추가
+            .navigationDestination(isPresented: $showFollowers) {
+                FollowersListView(userID: viewModel.user?.uid ?? "")
+            }
+            .navigationDestination(isPresented: $showFollowing) {
+                FollowingListView(userID: viewModel.user?.uid ?? "")
+            }
         }
     }
     
@@ -134,23 +139,20 @@ struct ProfileView: View {
             case .analysis:
                 Text("分析")
             case .posts:
-                LazyVStack {
-                    ForEach(0..<10) { item in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("6 種目")
-                                    .font(.system(size: 10))
-                                    .foregroundStyle(.secondary)
-                                Text("一軍ワークアウト")
+                if viewModel.workouts.isEmpty {
+                    Text("まだワークアウトがありません")
+                        .padding()
+                } else {
+                    LazyVStack(spacing: 8) {
+                        ForEach(viewModel.workouts, id: \.id) { workout in
+                            NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
+                                WorkoutCell(
+                                    workoutName: workout.name,
+                                    exerciseImageName: workout.exercises.first?.name,
+                                    count: workout.exercises.count
+                                )
                             }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
                         }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 16)
-                        .hAlign(.leading)
-                        .background(.white, in: RoundedRectangle(cornerRadius: 8))
                     }
                 }
             }
@@ -201,27 +203,31 @@ extension ProfileView {
                 print("DEBUG: フォロワーボタンタップ")
                 showFollowers = true
             } label: {
-                followStatItemView(title: "フォロワー", count: viewModel.followersCount)
-                    .hAlign(.center)
+                VStack {
+                    Text("フォロワー")
+                        .font(.callout)
+                        .fontWeight(.semibold)
+                    Text("\(viewModel.followersCount)") // ViewModel에서 가져옴
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.primary)
             }
+            
             Button {
-                print("DEBUG: フォローボタンタップ")
+                print("DEBUG: フォロー中ボタンタップ")
                 showFollowing = true
             } label: {
-                followStatItemView(title: "フォロー", count: viewModel.followingCount)
-                    .hAlign(.center)
+                VStack {
+                    Text("フォロー中")
+                        .font(.callout)
+                        .fontWeight(.semibold)
+                    Text("\(viewModel.followingCount)") // ViewModel에서 가져옴
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.primary)
             }
-        }
-        .padding(.vertical, 16)
-    }
-    
-    private func followStatItemView(title: String, count: Int) -> some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .font(.system(size: 8))
-            Text("\(count)")
-                .font(.system(size: 19))
-                .fontWeight(.medium)
         }
     }
     

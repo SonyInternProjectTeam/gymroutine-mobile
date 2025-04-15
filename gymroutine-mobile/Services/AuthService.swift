@@ -12,7 +12,8 @@ import Combine
 
 class AuthService {
     private let db = Firestore.firestore()
-    private let userManager = UserManager.shared
+    // userManager는 @MainActor 클래스이므로 접근 시 주의 필요
+    // private let userManager = UserManager.shared // 직접 접근 대신 필요 시 함수 인자로 전달하거나 @MainActor 컨텍스트에서 사용
     
     /// Checks if the user is currently logged in and returns their user ID.
     func getCurrentUser() -> FirebaseAuth.User? {
@@ -25,9 +26,19 @@ class AuthService {
                 .collection("Users")
                 .document(uid)
                 .getDocument()
-            return try .success(snapshot.data(as: User.self))
+            
+            // Attempt to decode User
+            let user = try snapshot.data(as: User.self)
+            print("✅ Successfully decoded User: \(user.email)") // Add success log
+            return .success(user)
         } catch {
-            return .failure(NSError(domain: "FetchUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not found"]))
+            // Log the specific decoding error
+            print("🔥 Failed to decode User for uid: \(uid). Error: \(error)")
+            // You might want to check the specific error type, e.g., DecodingError
+            if let decodingError = error as? DecodingError {
+                print("   Decoding Error Details: \(decodingError)")
+            }
+            return .failure(NSError(domain: "FetchUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not found or failed to decode."]))
         }
     }
     
@@ -39,8 +50,8 @@ class AuthService {
                 if let error = error {
                     promise(.failure(error))
                 } else if let userUID = authResult?.user.uid {
-                    // UserManager Update
-                    let newUser = User(uid: userUID, email: email)
+                    // UserManager 업데이트는 여기서 직접 하지 않고, 로그인 또는 초기화 시 처리
+                    // let newUser = User(uid: userUID, email: email) // 변수 미사용 제거
                     promise(.success(userUID))
                 } else {
                     promise(.failure(NSError(domain: "SignupError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User creation failed"])))
@@ -54,29 +65,43 @@ class AuthService {
         do {
             let documentRef = db.collection("Users").document(user.uid)
             
-            /// TODO 1: ロケーション
-            //            if let location = user.location {
-            //                userData["location"] = [
-            //                    "latitude": location.latitude,
-            //                    "longitude": location.longitude
-            //                ]
-            //            }
-            
-            let userData: [String: Any] = [
+            // Convert weightHistory to an array of dictionaries for Firestore
+            // Use nil-coalescing to handle optional user.weightHistory
+            let weightHistoryData = (user.weightHistory ?? []).map { entry -> [String: Any] in
+                return ["weight": entry.weight, "date": entry.date] // entry.date is already a Timestamp
+            }
+
+            var userData: [String: Any] = [
                 "uid": user.uid,
                 "email": user.email,
                 "name": user.name,
                 "profilePhoto": user.profilePhoto,
                 "visibility": user.visibility,
                 "isActive": user.isActive,
-                "birthday": user.birthday,
                 "gender": user.gender,
-                "createdAt": Timestamp(date: user.createdAt)
+                "createdAt": Timestamp(date: user.createdAt),
+                "weightHistory": weightHistoryData // Always include weightHistory (potentially empty array)
             ]
+            
+            // Add optional fields only if they are not nil
+            if let birthday = user.birthday {
+                userData["birthday"] = Timestamp(date: birthday)
+            }
+            if let totalDays = user.totalWorkoutDays {
+                userData["totalWorkoutDays"] = totalDays
+            }
+            if let weight = user.currentWeight {
+                userData["currentWeight"] = weight
+            }
+            if let consecutiveDays = user.consecutiveWorkoutDays {
+                userData["consecutiveWorkoutDays"] = consecutiveDays
+            }
+
+            // Set data (merge is true, so existing fields won't be overwritten unnecessarily)
             try await documentRef.setData(userData, merge: true)
             
-            // Initialize UserManager after saving
-            try await UserManager.shared.initializeUser()
+            // Initialize UserManager after saving - @MainActor 컨텍스트에서 호출 필요
+            // await UserManager.shared.initializeUser() // 호출하는 쪽에서 처리하도록 변경
             
             return .success(())
         } catch {
@@ -93,21 +118,18 @@ class AuthService {
                     promise(.failure(error))
                 } else if let _ = authResult {
                     Task {
-                        do {
-                            // initializeUser 비동기 작업 완료를 명확히 기다림
-                            try await UserManager.shared.initializeUser()
-                            
-                            // UserManager의 상태를 확인하여 Promise 처리
-                            DispatchQueue.main.async {
-                                if let user = UserManager.shared.currentUser {
-                                    promise(.success(user)) // 성공 반환
-                                } else {
-                                    promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User initialization failed."])))
-                                }
-                            }
-                        } catch {
-                            promise(.failure(error)) // 에러 반환
+                        // initializeUser는 @MainActor 함수이므로 await 필요
+                        await UserManager.shared.initializeUser()
+                        
+                        // initializeUser 호출 후 상태 확인 (@MainActor)
+                        let user = await UserManager.shared.currentUser
+                        if let user = user {
+                            promise(.success(user))
+                        } else {
+                            // initializeUser가 성공했지만 user가 nil인 경우 (드물지만 처리)
+                            promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User initialization failed."])))
                         }
+                        // initializeUser 자체에서 발생하는 에러는 내부에서 처리되므로 여기서 catch 불필요
                     }
                 } else {
                     promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Login failed."])))
@@ -121,10 +143,12 @@ class AuthService {
     
     /// Firebase Authentication - logout
     func logout() {
-        do {
-            try Auth.auth().signOut()
-        } catch {
-            print("Error signing out: \(error)")
+        // signOut은 에러를 던질 수 있으므로 try? 사용
+        try? Auth.auth().signOut()
+        // 로그아웃 시 UserManager 상태 업데이트 (@MainActor에서 실행)
+        Task { @MainActor in
+            UserManager.shared.currentUser = nil
+            UserManager.shared.isLoggedIn = false
         }
     }
     

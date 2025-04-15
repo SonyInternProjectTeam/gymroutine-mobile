@@ -18,7 +18,7 @@ struct Exercise: Codable, Hashable {
     func toExercisePart() -> ExercisePart? {
         return ExercisePart(rawValue: part)
     }
-    
+
     static func mock() -> Exercise{
         return Exercise(
             name: "サンプルエクササイズ",
@@ -62,7 +62,7 @@ struct WorkoutExercise: Identifiable, Codable {
     static func mock() -> WorkoutExercise {
         return WorkoutExercise(
             name: "Bench Press",
-            part: "Chest",
+            part: "chest",
             sets: [
                 ExerciseSet(reps: 12, weight: 50.0),
                 ExerciseSet(reps: 10, weight: 55.0),
