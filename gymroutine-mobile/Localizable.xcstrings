@@ -16,6 +16,16 @@
     "%@" : {
 
     },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "%@ kg x %lld reps" : {
       "localizations" : {
         "en" : {
@@ -693,6 +703,9 @@
         }
       }
     },
+    "Less" : {
+
+    },
     "Loading..." : {
 
     },
@@ -717,6 +730,9 @@
           }
         }
       }
+    },
+    "More" : {
+
     },
     "Mountain Climber" : {
       "extractionState" : "manual",
@@ -1094,6 +1110,9 @@
     "Workout" : {
 
     },
+    "Workout Activity" : {
+
+    },
     "Workout Completed!" : {
 
     },
@@ -1308,9 +1327,6 @@
 
     },
     "生年月日を選択してください" : {
-
-    },
-    "簡易カレンダーView" : {
 
     },
     "累計トレーニング日数" : {
