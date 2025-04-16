@@ -900,6 +900,7 @@
 				272779E82DA8BAD700166807 /* StoryView.swift in Sources */,
 				272779E92DA8BAD700166807 /* StoryViewModel.swift in Sources */,
 				00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */,
+				275C71452DACD06C00579962 /* GlobalWorkoutSessionView.swift in Sources */,
 				00CDC4662D845E8E003B18EB /* SplashView.swift in Sources */,
 				00CDC4672D845E8E003B18EB /* WelcomeView.swift in Sources */,
 				27D6A86B2D9D9AA3004D3F2B /* AppWorkoutManager.swift in Sources */,
