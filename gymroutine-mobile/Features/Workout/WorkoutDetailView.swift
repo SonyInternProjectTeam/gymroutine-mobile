@@ -58,6 +58,17 @@ struct WorkoutDetailView: View {
             ExerciseSearchView(exercisesManager: viewModel)
                 .presentationDragIndicator(.visible)
         }
+        // 편집 화면 추가
+        .sheet(isPresented: $viewModel.showEditView) {
+            // 편집 화면이 닫힐 때 워크아웃 데이터 새로고침
+            viewModel.refreshWorkoutData()
+        } content: {
+            NavigationView {
+                WorkoutEditView(workout: viewModel.workout)
+            }
+        }
+        
+        // AppWorkoutManager의 showWorkoutSession 값 변경 감지
         .onChange(of: viewModel.showWorkoutSession) {
             print("📱 showWorkoutSession 값이 변경되었습니다: \(viewModel.showWorkoutSession)")
         }

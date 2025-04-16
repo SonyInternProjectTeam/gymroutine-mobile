@@ -222,4 +222,41 @@ class WorkoutService {
     }
     
     // TODO: Consider adding a function to fetch all results for a given month or date range if needed for Calendar view etc.
+
+    // MARK: - Workout Update
+
+    /// ワークアウトの基本情報（名前、メモなど）を更新するメソッド
+    func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String]? = nil) async -> Result<Void, Error> {
+        do {
+            // 更新するフィールドのみを含める
+            var updateData: [String: Any] = [
+                "name": name
+            ]
+            
+            // メモがある場合は追加
+            if let notes = notes {
+                updateData["notes"] = notes
+            } else {
+                // メモがない場合はフィールドを削除
+                updateData["notes"] = FieldValue.delete()
+            }
+            
+            // ルーチンの曜日がある場合は追加
+            if let scheduledDays = scheduledDays {
+                updateData["scheduledDays"] = scheduledDays
+            }
+            
+            try await db.collection("Workouts").document(workoutID).updateData(updateData)
+            return .success(())
+        } catch {
+            print("🔥 ワークアウト情報の更新エラー: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+
+    /// ワークアウトのエクササイズ順序を並べ替えるメソッド
+    func reorderWorkoutExercises(workoutID: String, exercises: [WorkoutExercise]) async -> Result<Void, Error> {
+        // 以前のupdateWorkoutExercisesメソッドと同じ動作ですが、目的を明確にするために別メソッドとして実装
+        return await updateWorkoutExercises(workoutID: workoutID, exercises: exercises)
+    }
 }
