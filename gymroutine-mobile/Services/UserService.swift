@@ -11,7 +11,9 @@ import FirebaseFirestore
 import FirebaseAuth
 import UIKit
 
-class UserService {
+@MainActor
+final class UserService {
+    static let shared = UserService()
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
     
@@ -137,6 +139,91 @@ class UserService {
         } catch {
             print("🔥 フォロー解除処理中にエラーが発生しました: \(error.localizedDescription)")
             return false
+        }
+    }
+    
+    /// Updates the user's current weight and updates/adds an entry for the current day in the weight history.
+    /// - Parameters:
+    ///   - userId: The ID of the user to update.
+    ///   - newWeight: The new weight value (in kg).
+    /// - Returns: A Result indicating success or failure.
+    func updateWeight(userId: String, newWeight: Double) async -> Result<Void, Error> {
+        let userRef = db.collection("Users").document(userId)
+
+        // Get today's date string in JST (YYYY-MM-DD)
+        // Important: Use a consistent timezone (like JST) for date comparison
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.timeZone = TimeZone(identifier: "Asia/Tokyo") // Set timezone to JST
+        let todayDateString = dateFormatter.string(from: Date())
+
+        do {
+            // Use a transaction to read, modify, and write atomically
+            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+                let userDocument: DocumentSnapshot
+                do {
+                    // Get the latest user data within the transaction
+                    try userDocument = transaction.getDocument(userRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil // Signal failure
+                }
+
+                // Decode existing weight history (or default to empty array)
+                var currentHistory = userDocument.data()?["WeightHistory"] as? [[String: Any]] ?? []
+
+                // Find if an entry for today already exists
+                var updated = false
+                for i in 0..<currentHistory.count {
+                    if let entryTimestamp = currentHistory[i]["date"] as? Timestamp {
+                        let entryDateString = dateFormatter.string(from: entryTimestamp.dateValue())
+                        if entryDateString == todayDateString {
+                            // Update existing entry for today
+                            currentHistory[i]["weight"] = newWeight
+                            // Optionally update the timestamp if you want the latest update time for the day
+                            // currentHistory[i]["date"] = Timestamp(date: Date())
+                            updated = true
+                            print("[UserService Tx] Updated existing weight entry for \(todayDateString)")
+                            break
+                        }
+                    }
+                }
+
+                // If no entry for today was found, add a new one
+                if !updated {
+                    let newEntry: [String: Any] = [
+                        "weight": newWeight,
+                        "date": Timestamp(date: Date()) // Client-side timestamp for today (JST)
+                    ]
+                    currentHistory.append(newEntry)
+                    print("[UserService Tx] Added new weight entry for \(todayDateString)")
+                }
+
+                // Prepare the final update data
+                let updateData: [String: Any] = [
+                    "currentWeight": newWeight,
+                    "weightHistory": currentHistory // Write the modified array back
+                ]
+
+                // Update the document within the transaction
+                transaction.updateData(updateData, forDocument: userRef)
+                print("[UserService Tx] Transaction update prepared.")
+                return nil // Signal success
+            }
+
+            // Transaction successful
+            print("[UserService] Successfully updated weight and history for user \(userId) to \(newWeight) kg")
+
+            // Optional: Update local UserManager's currentUser if needed immediately
+            // Requires careful merging or re-fetching as the entire history array might change
+            await UserManager.shared.fetchInitialUserData(userId: userId) // Re-fetch user data to get the latest state
+
+            return .success(())
+
+        } catch {
+            // Transaction failed
+            print("[UserService] Failed to update weight with transaction for user \(userId): \(error.localizedDescription)")
+            return .failure(error)
         }
     }
 }

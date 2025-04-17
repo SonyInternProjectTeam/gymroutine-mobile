@@ -14,6 +14,7 @@ struct HomeView: View {
     
     @State private var isShowTodayworkouts = true
     @State private var createWorkoutFlg = false
+    @State private var showingUpdateWeightSheet = false
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -35,6 +36,10 @@ struct HomeView: View {
             // 기타 필요한 데이터 업데이트
             viewModel.loadFollowingUsers()
             viewModel.loadTodaysWorkouts()
+        }
+        .sheet(isPresented: $showingUpdateWeightSheet) {
+            UpdateWeightView()
+                .environmentObject(userManager)
         }
         .sheet(item: $viewModel.selectedUserForStory) { user in
             StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
@@ -142,8 +147,8 @@ struct HomeView: View {
                     .font(.title2.bold())
                     .hAlign(.leading)
                 
-                // 임시 정보
                 HStack {
+                    // Total Days
                     VStack(spacing: 16) {
                         Text("累計トレーニング日数")
                             .foregroundStyle(.secondary)
@@ -153,7 +158,6 @@ struct HomeView: View {
                         HStack(alignment: .bottom) {
                             Text("\(user.totalWorkoutDays ?? 0)")
                                 .font(.largeTitle.bold())
-                            
                             Text("日")
                         }
                         .hAlign(.trailing)
@@ -163,6 +167,7 @@ struct HomeView: View {
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     
+                    // Current Weight - Add onTapGesture here
                     VStack(spacing: 16) {
                         Text("現在の体重")
                             .foregroundStyle(.secondary)
@@ -183,6 +188,10 @@ struct HomeView: View {
                     .frame(height: 108)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        showingUpdateWeightSheet = true
+                    }
                 }
             } else {
                 Text("ユーザー情報が読み込めません")
