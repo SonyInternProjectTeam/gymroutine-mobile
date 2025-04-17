@@ -132,7 +132,8 @@ struct ProfileView: View {
         Group {
             switch viewModel.selectedTab {
             case .analysis:
-                Text("分析")
+                // Display the weight history graph
+                WeightHistoryGraphView(weightHistory: viewModel.user?.weightHistory)
             case .posts:
                 LazyVStack {
                     ForEach(0..<10) { item in
