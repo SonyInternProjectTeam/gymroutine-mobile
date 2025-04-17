@@ -14,6 +14,7 @@ const { initializeApp } = require("firebase-admin/app");
 // Import handlers
 const storyHandler = require("./handlers/storyHandler");
 const cronHandler = require("./handlers/cronHandler");
+const userStatsHandler = require("./handlers/userStatsHandler");
 
 // Initialize Firebase Admin
 initializeApp();
@@ -26,5 +27,11 @@ exports.createStoryFromWorkoutResult = onDocumentCreated(
 
 // Export scheduled function
 exports.expireStories = onSchedule("every 24 hours", cronHandler.expireStories);
+
+// Export user stats update function (triggered by the same event as heatmap)
+exports.updateUserStatsOnWorkout = onDocumentCreated({
+  document: "Result/{userId}/{month}/{resultId}",
+  region: "us-central1" 
+}, userStatsHandler.handleResultCreateForStats);
 
 // TODO: Add other function triggers and handlers as needed
