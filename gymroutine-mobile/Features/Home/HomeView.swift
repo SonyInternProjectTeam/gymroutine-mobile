@@ -151,7 +151,7 @@ struct HomeView: View {
                             .hAlign(.leading)
                         
                         HStack(alignment: .bottom) {
-                            Text("128")
+                            Text("\(user.totalWorkoutDays ?? 0)")
                                 .font(.largeTitle.bold())
                             
                             Text("日")
@@ -163,17 +163,19 @@ struct HomeView: View {
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     
-                    VStack {
+                    VStack(spacing: 16) {
                         Text("現在の体重")
                             .foregroundStyle(.secondary)
                             .font(.caption)
                             .hAlign(.leading)
-                        
+                            
                         HStack(alignment: .bottom) {
-                            Text("64")
+                            Text(user.currentWeight != nil ? String(format: "%.1f", user.currentWeight!) : "--")
                                 .font(.largeTitle.bold())
                             
-                            Text("kg")
+                            if user.currentWeight != nil {
+                                Text("kg")
+                            }
                         }
                         .hAlign(.trailing)
                     }
