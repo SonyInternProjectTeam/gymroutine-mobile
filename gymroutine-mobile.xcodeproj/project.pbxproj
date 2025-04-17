@@ -100,9 +100,11 @@
 		27E5E5512CCECA57003E3E70 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5502CCECA57003E3E70 /* FirebaseAnalytics */; };
 		27E5E5532CCECA57003E3E70 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5522CCECA57003E3E70 /* FirebaseCore */; };
 		27E5E5632CCECB2A003E3E70 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5622CCECB2A003E3E70 /* FirebaseAuth */; };
-		860018D02D9B72BA00C9F2C6 /* SnsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860018CF2D9B72BA00C9F2C6 /* SnsViewModel.swift */; };
 		79EE751A2D9CF23A004A5B27 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 79EE75192D9CF23A004A5B27 /* Localizable.xcstrings */; };
 		79EE75982D9D0932004A5B27 /* ExerciseImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EE75972D9D0932004A5B27 /* ExerciseImageCell.swift */; };
+		860018D02D9B72BA00C9F2C6 /* SnsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860018CF2D9B72BA00C9F2C6 /* SnsViewModel.swift */; };
+		861A9B0F2DADEAA800003E92 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861A9B0E2DADEAA800003E92 /* ProfileEditView.swift */; };
+		861A9B112DADF51800003E92 /* ProfileEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 861A9B102DADF51800003E92 /* ProfileEditViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -203,10 +205,6 @@
 		277465F42D8E9BC8004C25C3 /* WorkoutRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRepository.swift; sourceTree = "<group>"; };
 		277467862D8FF510004C25C3 /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
 		277467882D8FF6CA004C25C3 /* UserSearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSearchField.swift; sourceTree = "<group>"; };
-		27E5E5222CCEC9E9003E3E70 /* gymroutine-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gymroutine-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		27E5E5322CCEC9EA003E3E70 /* gymroutine-mobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		860018CF2D9B72BA00C9F2C6 /* SnsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnsViewModel.swift; sourceTree = "<group>"; };
 		277739FB2DA5EF4D0006397D /* WorkoutResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutResultView.swift; sourceTree = "<group>"; };
 		277739FD2DA605420006397D /* WorkoutResultModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutResultModel.swift; sourceTree = "<group>"; };
 		27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionView.swift; sourceTree = "<group>"; };
@@ -218,6 +216,9 @@
 		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		79EE75192D9CF23A004A5B27 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		79EE75972D9D0932004A5B27 /* ExerciseImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseImageCell.swift; sourceTree = "<group>"; };
+		860018CF2D9B72BA00C9F2C6 /* SnsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnsViewModel.swift; sourceTree = "<group>"; };
+		861A9B0E2DADEAA800003E92 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
+		861A9B102DADF51800003E92 /* ProfileEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -587,6 +588,8 @@
 			children = (
 				00CDC40B2D845E8E003B18EB /* ProfileView.swift */,
 				00CDC3EF2D845E8E003B18EB /* ProfileViewModel.swift */,
+				861A9B0E2DADEAA800003E92 /* ProfileEditView.swift */,
+				861A9B102DADF51800003E92 /* ProfileEditViewModel.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -595,7 +598,6 @@
 			isa = PBXGroup;
 			children = (
 				277739FB2DA5EF4D0006397D /* WorkoutResultView.swift */,
-				27D6A8682D9D9A91004D3F2B /* GlobalWorkoutSessionView.swift */,
 				27D6A86C2D9D9ABE004D3F2B /* MiniWorkoutView.swift */,
 				27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */,
 				27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */,
@@ -810,6 +812,7 @@
 				277467892D8FF6CA004C25C3 /* UserSearchField.swift in Sources */,
 				00CDC42C2D845E8E003B18EB /* ExcersiceModel.swift in Sources */,
 				008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */,
+				861A9B112DADF51800003E92 /* ProfileEditViewModel.swift in Sources */,
 				00CDC42D2D845E8E003B18EB /* UserModel.swift in Sources */,
 				00CDC42E2D845E8E003B18EB /* WorkoutModel.swift in Sources */,
 				003AF5EB2D8BF2720019B3AF /* BannerView.swift in Sources */,
@@ -879,12 +882,12 @@
 				009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */,
 				0074075C2D9BC64C00808964 /* CalendarViewModel.swift in Sources */,
 				272779F12DA8C30700166807 /* StoryService.swift in Sources */,
-				00CDC4632D845E8E003B18EB /* SearchUserView.swift in Sources */,
 				00CDC4642D845E8E003B18EB /* SignupView.swift in Sources */,
 				272779EF2DA8BDF600166807 /* StoryRepository.swift in Sources */,
 				272779E82DA8BAD700166807 /* StoryView.swift in Sources */,
 				272779E92DA8BAD700166807 /* StoryViewModel.swift in Sources */,
 				00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */,
+				861A9B0F2DADEAA800003E92 /* ProfileEditView.swift in Sources */,
 				00CDC4662D845E8E003B18EB /* SplashView.swift in Sources */,
 				00CDC4672D845E8E003B18EB /* WelcomeView.swift in Sources */,
 				27D6A86B2D9D9AA3004D3F2B /* AppWorkoutManager.swift in Sources */,

@@ -63,6 +63,7 @@ final class InitProfileSetupViewModel: ObservableObject {
             let saveResult = await authService.saveUserInfo(user: user)
             switch saveResult {
             case .success(_):
+                UserManager.shared.currentUser = user
                 router.switchRootView(to: .main(user: user))
             case .failure(let error):
                 UIApplication.showBanner(type: .error, message: error.localizedDescription)

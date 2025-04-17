@@ -67,6 +67,40 @@ class UserService {
         }
     }
     
+    /// ユーザー設定をFireStoreのユーザープロフィールを更新する処理
+    /// - Parameters:
+    ///     - `userID`: ユーザーID
+    ///     - `user`:ユーザー名
+    ///     - `newVisibility`:公開範囲
+    /// - Returns: 更新成功時はtrue、失敗時はfalseを返す
+    func updateUserProfile(userID: String, newVisibility: Int?, newName: String?) async -> Bool {
+        
+        var newprofileData: [String: Any] = [:]
+        
+        //nilを除外した配列を作成
+        let updates: [String: Any] = [
+            "visibility": newVisibility,
+            "name": newName
+        ].compactMapValues { $0 }
+        
+        if updates.isEmpty {
+            print("更新データが空のため、処理をスキップします。")
+            return false
+        }
+
+        newprofileData.merge(updates) { _, new in new }
+        
+        do {
+            try await db.collection("Users").document(userID).updateData(newprofileData)
+            print("ユーザードキュメントの更新に成功しました。")
+            return true
+        } catch {
+            print("更新時にエラーが発生しました。")
+            return false
+        }
+    }
+            
+    
     // MARK: - フォロー関連のFirebase通信処理
     
     /// フォロー状態を確認する

@@ -11,50 +11,60 @@ import PhotosUI
 struct ProfileView: View {
     @StateObject var viewModel: ProfileViewModel
     @Namespace var namespace
+    @EnvironmentObject var userManager: UserManager
     
     // フォロワーとフォロー中の一覧画面に遷移するための状態変数
     @State private var showFollowers: Bool = false
     @State private var showFollowing: Bool = false
+    @State private var showEdit: Bool = false
+    
     
     init (user:User? = nil) {
         self._viewModel = StateObject(wrappedValue: .init(user: user))
     }
     
     var body: some View {
-        ZStack {
-            Group {
-                if let user = viewModel.user {
-                    profileContentView(user: user)
-                } else {
-                    Text("プロフィール情報がありません")
-                        .font(.headline)
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            // iOS 17 이상 대응 onChange 수정
-            .onChange(of: viewModel.selectedPhotoItem) {
-                viewModel.handleSelectedPhotoItemChange(viewModel.selectedPhotoItem)
-            }
-            // 隠しNavigationLink를 overlay로 배치（영향을 주지 않는 0 사이즈）
-            .overlay(
+        NavigationStack {
+            ZStack {
                 Group {
-                    // Deprecated NavigationLink 수정
-                    NavigationLink(value: "followers") {
-                        EmptyView()
-                    }
-                    NavigationLink(value: "following") {
-                        EmptyView()
+                    if let user = UserManager.shared.currentUser {
+                        profileContentView(user: user)
+                    } else {
+                        Text("プロフィール情報がありません")
+                            .font(.headline)
                     }
                 }
-                .frame(width: 0, height: 0)
-                .hidden()
-            )
-             // Navigation Destination 추가
-            .navigationDestination(isPresented: $showFollowers) {
-                FollowersListView(userID: viewModel.user?.uid ?? "")
-            }
-            .navigationDestination(isPresented: $showFollowing) {
-                FollowingListView(userID: viewModel.user?.uid ?? "")
+                .navigationBarTitleDisplayMode(.inline)
+                // iOS 17 이상 대응 onChange 수정
+                .onChange(of: viewModel.selectedPhotoItem) {
+                    viewModel.handleSelectedPhotoItemChange(viewModel.selectedPhotoItem)
+                }
+                // 隠しNavigationLink를 overlay로 배치（영향을 주지 않는 0 사이즈）
+                .overlay(
+                    Group {
+                        // Deprecated NavigationLink 수정
+                        NavigationLink(value: "followers") {
+                            EmptyView()
+                        }
+                        NavigationLink(value: "following") {
+                            EmptyView()
+                        }
+                    }
+                        .frame(width: 0, height: 0)
+                        .hidden()
+                )
+                // Navigation Destination 추가
+                .navigationDestination(isPresented: $showFollowers) {
+                    FollowersListView(userID: viewModel.user?.uid ?? "")
+                }
+                .navigationDestination(isPresented: $showFollowing) {
+                    FollowingListView(userID: viewModel.user?.uid ?? "")
+                }
+                .navigationDestination(isPresented: $showEdit) {
+                    if let user = UserManager.shared.currentUser {
+                        ProfileEditView(user: user)
+                    }
+                }
             }
         }
     }
@@ -237,10 +247,11 @@ extension ProfileView {
     
     // MARK: - プロフィールアクションボタン（編集/フォロー）
     private func profileActionButton() -> some View {
-        if viewModel.isCurrentUser {
+//        if viewModel.isCurrentUser {
+            if true {
             Button(action: {
                 print("DEBUG: プロフィール編集ボタンタップ")
-                // プロフィール編集画面への遷移処理を追加
+                showEdit = true
             }) {
                 Text("プロフィール編集")
                     .font(.headline)
@@ -280,5 +291,14 @@ extension ProfileView {
 }
 
 #Preview {
-    ProfileView()
+    ProfileView(user:User(uid: "5CKiKZmOzlhkEECu4VBDZGltkrn2",
+                          email: "wkk03240324@gmail.com",
+                          name: "Kakeru Koizumi",
+                          profilePhoto: "",
+                          visibility: 2,
+                          isActive: false,
+                          birthday: Date(timeIntervalSince1970: 1017570720),
+                          gender: "男",
+                          createdAt: Date(timeIntervalSince1970: 1735656838)
+                         ))
 }
