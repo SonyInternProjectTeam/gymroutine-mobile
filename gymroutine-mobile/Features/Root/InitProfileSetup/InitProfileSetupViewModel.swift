@@ -55,7 +55,11 @@ final class InitProfileSetupViewModel: ObservableObject {
             isActive: false,
             birthday: self.birthday,
             gender: self.gender?.rawValue ?? Gender.noAnswer.rawValue,
-            createdAt: Date()
+            createdAt: Date(),
+            totalWorkoutDays: 0,
+            currentWeight: nil,
+            consecutiveWorkoutDays: 0,
+            weightHistory: []
         )
         
         Task {

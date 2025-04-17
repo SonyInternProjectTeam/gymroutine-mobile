@@ -145,10 +145,16 @@ extension CalendarView {
                             .foregroundStyle(.secondary)
                     } else {
                         ForEach(workouts, id: \.id) { workout in
-                            Text(workout.name)
-                                .font(.headline)
-                                .hAlign(.leading)
-                                .padding()
+                            NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
+                                Text(workout.name)
+                                    .font(.headline)
+                                    .hAlign(.leading)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.white.opacity(0.5))
+                                    .cornerRadius(8)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }

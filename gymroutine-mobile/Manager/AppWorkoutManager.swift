@@ -99,10 +99,15 @@ class AppWorkoutManager: ObservableObject {
     // 워크아웃 완료 처리 (WorkoutSessionViewModel에서 호출됨)
     func completeWorkout(session: WorkoutSessionModel) {
         print("✅ AppWorkoutManager: 워크아웃 완료됨 - \(session.workout.name)")
+        // 상태 변경 전 로그 추가
+        print("   ➡️ Setting completedWorkoutSession and showResultView = true")
         self.completedWorkoutSession = session
         self.showResultView = true // 결과 화면 표시 트리거
+        // 상태 변경 후 로그 추가
+        print("   ⏸️ Current State: showResultView = \(self.showResultView), completedWorkoutSession is \(self.completedWorkoutSession == nil ? "nil" : "set")")
 
         // 기존 세션 상태 정리
+        print("   🧹 Clearing active session states (isWorkoutSessionActive = false, isWorkoutSessionMaximized = false)")
         self.isWorkoutSessionActive = false
         self.isWorkoutSessionMaximized = false
         self.workoutSessionViewModel = nil

@@ -151,7 +151,7 @@ struct ProfileView: View {
         Group {
             switch viewModel.selectedTab {
             case .analysis:
-                Text("分析")
+             WeightHistoryGraphView(weightHistory: viewModel.user?.weightHistory)
             case .posts:
                 if viewModel.workouts.isEmpty {
                     Text("まだワークアウトがありません")
