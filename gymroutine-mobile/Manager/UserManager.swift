@@ -42,6 +42,16 @@ class UserManager: ObservableObject {
             throw NSError(domain: "FetchError", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data found for user"])
         }
         
+        // Decode WeightHistory manually if needed, assuming it's an array of maps
+        let weightHistoryData = data["weightHistory"] as? [[String: Any]] ?? []
+        var weightHistoryEntries: [WeightEntry] = []
+        for entryData in weightHistoryData {
+            if let weight = entryData["weight"] as? Double,
+               let dateTimestamp = entryData["date"] as? Timestamp {
+                weightHistoryEntries.append(WeightEntry(weight: weight, date: dateTimestamp))
+            }
+        }
+        
         return User(
             uid: data["uid"] as? String ?? "",
             email: data["email"] as? String ?? "",
@@ -51,7 +61,12 @@ class UserManager: ObservableObject {
             isActive: data["isActive"] as? Bool ?? false,
             birthday: (data["birthday"] as? Timestamp)?.dateValue(),
             gender: data["gender"] as? String ?? "",
-            createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+            createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
+            totalWorkoutDays: data["totalWorkoutDays"] as? Int,
+            currentWeight: data["currentWeight"] as? Double,
+            consecutiveWorkoutDays: data["consecutiveWorkoutDays"] as? Int,
+            weightHistory: weightHistoryEntries, // Pass the decoded array
+            lastWorkoutDate: data["lastWorkoutDate"] as? String // Fetch and pass lastWorkoutDate
         )
     }
     
