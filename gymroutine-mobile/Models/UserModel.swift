@@ -51,8 +51,21 @@ struct User: Decodable, Identifiable, Equatable { // Add Equatable conformance
         self.lastWorkoutDate = lastWorkoutDate // Initialize lastWorkoutDate
     }
     
-    // Implement Equatable: Compare users based on their unique ID (uid)
+    // Implement Equatable: Compare users based on all relevant fields
     static func == (lhs: User, rhs: User) -> Bool {
-        return lhs.uid == rhs.uid
+        return lhs.uid == rhs.uid &&
+               lhs.email == rhs.email &&
+               lhs.name == rhs.name &&
+               lhs.profilePhoto == rhs.profilePhoto &&
+               lhs.visibility == rhs.visibility &&
+               lhs.isActive == rhs.isActive &&
+               lhs.birthday == rhs.birthday &&
+               lhs.gender == rhs.gender &&
+               lhs.createdAt == rhs.createdAt && // Compare createdAt as well
+               lhs.totalWorkoutDays == rhs.totalWorkoutDays &&
+               lhs.currentWeight == rhs.currentWeight &&
+               lhs.consecutiveWorkoutDays == rhs.consecutiveWorkoutDays &&
+               lhs.weightHistory == rhs.weightHistory && // Compare weightHistory array
+               lhs.lastWorkoutDate == rhs.lastWorkoutDate // Compare lastWorkoutDate
     }
 }
