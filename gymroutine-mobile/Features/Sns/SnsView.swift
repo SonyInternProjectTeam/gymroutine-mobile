@@ -7,46 +7,10 @@
 
 import SwiftUI
 
-
-
 struct SnsView: View {
     @StateObject private var viewModel = SnsViewModel()
     @FocusState private var isFocused: Bool
     @State private var searchMode: Bool = false
-
-    // 테스트용 추천 사용자 데이터
-    let testUsers: [User] = [
-        User(uid: "5CKiKZmOzlhkEECu4VBDZGltkrn2",
-             email: "wkk03240324@gmail.com",
-             name: "Kakeru Koizumi",
-             profilePhoto: "",
-             visibility: 2,
-             isActive: false,
-             birthday: Date(timeIntervalSince1970: 1017570720),
-             gender: "男",
-             createdAt: Date(timeIntervalSince1970: 1735656838)
-            ),
-        User(uid: "7KSQ7Wlqr9OFa9j1CXdtBqbGkLU2",
-             email: "kazusukechin@gmail.com",
-             name: "Kazu",
-             profilePhoto: "",
-             visibility: 2,
-             isActive: false,
-             birthday: Date(timeIntervalSince1970: 1704182340),
-             gender: "",
-             createdAt: Date(timeIntervalSince1970: 1703839169)
-            ),
-        User(uid: "AIvdESvweDaVwEednWjk6oekzJQ2",
-             email: "test4@test.com",
-             name: "Test4",
-             profilePhoto: "https://firebasestorage.googleapis.com:443/v0/b/gymroutine-b7b6c.appspot.com/o/profile_photos%2FAIvdESvweDaVwEednWjk6oekzJQ2.jpg?alt=media&token=c750172f-c5a5-4f4f-ba05-f18c04278158",
-             visibility: 2,
-             isActive: false,
-             birthday: Date(timeIntervalSince1970: 1733775060),
-             gender: "男性",
-             createdAt: Date(timeIntervalSince1970: 1733071896)
-            )
-    ]
 
     var body: some View {
         VStack(spacing: 16) {
@@ -68,6 +32,10 @@ struct SnsView: View {
         .navigationTitle("SNS")
         // Large Title을 쓰지 않고 상단 여백을 줄이려면 Inline Title
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // 画面表示時におすすめユーザーを生成して取得
+            viewModel.initializeRecommendations()
+        }
     }
 
     private var searchBarView: some View {
@@ -120,29 +88,126 @@ struct SnsView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Image(systemName: "person.2")
-                Text("おすすめ")
+                Text("おすすめユーザー")
                     .font(.title2)
                     .fontWeight(.bold)
-            }
-            .padding(.leading, 16)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(testUsers, id: \.uid) { user in
-                        // 실제 프로젝트에서는 UserCell, UserProfileView 등 사용
-                        UserCell(user: user)
-                    }
+                
+                Spacer()
+                
+                Button(action: {
+                    // おすすめリストを更新
+                    viewModel.refreshRecommendations()
+                }) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.headline)
                 }
-                .padding(.leading, 16)
+                .disabled(viewModel.isLoadingRecommendations)
+            }
+            .padding(.horizontal, 16)
+            
+            if viewModel.isLoadingRecommendations {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                        .padding()
+                    Spacer()
+                }
+            } else if let error = viewModel.recommendationsError {
+                Text(error)
+                    .foregroundColor(.red)
+                    .font(.subheadline)
+                    .padding(.horizontal, 16)
+            } else if viewModel.recommendedUsers.isEmpty {
+                VStack(alignment: .center) {
+                    Text("おすすめユーザーが見つかりませんでした")
+                        .foregroundColor(.gray)
+                        .padding()
+                    
+                    Button("再取得") {
+                        viewModel.refreshRecommendations()
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 30)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(viewModel.recommendedUsers) { recommendedUser in
+                            recommendedUserCell(for: recommendedUser)
+                        }
+                    }
+                    .padding(.leading, 16)
+                    .padding(.trailing, 8)
+                }
             }
 
             Spacer()
         }
     }
 
+    /// 추천 사용자 셀 뷰
+    private func recommendedUserCell(for recommendedUser: RecommendedUser) -> some View {
+        let user = recommendedUser.user
+        
+        return NavigationLink(destination: ProfileView(user: user)) {
+            VStack(alignment: .center, spacing: 8) {
+                ZStack(alignment: .bottomTrailing) {
+                    // 프로필 이미지
+                    profileImageView(for: user)
+                        .frame(width: 100, height: 100)
+                        .shadow(radius: 3)
+                    
+                    // 매칭 퍼센트 뱃지
+                    Text("\(recommendedUser.matchPercentage)%")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Color.blue)
+                        .clipShape(Capsule())
+                        .offset(x: 0, y: 3)
+                }
+                
+                // 사용자 이름
+                Text(user.name)
+                    .font(.headline)
+                    .lineLimit(1)
+                
+                // 추천 이유
+                Text(recommendedUser.recommendationReason)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .frame(width: 120)
+            }
+            .frame(width: 130)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(UIColor.systemBackground))
+                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
     /// 사용자의 프로필 정보를 표시하는 뷰 (필요에 따라 리팩토링)
     private func userProfileView(for user: User) -> some View {
         HStack {
+            profileImageView(for: user)
+                .frame(width: 50, height: 50)
+            
+            Text(user.name)
+                .font(.headline)
+        }
+    }
+    
+    /// 프로필 이미지 뷰
+    private func profileImageView(for user: User) -> some View {
+        Group {
             if !user.profilePhoto.isEmpty, let url = URL(string: user.profilePhoto) {
                 AsyncImage(url: url) { image in
                     image.resizable()
@@ -150,16 +215,14 @@ struct SnsView: View {
                 } placeholder: {
                     ProgressView()
                 }
-                .frame(width: 50, height: 50)
                 .clipShape(Circle())
             } else {
                 Image(systemName: "person.circle")
                     .resizable()
-                    .frame(width: 50, height: 50)
+                    .scaledToFit()
                     .foregroundColor(.gray)
+                    .clipShape(Circle())
             }
-            Text(user.name)
-                .font(.headline)
         }
     }
 }
