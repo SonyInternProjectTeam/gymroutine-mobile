@@ -16,12 +16,11 @@ struct WorkoutExerciseCell: View {
     var body: some View {
         VStack(spacing: 16) {
             HStack(spacing: 16) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(.main)
+                ExerciseImageCell(imageName: workoutExercise.name)
                     .frame(width: 56, height: 56)
-                
+
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(workoutExercise.part)
+                    Text(LocalizedStringKey(workoutExercise.part))
                         .font(.caption)
                         .padding(.vertical, 4)
                         .padding(.horizontal, 12)
@@ -30,7 +29,7 @@ struct WorkoutExerciseCell: View {
                                 .stroke(.secondary.opacity(0.4), lineWidth: 2)
                         )
                     
-                    Text(workoutExercise.name)
+                    Text(LocalizedStringKey(workoutExercise.name))
                         .font(.headline)
                 }
                 .hAlign(.leading)

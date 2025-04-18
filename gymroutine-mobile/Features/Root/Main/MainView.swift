@@ -8,48 +8,61 @@
 import SwiftUI
 
 struct MainView: View {
-    @ObservedObject var viewModel: MainViewModel
-    @ObservedObject var homeViewModel: HomeViewModel  // 변수 이름 소문자 사용
-    @EnvironmentObject var userManager: UserManager
-    @State private var selectedTab: Int = 0 // 현재 선택된 탭
-
+    @ObservedObject var workoutManager = AppWorkoutManager.shared
+    @State private var selectedTab = 0
+    
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // Home 탭: NavigationStack으로 감싸서 내부 네비게이션을 지원
-            NavigationStack {
-                HomeView(viewModel: homeViewModel)
+        ZStack {
+            TabView(selection: $selectedTab) {
+                NavigationStack {
+                    HomeView(viewModel: HomeViewModel())
+                }
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("Home")
+                }
+                .tag(0)
+                
+                NavigationStack {
+                    CalendarView()
+                }
+                .tabItem {
+                    Image(systemName: "calendar")
+                    Text("Calendar")
+                }
+                .tag(1)
+                
+                NavigationStack {
+                    SnsView()
+                }
+                .tabItem {
+                    Image(systemName: "person.2.fill")
+                    Text("SNS")
+                }
+                .tag(2)
+                
+                NavigationStack {
+                    ProfileView()
+                }
+                .tabItem {
+                    Image(systemName: "person.circle.fill")
+                    Text("Profile")
+                }
+                .tag(3)
             }
-            .tabItem {
-                Label("Home", systemImage: "house")
-            }
-            .tag(0)
             
-            // Calendar 탭
-            NavigationStack {
-                CalendarView()
+            // ボトムタブバーの上にミニUIを配置（タブバーを隠さず上に表示）
+            VStack {
+                Spacer()
+                if workoutManager.isWorkoutSessionActive && !workoutManager.isWorkoutSessionMaximized {
+                    MiniWorkoutView()
+                        .transition(.move(edge: .bottom))
+                        .padding(.bottom, 49) // タブバーの高さ
+                }
             }
-            .tabItem {
-                Label("Calendar", systemImage: "calendar")
-            }
-            .tag(1)
-            
-            // SNS 탭
-            NavigationStack {
-                SnsView()
-            }
-            .tabItem {
-                Label("SNS", systemImage: "magnifyingglass")
-            }
-            .tag(2)
-            
-            // Profile 탭
-            NavigationStack {
-                ProfileView(viewModel: ProfileViewModel())
-            }
-            .tabItem {
-                Label("Profile", systemImage: "person.circle")
-            }
-            .tag(3)
+
+            // Add GlobalWorkoutSessionView to manage session and result modals
+            GlobalWorkoutSessionView()
         }
     }
 }

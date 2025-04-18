@@ -28,7 +28,6 @@ class UserService {
             return .failure(error)
         }
     }
-    
     /// ユーザー名で検索を行う
     /// - Parameter name: 検索対象の名前
     /// - Returns: 名前に部分一致するユーザーの配列またはエラーをResultで返す
