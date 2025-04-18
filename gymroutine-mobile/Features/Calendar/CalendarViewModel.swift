@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 import FirebaseFirestore
+import Combine
 
 @MainActor
 final class CalendarViewModel: ObservableObject {
@@ -23,7 +24,9 @@ final class CalendarViewModel: ObservableObject {
     private let calendar: Calendar = .current
     private let workoutService = WorkoutService()
     private let userManager = UserManager.shared
-    private let resultService = ResultService() // 追加: ワークアウト結果を取得するサービス
+    private let db = Firestore.firestore() // Firestore 직접 접근 위해 추가
+    private var listenerRegistration: ListenerRegistration? // 리스너 등록 관리 위해 추가
+    private var cancellables = Set<AnyCancellable>() // 이것은 다른 구독용으로 남겨둘 수 있음
     
     let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     
@@ -31,7 +34,23 @@ final class CalendarViewModel: ObservableObject {
         self.months = (-2...2).compactMap { calendar.date(byAdding: .month, value: $0, to: selectedDate) }
         self.selectedMonth = selectedDate
         fetchUserRoutine()
-        fetchWorkoutHistory() // 初期化時にワークアウト履歴も取得
+        setupWorkoutHistoryListener() // fetch 대신 리스너 설정 함수 호출
+        // subscribeToResultUpdates() // PassthroughSubject 구독 제거
+    }
+    
+    // ViewModel 소멸 시 리스너 제거
+    deinit {
+        // Task를 사용하여 메인 액터에서 리스너 제거 실행
+        Task { @MainActor in
+            removeListener()
+        }
+    }
+    
+    // 리스너 제거 함수
+    func removeListener() {
+        listenerRegistration?.remove()
+        listenerRegistration = nil
+        print("[DEBUG] Workout history listener removed.")
     }
     
     // ワークアウト名を取得（存在しない場合は適切な代替名を返す）
@@ -82,93 +101,99 @@ final class CalendarViewModel: ObservableObject {
         }
     }
     
-    // ユーザーのワークアウト履歴を取得
-    func fetchWorkoutHistory() {
+    // Firestore 리스너 설정 함수 (기존 fetchWorkoutHistory 대체)
+    func setupWorkoutHistoryListener() {
+        removeListener() // 기존 리스너가 있다면 제거
+        
         guard let uid = userManager.currentUser?.uid else {
-            print("[ERROR] ユーザーIDが取得できません")
+            print("[ERROR] Listener setup failed: User ID not available.")
+            // 필요하다면 사용자에게 오류 메시지를 표시하거나 재시도 로직 추가
             return
         }
         
-        // 現在表示中の月の最初の日と最後の日を計算
-        guard let selectedMonth = selectedMonth else { return }
-        guard let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: selectedMonth)),
-              let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: startOfMonth) else {
+        guard let currentMonth = selectedMonth else {
+            print("[ERROR] Listener setup failed: Selected month not available.")
             return
         }
         
-        // 前後1ヶ月を含めた期間で取得（カレンダー表示の都合上）
-        let startDate = calendar.date(byAdding: .month, value: -1, to: startOfMonth) ?? startOfMonth
-        let endDate = calendar.date(byAdding: .month, value: 1, to: endOfMonth) ?? endOfMonth
+        // 현재 선택된 달의 년/월 문자열 생성 ("yyyyMM")
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMM"
+        let currentYearMonth = dateFormatter.string(from: currentMonth)
         
-        Task {
-            // ResultServiceを使用して指定期間の運動結果を取得
-            guard let results = await resultService.fetchWorkoutResults(
-                forUser: uid,
-                startDate: startDate,
-                endDate: endDate
-            ) else {
+        print("[DEBUG] Setting up listener for workout history in \(currentYearMonth) for user \(uid)")
+        
+        let monthCollectionRef = db.collection("Result")
+            .document(uid)
+            .collection(currentYearMonth)
+        
+        listenerRegistration = monthCollectionRef.addSnapshotListener { [weak self] (querySnapshot, error) in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("[ERROR] Failed to listen for workout history updates: \(error.localizedDescription)")
+                // TODO: Handle error appropriately (e.g., show alert to user)
                 return
             }
             
-            // 日付別に運動結果を整理
-            var workoutsByDate: [String: [WorkoutResult]] = [:]
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd"
-            
-            for result in results {
-                guard let date = result.createdAt?.dateValue() else { continue }
-                let dateString = dateFormatter.string(from: date)
-                workoutsByDate[dateString, default: []].append(result)
+            guard let documents = querySnapshot?.documents else {
+                print("[DEBUG] No documents found in snapshot for \(currentYearMonth).")
+                // 해당 월에 데이터가 없을 수 있으므로 오류는 아님. 해당 월 데이터 초기화.
+                self.updateCompletedWorkouts(from: [])
+                return
             }
             
-            DispatchQueue.main.async {
-                self.completedWorkoutsByDate = workoutsByDate
-                print("[DEBUG] 完了したワークアウト履歴を取得しました: \(workoutsByDate.count)日分")
+            print("[DEBUG] Received snapshot update with \(documents.count) documents for \(currentYearMonth).")
+            
+            let results: [WorkoutResult] = documents.compactMap { document -> WorkoutResult? in
+                do {
+                    var result = try document.data(as: WorkoutResult.self)
+                    result.id = document.documentID // ID 수동 할당
+                    return result
+                } catch {
+                    print("[ERROR] Failed to decode workout result document \(document.documentID): \(error)")
+                    return nil
+                }
             }
+            
+            // ViewModel의 상태 업데이트
+            self.updateCompletedWorkouts(from: results)
         }
     }
     
-    // 指定日に完了したワークアウトを取得
-    func getCompletedWorkoutsForDate(_ date: Date) -> [WorkoutResult] {
+    // 받은 결과로 completedWorkoutsByDate 상태를 업데이트하는 헬퍼 함수
+    private func updateCompletedWorkouts(from results: [WorkoutResult]) {
+        var workoutsByDate: [String: [WorkoutResult]] = [:]
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        let dateString = dateFormatter.string(from: date)
         
-        return completedWorkoutsByDate[dateString] ?? []
-    }
-    
-    // 日付にワークアウト履歴があるかどうか確認
-    func hasCompletedWorkout(on date: Date) -> Bool {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let dateString = dateFormatter.string(from: date)
-        
-        return completedWorkoutsByDate[dateString]?.isEmpty == false
-    }
-    
-    // userが設定したScheduleDaysから、曜日ごとにカテゴライズ
-    private func categorizeWorkoutsByWeekday(_ workouts: [Workout]) {
-        var categorizedWorkouts: [String: [Workout]] = [:]
-        
-        for workout in workouts {
-            for scheduledDay in workout.scheduledDays {
-                categorizedWorkouts[scheduledDay, default: []].append(workout)
-            }
+        for result in results {
+            guard let date = result.createdAt?.dateValue() else { continue }
+            let dateString = dateFormatter.string(from: date)
+            workoutsByDate[dateString, default: []].append(result)
         }
         
-        self.workoutsByWeekday = categorizedWorkouts
+        // 현재 선택된 달에 해당하는 데이터만 업데이트 (혹은 전체 데이터 업데이트 구조 유지)
+        // 여기서는 전체를 업데이트하는 기존 방식을 유지합니다.
+        DispatchQueue.main.async {
+             // 주의: 이 방식은 리스너가 설정된 달의 데이터만 업데이트합니다.
+             // 다른 달의 데이터가 필요하다면, 월 변경 시 리스너를 재설정해야 합니다.
+             // 또는, 여러 달의 리스너를 동시에 관리하는 더 복잡한 구조가 필요합니다.
+            self.completedWorkoutsByDate = workoutsByDate
+             print("[DEBUG] Updated completed workouts data: \(self.completedWorkoutsByDate.count) dates with results.")
+        }
     }
     
-    //カレンダーがスクロールすると呼び出される
+    // 월 변경 시 리스너 재설정
     func onChangeMonth(_ month: Date?) {
         guard let month = month else { return }
         
-        print("[DEBUG] ここで「\(month.formatted(.dateTime.year().month()))」のDB取得ロジックを呼び出し")
-        checkAndLoadMoreMonths(for: month)
-        fetchWorkoutHistory() // 月が変わったらワークアウト履歴も再取得
+        print("[DEBUG] Month changed to \(month.formatted(.dateTime.year().month())). Setting up listener...")
+        checkAndLoadMoreMonths(for: month) // 이전/다음 달 로딩 로직 (기존 유지)
+        setupWorkoutHistoryListener() // 새 달에 대한 리스너 설정
     }
     
-    // スクロール時に前後2ヶ月が確保されるように管理
+    // 스クロール時に前後2ヶ月が確保されるように管理
     func checkAndLoadMoreMonths(for monthDate: Date) {
         if let firstIndex = months.firstIndex(of: monthDate),
            firstIndex == 1 { // 先頭から2番目が表示されたら先月を追加
@@ -202,5 +227,36 @@ final class CalendarViewModel: ObservableObject {
         guard index >= 0, index < weekdays.count else { return [] }
         let weekday = weekdays[index]
         return workoutsByWeekday[weekday] ?? []
+    }
+    
+    // 지정일에 완료된 워크아웃 가져오기
+    func getCompletedWorkoutsForDate(_ date: Date) -> [WorkoutResult] {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: date)
+        
+        return completedWorkoutsByDate[dateString] ?? []
+    }
+    
+    // 날짜에 워크아웃 기록 있는지 확인
+    func hasCompletedWorkout(on date: Date) -> Bool {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: date)
+        
+        return completedWorkoutsByDate[dateString]?.isEmpty == false
+    }
+    
+    // userが設定したScheduleDaysから、曜日ごとにカテゴライズ
+    private func categorizeWorkoutsByWeekday(_ workouts: [Workout]) {
+        var categorizedWorkouts: [String: [Workout]] = [:]
+        
+        for workout in workouts {
+            for scheduledDay in workout.scheduledDays {
+                categorizedWorkouts[scheduledDay, default: []].append(workout)
+            }
+        }
+        
+        self.workoutsByWeekday = categorizedWorkouts
     }
 }
