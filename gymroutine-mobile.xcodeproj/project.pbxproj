@@ -892,6 +892,7 @@
 				009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */,
 				0074075C2D9BC64C00808964 /* CalendarViewModel.swift in Sources */,
 				272779F12DA8C30700166807 /* StoryService.swift in Sources */,
+				00CDC4632D845E8E003B18EB /* SearchUserView.swift in Sources */,
 				00CDC4642D845E8E003B18EB /* SignupView.swift in Sources */,
 				272779EF2DA8BDF600166807 /* StoryRepository.swift in Sources */,
 				272779E82DA8BAD700166807 /* StoryView.swift in Sources */,
