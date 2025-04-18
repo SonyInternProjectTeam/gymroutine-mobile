@@ -11,13 +11,14 @@ import PhotosUI
 struct ProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
     @Namespace var namespace
-    @EnvironmentObject var router: Router
     
     // フォロワーとフォロー中の一覧画面に遷移するための状態変数
     @State private var showFollowers: Bool = false
     @State private var showFollowing: Bool = false
     @State private var showEditProfile: Bool = false
-    
+
+    let router: Router?
+
     var body: some View {
         ZStack {
             Group {
@@ -55,9 +56,8 @@ struct ProfileView: View {
                 FollowingListView(userID: viewModel.user?.uid ?? "")
             }
             .navigationDestination(isPresented: $showEditProfile) {
-                if let user = viewModel.user {
-                    ProfileEditView(user: user)
-                        .environmentObject(router)
+                if let user = viewModel.user, let router = router {
+                    ProfileEditView(user: user, router: router)
                 }
             }
             .onAppear {
@@ -288,5 +288,5 @@ extension ProfileView {
 }
 
 #Preview {
-    ProfileView(viewModel: ProfileViewModel())
+    ProfileView(viewModel: ProfileViewModel(), router: Router())
 }

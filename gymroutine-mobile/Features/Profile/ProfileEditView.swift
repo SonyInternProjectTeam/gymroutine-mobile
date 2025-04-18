@@ -10,8 +10,6 @@ import SwiftUI
 struct ProfileEditView: View {
     let user: User
     @StateObject var viewModel: ProfileEditViewModel
-    @EnvironmentObject var router: Router
-    
     @State private var name: String
     @State private var visibility: Int
     
@@ -31,9 +29,9 @@ struct ProfileEditView: View {
         3: "非公開"
     ]
     
-    init (user: User) {
+    init (user: User, router: Router) {
         self.user = user
-        self._viewModel = StateObject(wrappedValue: .init(user: user))
+        self._viewModel = StateObject(wrappedValue: .init(user: user, router: router))
         self._name = State(initialValue: user.name)
         self._visibility = State(initialValue: user.visibility)
     }
@@ -94,8 +92,6 @@ struct ProfileEditView: View {
         .navigationTitle("ユーザー設定")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            // Router를 viewModel에 주입
-            viewModel.router = router
             // Refresh user data when view appears
             viewModel.refreshUserData()
         }
@@ -175,5 +171,5 @@ struct ProfileEditView: View {
                               birthday: Date(timeIntervalSince1970: 1017570720),
                               gender: "男",
                               createdAt: Date(timeIntervalSince1970: 1735656838)
-                             ))
+                             ), router: Router())
 }

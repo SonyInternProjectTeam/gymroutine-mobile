@@ -19,14 +19,10 @@ final class ProfileEditViewModel: ObservableObject {
     private let userManager = UserManager.shared
     private let userService = UserService()
     private let authService = AuthService()
-    var router: Router?
-    
-    init(user:User? = nil, router: Router? = nil){
-        if let user = user {
-            self.user = user
-        } else {
-            self.user = userManager.currentUser
-        }
+    let router: Router
+
+    init(user:User, router: Router) {
+        self.user = user
         self.router = router
     }
     
@@ -85,7 +81,7 @@ final class ProfileEditViewModel: ObservableObject {
     func logout() {
         authService.logout()
         // 로그아웃 후 welcome 화면으로 이동
-        router?.switchRootView(to: .welcome)
+        router.switchRootView(to: .welcome)
     }
     
     /// Delete the current user's account
@@ -100,7 +96,7 @@ final class ProfileEditViewModel: ObservableObject {
                 print("アカウント削除に失敗しました")
             } else {
                 // 계정 삭제 성공 시 welcome 화면으로 이동
-                router?.switchRootView(to: .welcome)
+                router.switchRootView(to: .welcome)
             }
             // On success, AuthService already updates UserManager state
             // which should trigger navigation to login screen
