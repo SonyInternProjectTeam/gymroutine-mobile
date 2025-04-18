@@ -75,6 +75,7 @@ struct ExerciseSearchView: View {
                 }
                 .padding()
             }
+            .animation(.default, value: viewModel.selectedExercisePart)
             .background(Color.gray.opacity(0.1))
             .sheet(isPresented: $viewModel.filterExercisePartFlg) {
                 selectExercisePartView
@@ -139,13 +140,20 @@ struct ExerciseSearchView: View {
         Button(action: {
             viewModel.handleFilterExerisePart(part: part)
         }) {
-            VStack(alignment: .leading) {
-                Text(part.rawValue)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(LocalizedStringKey(part.rawValue))
                     .font(.headline)
+                
+                if let image = UIImage(named: part.rawValue) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 65)
+                        .hAlign(.trailing)
+                }
             }
             .hAlign(.leading)
-            .padding()
-            .frame(height: 80)
+            .padding(10)
             .background(
                 RadialGradient(gradient: Gradient(colors: [.white, .main]), center: .bottomTrailing, startRadius: 1, endRadius: 160)
             )
@@ -171,7 +179,7 @@ struct ExerciseSearchView: View {
             } label: {
                 Group {
                     if let part = viewModel.selectedExercisePart {
-                        Label(part.rawValue, systemImage: "slider.horizontal.3")
+                        Label(LocalizedStringKey(part.rawValue), systemImage: "slider.horizontal.3")
                             .foregroundStyle(.main)
                     } else {
                         Label("絞り込み", systemImage: "slider.horizontal.3")
@@ -209,7 +217,7 @@ struct ExerciseSearchView: View {
                         Button(action: {
                             viewModel.handleFilterExerisePart(part: part)
                         }) {
-                            Text(part.rawValue.capitalized)
+                            Text(LocalizedStringKey(part.rawValue))
                                 .font(.headline)
                                 .foregroundColor(.primary)
                                 .padding(.vertical, 12)
