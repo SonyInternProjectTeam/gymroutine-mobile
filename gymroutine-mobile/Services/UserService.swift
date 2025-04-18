@@ -141,6 +141,39 @@ final class UserService {
             return false
         }
     }
+
+    /// ユーザー設定をFireStoreのユーザープロフィールを更新する処理
+    /// - Parameters:
+    ///     - `userID`: ユーザーID
+    ///     - `user`:ユーザー名
+    ///     - `newVisibility`:公開範囲
+    /// - Returns: 更新成功時はtrue、失敗時はfalseを返す
+    func updateUserProfile(userID: String, newVisibility: Int?, newName: String?) async -> Bool {
+        
+        var newprofileData: [String: Any] = [:]
+        
+        //nilを除外した配列を作成
+        let updates: [String: Any] = [
+            "visibility": newVisibility,
+            "name": newName
+        ].compactMapValues { $0 }
+        
+        if updates.isEmpty {
+            print("更新データが空のため、処理をスキップします。")
+            return false
+        }
+
+        newprofileData.merge(updates) { _, new in new }
+        
+        do {
+            try await db.collection("Users").document(userID).updateData(newprofileData)
+            print("ユーザードキュメントの更新に成功しました。")
+            return true
+        } catch {
+            print("更新時にエラーが発生しました。")
+            return false
+        }
+    }
     
     /// Updates the user's current weight and updates/adds an entry for the current day in the weight history.
     /// - Parameters:
@@ -170,13 +203,18 @@ final class UserService {
                 }
 
                 // Decode existing weight history (or default to empty array)
-                var currentHistory = userDocument.data()?["WeightHistory"] as? [[String: Any]] ?? []
+                var currentHistory = userDocument.data()?["weightHistory"] as? [[String: Any]] ?? []
+                
+                // Debug: Check what's in the document
+                print("[UserService] Current document data: \(String(describing: userDocument.data()))")
+                print("[UserService] Current history array: \(currentHistory)")
 
                 // Find if an entry for today already exists
                 var updated = false
                 for i in 0..<currentHistory.count {
                     if let entryTimestamp = currentHistory[i]["date"] as? Timestamp {
                         let entryDateString = dateFormatter.string(from: entryTimestamp.dateValue())
+                        print("[UserService] Comparing dates: entry=\(entryDateString), today=\(todayDateString)")
                         if entryDateString == todayDateString {
                             // Update existing entry for today
                             currentHistory[i]["weight"] = newWeight
@@ -191,6 +229,7 @@ final class UserService {
 
                 // If no entry for today was found, add a new one
                 if !updated {
+                    print("[UserService Tx] No entry found for today, adding new one")
                     let newEntry: [String: Any] = [
                         "weight": newWeight,
                         "date": Timestamp(date: Date()) // Client-side timestamp for today (JST)
@@ -202,7 +241,7 @@ final class UserService {
                 // Prepare the final update data
                 let updateData: [String: Any] = [
                     "currentWeight": newWeight,
-                    "weightHistory": currentHistory // Write the modified array back
+                    "weightHistory": currentHistory // Write the modified array back (소문자로 수정)
                 ]
 
                 // Update the document within the transaction
@@ -213,6 +252,9 @@ final class UserService {
 
             // Transaction successful
             print("[UserService] Successfully updated weight and history for user \(userId) to \(newWeight) kg")
+            
+            // Print success message with more details
+            print("[UserService] 체중 업데이트 완료: \(newWeight)kg, 날짜: \(todayDateString)")
 
             // Optional: Update local UserManager's currentUser if needed immediately
             // Requires careful merging or re-fetching as the entire history array might change

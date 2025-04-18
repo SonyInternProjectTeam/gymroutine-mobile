@@ -15,7 +15,10 @@ struct ProfileView: View {
     // フォロワーとフォロー中の一覧画面に遷移するための状態変数
     @State private var showFollowers: Bool = false
     @State private var showFollowing: Bool = false
-    
+    @State private var showEditProfile: Bool = false
+
+    let router: Router?
+
     var body: some View {
         ZStack {
             Group {
@@ -51,6 +54,15 @@ struct ProfileView: View {
             }
             .navigationDestination(isPresented: $showFollowing) {
                 FollowingListView(userID: viewModel.user?.uid ?? "")
+            }
+            .navigationDestination(isPresented: $showEditProfile) {
+                if let user = viewModel.user, let router = router {
+                    ProfileEditView(user: user, router: router)
+                }
+            }
+            .onAppear {
+                // Refresh user data when ProfileView appears (e.g., after returning from ProfileEditView)
+                viewModel.loadUserData()
             }
         }
     }
@@ -137,7 +149,8 @@ struct ProfileView: View {
         Group {
             switch viewModel.selectedTab {
             case .analysis:
-             WeightHistoryGraphView(weightHistory: viewModel.user?.weightHistory)
+                // WeightHistoryViewModel이 자체적으로 UserManager에서 데이터를 관찰합니다
+                WeightHistoryGraphView(weightHistory: viewModel.user?.weightHistory)
             case .posts:
                 if viewModel.workouts.isEmpty {
                     Text("まだワークアウトがありません")
@@ -235,8 +248,7 @@ extension ProfileView {
     private func profileActionButton() -> some View {
         if viewModel.isCurrentUser {
             Button(action: {
-                print("DEBUG: プロフィール編集ボタンタップ")
-                // プロフィール編集画面への遷移処理を追加
+                showEditProfile = true
             }) {
                 Text("プロフィール編集")
                     .font(.headline)
@@ -276,5 +288,5 @@ extension ProfileView {
 }
 
 #Preview {
-    ProfileView(viewModel: ProfileViewModel())
+    ProfileView(viewModel: ProfileViewModel(), router: Router())
 }
