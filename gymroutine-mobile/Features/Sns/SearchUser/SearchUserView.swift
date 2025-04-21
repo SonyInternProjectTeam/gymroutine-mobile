@@ -34,7 +34,7 @@ struct SearchUserView: View {
                         .padding()
                 } else {
                     List(viewModel.userDetails, id: \.uid) { user in
-                        NavigationLink(destination: ProfileView(viewModel: ProfileViewModel(user: user))) {
+                        NavigationLink(destination: ProfileView(viewModel: ProfileViewModel(user: user), router: nil)) {
                             userProfileView(for: user)
                         }
                     }

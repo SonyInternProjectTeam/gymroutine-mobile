@@ -15,6 +15,7 @@ const { initializeApp } = require("firebase-admin/app");
 const storyHandler = require("./handlers/storyHandler");
 const cronHandler = require("./handlers/cronHandler");
 const heatmapHandler = require("./handlers/heatmapHandler");
+const userStatsHandler = require("./handlers/userStatsHandler");
 
 // Initialize Firebase Admin
 initializeApp();
@@ -28,6 +29,7 @@ exports.createStoryFromWorkoutResult = onDocumentCreated(
 // Export scheduled function
 exports.expireStories = onSchedule("every 24 hours", cronHandler.expireStories);
 
+
 // Export heatmap update function
 // In v2, event payload includes both 'data' (document data) and params from URL pattern
 exports.updateWorkoutHeatmap = onDocumentCreated({
@@ -35,5 +37,11 @@ exports.updateWorkoutHeatmap = onDocumentCreated({
   // Optional: Specify region if needed
   region: "us-central1" 
 }, heatmapHandler.handleResultCreate);
+
+// Export user stats update function (triggered by the same event as heatmap)
+exports.updateUserStatsOnWorkout = onDocumentCreated({
+  document: "Result/{userId}/{month}/{resultId}",
+  region: "us-central1" 
+}, userStatsHandler.handleResultCreateForStats);
 
 // TODO: Add other function triggers and handlers as needed
