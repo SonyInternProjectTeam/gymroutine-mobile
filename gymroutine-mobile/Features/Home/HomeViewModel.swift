@@ -8,29 +8,124 @@
 import Foundation
 import SwiftUI
 import Combine
+import FirebaseFirestore
 
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published var followingUsers: [User] = []
-    @Published var todaysWorkouts: [Workout] = []  // 오늘의 워크아웃 목록 추가
+    @Published var todaysWorkouts: [Workout] = []  // Today's workouts list
     @Published var activeStoriesByUserID: [String: [Story]] = [:] // [UserID: [Story]] dictionary to store active stories
     @Published var selectedUserForStory: User? = nil // For triggering navigation
     @Published var storiesForSelectedUser: [Story] = [] // Stories to pass to StoryView
+    @Published var heatmapData: [Date: Int] = [:] // Heatmap data
     
     private let snsService = SnsService()
-    private let workoutRepository = WorkoutRepository()  // Repository 인스턴스 추가
+    private let workoutRepository = WorkoutRepository()  // Repository instance
     private let storyService = StoryService.shared // Add StoryService instance
+    private let heatmapService = HeatmapService() // Heatmap service
     private var cancellables = Set<AnyCancellable>() // Add cancellables
+    private var heatmapListener: ListenerRegistration? // Firestore listener for heatmap updates
     
     init() {
         setupSubscribers()
         loadFollowingUsers()
         loadTodaysWorkouts()
+        loadHeatmapData() // Load heatmap data
+        setupAppLifecycleObservers()
+        setupHeatmapRealTimeListener()
     }
     
     deinit {
-        // ViewModel이 해제될 때 실시간 업데이트 중지
+        // Stop realtime updates when ViewModel is deallocated
         storyService.stopRealtimeUpdates()
+        heatmapListener?.remove() // Remove Firestore listener
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // Setup app lifecycle observers to refresh data when app becomes active
+    private func setupAppLifecycleObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(refreshDataOnAppActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+        
+        // Also listen for workout completion notifications if available
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(refreshHeatmapOnWorkoutComplete),
+            name: NSNotification.Name("WorkoutCompletedNotification"),
+            object: nil
+        )
+    }
+    
+    @objc private func refreshDataOnAppActive() {
+        print("App became active, refreshing data...")
+        loadHeatmapData() // Refresh heatmap data
+    }
+    
+    @objc private func refreshHeatmapOnWorkoutComplete() {
+        print("Workout completed, refreshing heatmap...")
+        loadHeatmapData() // Refresh heatmap when a workout is completed
+    }
+    
+    // Setup a real-time listener for the current month's heatmap data
+    private func setupHeatmapRealTimeListener() {
+        guard let currentUserID = UserManager.shared.currentUser?.uid else { return }
+        
+        // Get current month in YYYYMM format
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMM"
+        let currentMonth = dateFormatter.string(from: Date())
+        
+        // Create reference to the heatmap document
+        let db = Firestore.firestore()
+        let heatmapRef = db.collection("WorkoutHeatmap")
+            .document(currentUserID)
+            .collection(currentMonth)
+            .document("heatmapData")
+        
+        // Add real-time listener
+        heatmapListener = heatmapRef.addSnapshotListener { [weak self] (documentSnapshot, error) in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error listening for heatmap updates: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let document = documentSnapshot, document.exists else {
+                print("Heatmap document does not exist or was deleted")
+                return
+            }
+            
+            // Process the document data and update heatmapData
+            if let data = document.data(), let heatmapDict = data["heatmapData"] as? [String: Int] {
+                print("Real-time update received for heatmap data")
+                Task {
+                    // Convert string dates to Date objects
+                    var newHeatmapData: [Date: Int] = [:]
+                    let dayFormatter = DateFormatter()
+                    dayFormatter.dateFormat = "yyyy-MM-dd"
+                    
+                    for (dateString, count) in heatmapDict {
+                        if let date = dayFormatter.date(from: dateString) {
+                            let calendar = Calendar.current
+                            if let normalizedDate = calendar.date(from: calendar.dateComponents([.year, .month, .day], from: date)) {
+                                newHeatmapData[normalizedDate] = count
+                            }
+                        }
+                    }
+                    
+                    // Update the published property on the main thread
+                    await MainActor.run {
+                        self.heatmapData = newHeatmapData
+                        print("Updated heatmap data with \(newHeatmapData.count) entries from real-time update")
+                    }
+                }
+            }
+        }
     }
     
     private func setupSubscribers() {
@@ -49,7 +144,7 @@ final class HomeViewModel: ObservableObject {
         print("Updated active stories: \(activeStoriesByUserID.count) users have stories.")
     }
     
-    /// 현재 사용자가 팔로우 중인 사용자 목록 불러오기 & 스토리 가져오기 트리거
+    /// Load following users and trigger story fetching
     func loadFollowingUsers() {
         Task {
             UIApplication.showLoading()
@@ -61,10 +156,10 @@ final class HomeViewModel: ObservableObject {
             switch result {
             case .success(let users):
                 self.followingUsers = users
-                // 기존 일회성 로드 대신 실시간 업데이트 시작
+                // Start realtime updates instead of one-time load
                 storyService.startRealtimeUpdates(userId: currentUserID)
             case .failure(let error):
-                print("팔로잉ユーザーの読み込みに失敗しました: \(error.localizedDescription)")
+                print("Failed to load following users: \(error.localizedDescription)")
             }
             UIApplication.hideLoading()
         }
@@ -92,13 +187,21 @@ final class HomeViewModel: ObservableObject {
         }
     }
     
-    // 실시간 업데이트 수동 새로고침
+    // Manual refresh for realtime updates
     func refreshStories() {
         guard let currentUserID = UserManager.shared.currentUser?.uid else { return }
         storyService.startRealtimeUpdates(userId: currentUserID)
     }
     
-    /// WorkoutRepository에서 워크아웃을 불러와 오늘의 워크아웃만 필터링
+    // Global refresh method for all data
+    func refreshAllData() {
+        loadFollowingUsers()
+        loadTodaysWorkouts()
+        loadHeatmapData()
+        refreshStories()
+    }
+    
+    /// Load workouts from WorkoutRepository and filter for today's workouts
     func loadTodaysWorkouts() {
         guard let currentUserID = UserManager.shared.currentUser?.uid else {
             print("DEBUG: current user is nil, cannot load today's workouts")
@@ -109,7 +212,7 @@ final class HomeViewModel: ObservableObject {
             do {
                 let workouts = try await workoutRepository.fetchWorkouts(for: currentUserID)
                 let todayString = getTodayWeekdayString()
-                // scheduledDays 배열에 오늘의 요일이 포함된 워크아웃만 필터링
+                // Filter workouts that include today's weekday in their scheduledDays array
                 let filteredWorkouts = workouts.filter { $0.scheduledDays.contains(todayString) }
                 DispatchQueue.main.async {
                     self.todaysWorkouts = filteredWorkouts
@@ -122,10 +225,53 @@ final class HomeViewModel: ObservableObject {
         }
     }
     
-    /// 오늘의 요일을 문자열로 반환 (예: "Monday")
+    /// Load heatmap data for the current user
+    func loadHeatmapData() {
+        guard let currentUserID = UserManager.shared.currentUser?.uid else {
+            print("DEBUG: current user is nil, cannot load heatmap data")
+            return
+        }
+        
+        Task {
+            UIApplication.showLoading()
+            
+            // Load data through HeatmapService
+            let data = await heatmapService.getMonthlyHeatmapData(for: currentUserID)
+            
+            // Update UI on the main thread
+            await MainActor.run {
+                self.heatmapData = data
+                print("DEBUG: Loaded \(data.count) heatmap entries")
+                UIApplication.hideLoading()
+            }
+        }
+    }
+    
+    /// Load heatmap data for a specific year and month (used when changing months)
+    func loadHeatmapData(for year: Int, month: Int) {
+        guard let currentUserID = UserManager.shared.currentUser?.uid else {
+            print("DEBUG: current user is nil, cannot load heatmap data")
+            return
+        }
+        
+        Task {
+            UIApplication.showLoading()
+            
+            // Load data for specific month through HeatmapService
+            let data = await heatmapService.getHeatmapData(for: currentUserID, year: year, month: month)
+            
+            await MainActor.run {
+                self.heatmapData = data
+                print("DEBUG: Loaded \(data.count) heatmap entries for \(year)/\(month)")
+                UIApplication.hideLoading()
+            }
+        }
+    }
+    
+    /// Returns today's weekday as a string (e.g., "Monday")
     private func getTodayWeekdayString() -> String {
         let dateFormatter = DateFormatter()
-        // locale 및 dateFormat은 워크아웃 도큐먼트에 저장된 요일 형식에 맞게 조정 필요
+        // locale and dateFormat should match the format stored in workout documents
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "EEEE" // ex) "Monday", "Tuesday", ...
         return dateFormatter.string(from: Date())
