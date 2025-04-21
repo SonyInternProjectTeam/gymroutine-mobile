@@ -256,6 +256,7 @@ extension ProfileView {
             Text(user.name)
                 .font(.system(size: 27))
                 .fontWeight(.bold)
+                .lineLimit(1)
             if let birthday = user.birthday {
                 let age = Calendar.current.dateComponents([.year], from: birthday, to: Date()).year ?? 0
                 Text("\(age)歳 \(user.gender)")
