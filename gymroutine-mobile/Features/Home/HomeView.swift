@@ -11,9 +11,11 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
     @EnvironmentObject var userManager: UserManager
+    @ObservedObject private var workoutManager = AppWorkoutManager.shared
     
     @State private var isShowTodayworkouts = true
     @State private var createWorkoutFlg = false
+    @State private var showingUpdateWeightSheet = false
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -35,18 +37,24 @@ struct HomeView: View {
             // 기타 필요한 데이터 업데이트
             viewModel.loadFollowingUsers()
             viewModel.loadTodaysWorkouts()
+            // 히트맵 데이터도 업데이트
+            viewModel.loadHeatmapData()
+        }
+        .sheet(isPresented: $showingUpdateWeightSheet) {
+            UpdateWeightView()
+                .environmentObject(userManager)
         }
         .sheet(item: $viewModel.selectedUserForStory) { user in
             StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
+        }
+        .fullScreenCover(isPresented: $createWorkoutFlg) {
+            CreateWorkoutView()
         }
         .overlay(alignment: .bottom) {
             buttonBox
                 .clipped()
                 .shadow(radius: 4)
                 .padding()
-        }
-        .fullScreenCover(isPresented: $createWorkoutFlg) {
-            CreateWorkoutView()
         }
     }
     
@@ -73,25 +81,25 @@ struct HomeView: View {
             }
             .contentMargins(.horizontal, 16)
             
-            Label("現在\(viewModel.followingUsers.count)人が筋トレしています！", systemImage: "flame")
-                .fontWeight(.semibold)
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .hAlign(.leading)
-                .background(Color.red.opacity(0.3))
+            // TOOD: 現在運動してる人表示
+
+            // Label("現在\(viewModel.followingUsers.count)人が筋トレしています！", systemImage: "flame")
+            //     .fontWeight(.semibold)
+            //     .padding(.horizontal)
+            //     .padding(.vertical, 8)
+            //     .hAlign(.leading)
+            //     .background(Color.red.opacity(0.3))
+
+            Divider().padding(.bottom, 5)
         }
     }
     
     private var calendarBox: some View {
-        VStack {
-            Text("簡易カレンダーView")
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 200)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        HeatmapCalendarView(heatmapData: viewModel.heatmapData, startDate: Date(), numberOfMonths: 1)
+            .frame(height: 230)
+            .padding(.bottom, 20)
     }
-    
+
     private var todaysWorkoutsBox: some View {
         VStack {
             Button {
@@ -117,11 +125,16 @@ struct HomeView: View {
                         .padding()
                 } else {
                     ForEach(viewModel.todaysWorkouts, id: \.id) { workout in
-                        WorkoutCell(
-                            workoutName: workout.name,
-                            exerciseImageName: workout.exercises.first?.name,
-                            count: workout.exercises.count
-                        )
+                        NavigationLink(destination: {
+                            WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))
+                        }) {
+                            WorkoutCell(
+                                workoutName: workout.name,
+                                exerciseImageName: workout.exercises.first?.name,
+                                count: workout.exercises.count
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle()) // 기본 네비게이션 스타일 제거
                     }
                 }
             }
@@ -137,8 +150,8 @@ struct HomeView: View {
                     .font(.title2.bold())
                     .hAlign(.leading)
                 
-                // 임시 정보
                 HStack {
+                    // Total Days
                     VStack(spacing: 16) {
                         Text("累計トレーニング日数")
                             .foregroundStyle(.secondary)
@@ -146,9 +159,8 @@ struct HomeView: View {
                             .hAlign(.leading)
                         
                         HStack(alignment: .bottom) {
-                            Text("128")
+                            Text("\(user.totalWorkoutDays ?? 0)")
                                 .font(.largeTitle.bold())
-                            
                             Text("日")
                         }
                         .hAlign(.trailing)
@@ -158,17 +170,20 @@ struct HomeView: View {
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     
-                    VStack {
+                    // Current Weight - Add onTapGesture here
+                    VStack(spacing: 16) {
                         Text("現在の体重")
                             .foregroundStyle(.secondary)
                             .font(.caption)
                             .hAlign(.leading)
-                        
+                            
                         HStack(alignment: .bottom) {
-                            Text("64")
+                            Text(user.currentWeight != nil ? String(format: "%.1f", user.currentWeight!) : "--")
                                 .font(.largeTitle.bold())
                             
-                            Text("kg")
+                            if user.currentWeight != nil {
+                                Text("kg")
+                            }
                         }
                         .hAlign(.trailing)
                     }
@@ -176,11 +191,41 @@ struct HomeView: View {
                     .frame(height: 108)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        showingUpdateWeightSheet = true
+                    }
                 }
             } else {
                 Text("ユーザー情報が読み込めません")
             }
         }
+    }
+    
+    // Workout Quick Start function
+    // Todo: refactor this function to use the new workout creation flow
+    private func startQuickWorkout() {
+        guard let userId = userManager.currentUser?.uid else {
+            print("[ERROR] Quick start failed: User ID not available")
+            return
+        }
+        
+        // Create a quick workout with an empty exercise list
+        let quickWorkout = Workout(
+            id: UUID().uuidString,
+            userId: userId,
+            name: "Quick Start",
+            createdAt: Date(),
+            notes: "Started from quick start button",
+            isRoutine: false,
+            scheduledDays: [],
+            exercises: [] // Empty exercise list
+        )
+        
+        // Start the workout through AppWorkoutManager
+        workoutManager.startWorkout(workout: quickWorkout)
+        
+        print("[INFO] Quick start workout created with empty exercise list")
     }
     
     private var buttonBox: some View {
@@ -193,7 +238,7 @@ struct HomeView: View {
             .buttonStyle(SecondaryButtonStyle())
             
             Button {
-                // 추가 액션 구현
+                startQuickWorkout()
             } label: {
                 Label("今すぐ始める", systemImage: "play")
             }

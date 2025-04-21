@@ -7,20 +7,35 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const { onCall } = require("firebase-functions/v2/https");
-const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
-const admin = require("firebase-admin");
+const { initializeApp } = require("firebase-admin/app");
 
-// Initialize Firebase Admin at the top level
-admin.initializeApp();
+// Initialize Firebase Admin
+initializeApp();
 
 // Import handlers
 const storyHandler = require("./handlers/storyHandler");
 const cronHandler = require("./handlers/cronHandler");
+const heatmapHandler = require("./handlers/heatmapHandler");
+const userStatsHandler = require("./handlers/userStatsHandler");
 const recommendationScheduler = require("./handlers/recommendationScheduler");
 const apiHandler = require("./handlers/apiHandler");
 const userHandler = require("./handlers/userHandler");
+
+// Export heatmap update function
+// In v2, event payload includes both 'data' (document data) and params from URL pattern
+exports.updateWorkoutHeatmap = onDocumentCreated({
+  document: "Result/{userId}/{month}/{resultId}",
+  // Optional: Specify region if needed
+  region: "us-central1" 
+}, heatmapHandler.handleResultCreate);
+
+// Export user stats update function (triggered by the same event as heatmap)
+exports.updateUserStatsOnWorkout = onDocumentCreated({
+  document: "Result/{userId}/{month}/{resultId}",
+  region: "us-central1" 
+}, userStatsHandler.handleResultCreateForStats);
 
 // Export Firestore trigger functions
 exports.createStoryFromWorkoutResult = onDocumentCreated(
@@ -28,6 +43,7 @@ exports.createStoryFromWorkoutResult = onDocumentCreated(
   storyHandler.createStoryFromWorkoutResult
 );
 
+// Export user following change function
 exports.onUserFollowingChange = onDocumentUpdated(
   "Users/{userId}",
   userHandler.onUserFollowingChange

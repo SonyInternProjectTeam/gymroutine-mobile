@@ -8,7 +8,8 @@ struct WorkoutSessionModel {
     let startTime: Date
     var elapsedTime: TimeInterval
     var completedSets: Set<String> = [] // 완료된 세트 정보 ("exerciseIndex-setIndex")
-    // TODO: 필요에 따라 운동별 실제 수행 데이터 (무게, 횟수 등) 추가
+    var totalRestTime: TimeInterval = 0 // total rest time in seconds
+    // TODO: add actual exercise data (weight, reps, etc.) if needed
 }
 
 @MainActor
@@ -63,6 +64,11 @@ class AppWorkoutManager: ObservableObject {
         }
 
         print("▶️ AppWorkoutManager: 워크아웃 시작 - \(workout.name)")
+        // workoutId를 전달하여 WorkoutSessionViewModel 초기화
+        guard let workoutId = workout.id else {
+            print("🔥 워크아웃 ID가 없습니다.")
+            return
+        }
         let sessionViewModel = WorkoutSessionViewModel(workout: workout)
         self.workoutSessionViewModel = sessionViewModel
         self.currentWorkout = workout
@@ -70,6 +76,9 @@ class AppWorkoutManager: ObservableObject {
         self.isWorkoutSessionMaximized = true // 시작 시 전체 화면으로 표시
         self.showResultView = false // 결과 화면 숨김
         self.completedWorkoutSession = nil
+        
+        // 워크아웃 세션 시작 (이제 init에서 처리됨)
+        // sessionViewModel.startFromBeginning()
         
         // 사용자 isActive 상태를 true로 업데이트
         Task {
@@ -99,10 +108,15 @@ class AppWorkoutManager: ObservableObject {
     // 워크아웃 완료 처리 (WorkoutSessionViewModel에서 호출됨)
     func completeWorkout(session: WorkoutSessionModel) {
         print("✅ AppWorkoutManager: 워크아웃 완료됨 - \(session.workout.name)")
+        // 상태 변경 전 로그 추가
+        print("   ➡️ Setting completedWorkoutSession and showResultView = true")
         self.completedWorkoutSession = session
         self.showResultView = true // 결과 화면 표시 트리거
+        // 상태 변경 후 로그 추가
+        print("   ⏸️ Current State: showResultView = \(self.showResultView), completedWorkoutSession is \(self.completedWorkoutSession == nil ? "nil" : "set")")
 
         // 기존 세션 상태 정리
+        print("   🧹 Clearing active session states (isWorkoutSessionActive = false, isWorkoutSessionMaximized = false)")
         self.isWorkoutSessionActive = false
         self.isWorkoutSessionMaximized = false
         self.workoutSessionViewModel = nil
@@ -170,7 +184,7 @@ class AppWorkoutManager: ObservableObject {
         
         let workoutResult = WorkoutResultModel(
             duration: Int(session.elapsedTime),
-            restTime: nil,
+            restTime: Int(session.totalRestTime),
             workoutID: session.workout.id,
             exercises: exercisesResult,
             notes: notes.isEmpty ? nil : notes,

@@ -12,6 +12,7 @@ struct WorkoutExerciseCell: View {
     
     let workoutExercise: WorkoutExercise
     private let exerciseDetailOptions = ["セット", "レップ数", "重さ"]
+    var onRestTimeClicked: (() -> Void)? = nil
     
     var body: some View {
         VStack(spacing: 16) {
@@ -20,14 +21,32 @@ struct WorkoutExerciseCell: View {
                     .frame(width: 56, height: 56)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(LocalizedStringKey(workoutExercise.part))
-                        .font(.caption)
-                        .padding(.vertical, 4)
-                        .padding(.horizontal, 12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(.secondary.opacity(0.4), lineWidth: 2)
-                        )
+                    HStack {
+                        Text(LocalizedStringKey(workoutExercise.part))
+                            .font(.caption)
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(.secondary.opacity(0.4), lineWidth: 2)
+                            )
+                        
+                        Button(action: {
+                            onRestTimeClicked?()
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "timer")
+                                    .font(.caption)
+                                Text("\(workoutExercise.restTime ?? 90)秒")
+                                    .font(.caption)
+                            }
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 12)
+                            .background(Color.blue.opacity(0.1))
+                            .foregroundColor(.blue)
+                            .cornerRadius(20)
+                        }
+                    }
                     
                     Text(LocalizedStringKey(workoutExercise.name))
                         .font(.headline)

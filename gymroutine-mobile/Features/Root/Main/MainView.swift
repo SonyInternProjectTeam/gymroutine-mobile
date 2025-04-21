@@ -10,7 +10,8 @@ import SwiftUI
 struct MainView: View {
     @ObservedObject var workoutManager = AppWorkoutManager.shared
     @State private var selectedTab = 0
-    
+    let router: Router
+
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
@@ -42,7 +43,7 @@ struct MainView: View {
                 .tag(2)
                 
                 NavigationStack {
-                    ProfileView()
+                    ProfileView(viewModel: ProfileViewModel(), router: router)
                 }
                 .tabItem {
                     Image(systemName: "person.circle.fill")

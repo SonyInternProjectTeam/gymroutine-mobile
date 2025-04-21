@@ -25,6 +25,9 @@ struct GlobalWorkoutSessionView: View {
                     Text("워크아웃 세션 정보를 불러올 수 없습니다.")
                 }
             }
+            .onChange(of: workoutManager.isWorkoutSessionMaximized) { newValue in // DEBUG
+                print("🔄 GlobalWorkoutSessionView: isWorkoutSessionMaximized changed to \(newValue)")
+            }
 
             // 워크아웃 결과 화면 모달 (새로 추가)
             .fullScreenCover(isPresented: $workoutManager.showResultView) {
@@ -41,6 +44,12 @@ struct GlobalWorkoutSessionView: View {
                          }
                          .padding(.top)
                      }
+                 }
+             }
+             .onChange(of: workoutManager.showResultView) { newValue in // DEBUG
+                 print("🔄 GlobalWorkoutSessionView: showResultView changed to \(newValue)")
+                 if newValue {
+                     print("   - completedWorkoutSession is \(workoutManager.completedWorkoutSession == nil ? "nil" : "set")")
                  }
              }
     }
