@@ -36,6 +36,8 @@ struct HomeView: View {
             // 기타 필요한 데이터 업데이트
             viewModel.loadFollowingUsers()
             viewModel.loadTodaysWorkouts()
+            // 히트맵 데이터도 업데이트
+            viewModel.loadHeatmapData()
         }
         .sheet(isPresented: $showingUpdateWeightSheet) {
             UpdateWeightView()
@@ -78,25 +80,25 @@ struct HomeView: View {
             }
             .contentMargins(.horizontal, 16)
             
-            Label("現在\(viewModel.followingUsers.count)人が筋トレしています！", systemImage: "flame")
-                .fontWeight(.semibold)
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .hAlign(.leading)
-                .background(Color.red.opacity(0.3))
+            // TOOD: 現在運動してる人表示
+
+            // Label("現在\(viewModel.followingUsers.count)人が筋トレしています！", systemImage: "flame")
+            //     .fontWeight(.semibold)
+            //     .padding(.horizontal)
+            //     .padding(.vertical, 8)
+            //     .hAlign(.leading)
+            //     .background(Color.red.opacity(0.3))
+
+            Divider().padding(.bottom, 5)
         }
     }
     
     private var calendarBox: some View {
-        VStack {
-            Text("簡易カレンダーView")
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 200)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        HeatmapCalendarView(heatmapData: viewModel.heatmapData, startDate: Date(), numberOfMonths: 1)
+            .frame(height: 230)
+            .padding(.bottom, 20)
     }
-    
+
     private var todaysWorkoutsBox: some View {
         VStack {
             Button {
