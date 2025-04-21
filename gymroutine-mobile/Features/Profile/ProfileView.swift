@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @StateObject var viewModel: ProfileViewModel
     @Namespace var namespace
     
     // フォロワーとフォロー中の一覧画面に遷移するための状態変数

@@ -64,8 +64,11 @@ struct WorkoutResultView: View {
                 .fontWeight(.semibold)
             Text("Workout Name: \(workoutSession.workout.name)")
             Text("Total Time: \(formattedTotalTime(workoutSession.elapsedTime))")
+<<<<<<< HEAD
             Text("Rest Time: \(formattedTotalTime(workoutSession.totalRestTime))")
             Text("Active Time: \(formattedTotalTime(workoutSession.elapsedTime - workoutSession.totalRestTime))")
+=======
+>>>>>>> dev
             // TODO: 총 볼륨 등 추가 요약 정보 표시
             // let totalVolume = calculateTotalVolume()
             // Text("Total Volume: \(String(format: "%.1f", totalVolume)) kg")

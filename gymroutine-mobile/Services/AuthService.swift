@@ -65,6 +65,7 @@ class AuthService {
         do {
             let documentRef = db.collection("Users").document(user.uid)
             
+<<<<<<< HEAD
             // Convert weightHistory to an array of dictionaries for Firestore
             // Use nil-coalescing to handle optional user.weightHistory
             let weightHistoryData = (user.weightHistory ?? []).map { entry -> [String: Any] in
@@ -72,17 +73,26 @@ class AuthService {
             }
 
             var userData: [String: Any] = [
+=======
+            let userData: [String: Any] = [
+>>>>>>> dev
                 "uid": user.uid,
                 "email": user.email,
                 "name": user.name,
                 "profilePhoto": user.profilePhoto,
                 "visibility": user.visibility,
                 "isActive": user.isActive,
+<<<<<<< HEAD
+=======
+                // birthday가 nil이 아니면 Timestamp로 변환, nil이면 NSNull() 또는 필드 제거
+                "birthday": user.birthday != nil ? Timestamp(date: user.birthday!) : NSNull(),
+>>>>>>> dev
                 "gender": user.gender,
                 "createdAt": Timestamp(date: user.createdAt),
                 "weightHistory": weightHistoryData // Always include weightHistory (potentially empty array)
             ]
             
+<<<<<<< HEAD
             // Add optional fields only if they are not nil
             if let birthday = user.birthday {
                 userData["birthday"] = Timestamp(date: birthday)
@@ -98,6 +108,13 @@ class AuthService {
             }
 
             // Set data (merge is true, so existing fields won't be overwritten unnecessarily)
+=======
+            // NSNull 대신 필드를 제거하는 방법
+            // if let birthday = user.birthday {
+            //     userData["birthday"] = Timestamp(date: birthday)
+            // }
+            
+>>>>>>> dev
             try await documentRef.setData(userData, merge: true)
             
             // Initialize UserManager after saving - @MainActor 컨텍스트에서 호출 필요
