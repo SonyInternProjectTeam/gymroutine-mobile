@@ -75,7 +75,9 @@ struct SnsView: View {
                     .vAlign(.top)
             } else {
                 List(viewModel.userDetails, id: \.uid) { user in
-                    NavigationLink(destination: ProfileView(user: user)) {
+                    NavigationLink {
+                        ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
+                    } label: {
                         userProfileView(for: user)
                     }
                 }
@@ -150,7 +152,9 @@ struct SnsView: View {
     private func recommendedUserCell(for recommendedUser: RecommendedUser) -> some View {
         let user = recommendedUser.user
         
-        return NavigationLink(destination: ProfileView(user: user)) {
+        return NavigationLink {
+            ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
+        } label: {
             VStack(alignment: .center, spacing: 8) {
                 ZStack(alignment: .bottomTrailing) {
                     // 프로필 이미지
