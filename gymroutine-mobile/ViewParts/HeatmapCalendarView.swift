@@ -6,9 +6,12 @@ struct HeatmapCalendarView: View {
     var numberOfMonths: Int = 6 // Default to show 6 months
     
     private let daysOfWeek = ["日", "月", "火", "水", "木", "金", "土"]
-    private let columns: [GridItem] = Array(repeating: .init(.fixed(20)), count: 7) // Smaller fixed size
-    private let cellSize: CGFloat = 20 // Reduced cell size
+    // MARK: - 셀 크기 설정 (flexible로 설정하여 화면에 맞게 동적 조정)
+    private let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 7)
     private let cellSpacing: CGFloat = 3 // Reduced spacing
+    
+    // 멀티 월 뷰의 기본 셀 크기 (싱글 월은 동적 계산)
+    private let multiMonthCellSize: CGFloat = 25 // 멀티 월 뷰 셀 크기
     
     // Month formatter
     private let monthFormatter: DateFormatter = {
@@ -46,55 +49,64 @@ struct HeatmapCalendarView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Only show title for multi-month view
-            if numberOfMonths > 1 {
-                Text("Workout Activity")
-                    .font(.headline)
-                    .padding(.bottom, 4)
-            }
+        GeometryReader { geometry in
+            // MARK: - 화면 너비에서 패딩을 고려하여 가용 너비 계산
+            let availableWidth = geometry.size.width - 32  // 좌우 패딩 고려
             
-            if numberOfMonths == 1 {
-                // Optimized single month view for home screen
-                singleMonthView(for: startDate)
-            } else {
-                // Multi-month scrollable view
-                multiMonthView()
-            }
-            
-            // Only show legend for multi-month view or if space allows
-            if numberOfMonths > 1 {
-                // Color legend
-                HStack(spacing: 3) {
-                    Text("Less")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                    
-                    ForEach(0...4, id: \.self) { level in
-                        Rectangle()
-                            .fill(colorForLevel(level))
-                            .frame(width: 12, height: 12)
-                            .cornerRadius(2)
-                    }
-                    
-                    Text("More")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+            VStack(alignment: .leading, spacing: 12) {
+                // Only show title for multi-month view
+                if numberOfMonths > 1 {
+                    Text("Workout Activity")
+                        .font(.headline)
+                        .padding(.bottom, 4)
                 }
-                .padding(.top, 4)
-                .padding(.leading, 24) // Align with grid
+                
+                if numberOfMonths == 1 {
+                    // Optimized single month view for home screen
+                    singleMonthView(for: startDate, availableWidth: availableWidth)
+                } else {
+                    // Multi-month scrollable view
+                    multiMonthView()
+                }
+                
+                // Only show legend for multi-month view or if space allows
+                if numberOfMonths > 1 {
+                    // Color legend
+                    HStack(spacing: 3) {
+                        Text("Less")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        
+                        ForEach(0...4, id: \.self) { level in
+                            Rectangle()
+                                .fill(colorForLevel(level))
+                                .frame(width: 12, height: 12)
+                                .cornerRadius(2)
+                        }
+                        
+                        Text("More")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 4)
+                    .padding(.leading, 24) // Align with grid
+                }
             }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(10)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
     
     // MARK: - View Components
     
-    private func singleMonthView(for date: Date) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+    private func singleMonthView(for date: Date, availableWidth: CGFloat) -> some View {
+        // MARK: - 싱글 월 뷰 셀 크기 계산 (화면 폭을 기준으로)
+        // 7.5 = 7(날짜 수) + 0.5(여유 공간)으로 나누어 약간 작게 설정
+        let cellSize = (availableWidth - (6 * cellSpacing)) / 10
+        
+        return VStack(alignment: .leading, spacing: 8) {
             // Month header
             HStack {
                 let month = monthFormatter.string(from: date)
@@ -115,8 +127,7 @@ struct HeatmapCalendarView: View {
             }
             
             // Calendar Grid - no scrolling needed for single month
-            monthHeatmapGrid(for: date)
-                .frame(maxWidth: .infinity)
+            monthHeatmapGrid(for: date, cellSize: cellSize)
         }
     }
     
@@ -130,7 +141,7 @@ struct HeatmapCalendarView: View {
                         Text(day)
                             .font(.caption2)
                             .foregroundColor(.gray)
-                            .frame(width: 16, height: cellSize)
+                            .frame(width: 16, height: multiMonthCellSize) // 멀티 월 뷰 셀 크기 사용
                     }
                 }
                 .padding(.trailing, 4)
@@ -144,7 +155,7 @@ struct HeatmapCalendarView: View {
                                     Text(monthFormatter.string(from: monthDate))
                                         .font(.caption)
                                         .foregroundColor(.secondary)
-                                        .frame(width: calculateMonthWidth(for: monthDate), alignment: .leading)
+                                        .frame(width: calculateMonthWidth(for: monthDate, cellSize: multiMonthCellSize), alignment: .leading)
                                         .padding(.bottom, 4)
                                     
                                     Spacer()
@@ -164,7 +175,7 @@ struct HeatmapCalendarView: View {
                         Text(day)
                             .font(.caption2)
                             .foregroundColor(.gray)
-                            .frame(width: 16, height: cellSize)
+                            .frame(width: 16, height: multiMonthCellSize) // 멀티 월 뷰 셀 크기 사용
                     }
                 }
                 .padding(.trailing, 4)
@@ -175,7 +186,7 @@ struct HeatmapCalendarView: View {
                         ForEach(0..<numberOfMonths, id: \.self) { monthIndex in
                             if let monthDate = Calendar.current.date(byAdding: .month, value: monthIndex, to: startDate) {
                                 VStack(spacing: cellSpacing) {
-                                    monthHeatmapGrid(for: monthDate)
+                                    monthHeatmapGrid(for: monthDate, cellSize: multiMonthCellSize) // 멀티 월 뷰 셀 크기 사용
                                 }
                             }
                         }
@@ -188,7 +199,7 @@ struct HeatmapCalendarView: View {
     
     // MARK: - Helper Functions
     
-    private func monthHeatmapGrid(for date: Date) -> some View {
+    private func monthHeatmapGrid(for date: Date, cellSize: CGFloat) -> some View {
         let calendar = Calendar.current
         let month = calendar.component(.month, from: date)
         let year = calendar.component(.year, from: date)
@@ -201,10 +212,13 @@ struct HeatmapCalendarView: View {
         let firstDay = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
         let firstWeekday = calendar.component(.weekday, from: firstDay) // 1 = Sunday, 7 = Saturday
         
+        // 일요일=1, 월요일=2, ..., 토요일=7로 계산되므로 일요일(1)일 경우 0개, 월요일(2)일 경우 1개의 빈 셀 필요
+        let emptyCellsCount = firstWeekday - 1
+        
         // Create a grid of cells for this month
         return LazyVGrid(columns: columns, spacing: cellSpacing) {
             // Empty cells for padding before first day
-            ForEach(0..<(firstWeekday-1), id: \.self) { _ in
+            ForEach(0..<emptyCellsCount, id: \.self) { _ in
                 Rectangle()
                     .fill(Color.clear)
                     .frame(width: cellSize, height: cellSize)
@@ -214,14 +228,13 @@ struct HeatmapCalendarView: View {
             ForEach(1...numDays, id: \.self) { day in
                 if let date = calendar.date(from: DateComponents(year: year, month: month, day: day)) {
                     let dayCount = heatmapData[calendar.startOfDay(for: date)] ?? 0
-                    dayCellView(day: day, count: dayCount)
+                    dayCellView(day: day, count: dayCount, cellSize: cellSize)
                 }
             }
         }
-        .frame(width: calculateMonthWidth(for: date))
     }
     
-    private func dayCellView(day: Int, count: Int) -> some View {
+    private func dayCellView(day: Int, count: Int, cellSize: CGFloat) -> some View {
         let color = colorForCount(count)
         
         return ZStack {
@@ -239,13 +252,13 @@ struct HeatmapCalendarView: View {
             if numberOfMonths == 1 {
                 // Only show day numbers in single month view
                 Text("\(day)")
-                    .font(.system(size: 8))
+                    .font(.system(size: max(9, cellSize * 0.4))) // 최소 9pt, 아니면 셀 크기의 40%
                     .foregroundColor(count > 1 ? .white : .primary)
             }
         }
     }
     
-    private func calculateMonthWidth(for date: Date) -> CGFloat {
+    private func calculateMonthWidth(for date: Date, cellSize: CGFloat) -> CGFloat {
         let calendar = Calendar.current
         let firstDay = calendar.date(from: 
             DateComponents(

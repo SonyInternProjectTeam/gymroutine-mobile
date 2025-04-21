@@ -75,20 +75,25 @@ struct HomeView: View {
             }
             .contentMargins(.horizontal, 16)
             
-            Label("現在\(viewModel.followingUsers.count)人が筋トレしています！", systemImage: "flame")
-                .fontWeight(.semibold)
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .hAlign(.leading)
-                .background(Color.red.opacity(0.3))
+            // TOOD: 現在運動してる人表示
+
+            // Label("現在\(viewModel.followingUsers.count)人が筋トレしています！", systemImage: "flame")
+            //     .fontWeight(.semibold)
+            //     .padding(.horizontal)
+            //     .padding(.vertical, 8)
+            //     .hAlign(.leading)
+            //     .background(Color.red.opacity(0.3))
+
+            Divider().padding(.bottom, 5)
         }
     }
     
     private var calendarBox: some View {
         HeatmapCalendarView(heatmapData: viewModel.heatmapData, startDate: Date(), numberOfMonths: 1)
-            .frame(height: 200)
+            .frame(height: 230)
+            .padding(.bottom, 20)
     }
-    
+
     private var todaysWorkoutsBox: some View {
         VStack {
             Button {
