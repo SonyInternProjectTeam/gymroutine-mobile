@@ -76,6 +76,16 @@ struct WorkoutDetailView: View {
             // 뷰가 나타날 때마다 최신 데이터를 불러옴
             viewModel.refreshWorkoutData()
         }
+        // 앱이 활성화될 때마다 데이터 갱신
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            print("📱 앱이 활성화되어 워크아웃 데이터 갱신")
+            viewModel.refreshWorkoutData()
+        }
+        // 주기적으로 데이터 새로고침 (30초마다)
+        .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { _ in
+            print("⏱️ 주기적인 워크아웃 데이터 갱신")
+            viewModel.refreshWorkoutData()
+        }
     }
     
     private var workoutInfoBox: some View {
@@ -124,7 +134,9 @@ struct WorkoutDetailView: View {
                             .frame(width: 4)
                     }
                     
-                    WorkoutExerciseCell(workoutExercise: workoutExercise)
+                    WorkoutExerciseCell(workoutExercise: workoutExercise, onRestTimeClicked: {
+                        viewModel.showRestTimeSettings(for: index)
+                    })
                         .onTapGesture {
                             viewModel.onClickedExerciseSets(index: index)
                         }
@@ -156,6 +168,19 @@ struct WorkoutDetailView: View {
                             viewModel.updateExerciseSetAndSave(for: viewModel.exercises[index])
                         }
                     }
+                }
+            }
+            .sheet(isPresented: $viewModel.showRestTimeSettingsSheet) {
+                if let index = viewModel.selectedRestTimeIndex {
+                    RestTimeSettingsView(
+                        workoutExercise: $viewModel.exercises[index],
+                        onSave: {
+                            // This will be called after the exercise's rest time is updated
+                            viewModel.updateExerciseSetAndSave(for: viewModel.exercises[index])
+                        }
+                    )
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
                 }
             }
         }

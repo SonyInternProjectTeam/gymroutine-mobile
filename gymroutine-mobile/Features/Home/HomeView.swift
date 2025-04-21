@@ -11,6 +11,7 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
     @EnvironmentObject var userManager: UserManager
+    @ObservedObject private var workoutManager = AppWorkoutManager.shared
     
     @State private var isShowTodayworkouts = true
     @State private var createWorkoutFlg = false
@@ -46,14 +47,14 @@ struct HomeView: View {
         .sheet(item: $viewModel.selectedUserForStory) { user in
             StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
         }
+        .fullScreenCover(isPresented: $createWorkoutFlg) {
+            CreateWorkoutView()
+        }
         .overlay(alignment: .bottom) {
             buttonBox
                 .clipped()
                 .shadow(radius: 4)
                 .padding()
-        }
-        .fullScreenCover(isPresented: $createWorkoutFlg) {
-            CreateWorkoutView()
         }
     }
     
@@ -201,6 +202,32 @@ struct HomeView: View {
         }
     }
     
+    // Workout Quick Start function
+    // Todo: refactor this function to use the new workout creation flow
+    private func startQuickWorkout() {
+        guard let userId = userManager.currentUser?.uid else {
+            print("[ERROR] Quick start failed: User ID not available")
+            return
+        }
+        
+        // Create a quick workout with an empty exercise list
+        let quickWorkout = Workout(
+            id: UUID().uuidString,
+            userId: userId,
+            name: "Quick Start",
+            createdAt: Date(),
+            notes: "Started from quick start button",
+            isRoutine: false,
+            scheduledDays: [],
+            exercises: [] // Empty exercise list
+        )
+        
+        // Start the workout through AppWorkoutManager
+        workoutManager.startWorkout(workout: quickWorkout)
+        
+        print("[INFO] Quick start workout created with empty exercise list")
+    }
+    
     private var buttonBox: some View {
         HStack {
             Button {
@@ -211,7 +238,7 @@ struct HomeView: View {
             .buttonStyle(SecondaryButtonStyle())
             
             Button {
-                // 추가 액션 구현
+                startQuickWorkout()
             } label: {
                 Label("今すぐ始める", systemImage: "play")
             }

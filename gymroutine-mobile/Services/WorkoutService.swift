@@ -49,6 +49,11 @@ class WorkoutService {
                     "part": exercise.part
                 ]
                 
+                // Add restTime if available
+                if let restTime = exercise.restTime {
+                    exerciseDict["restTime"] = restTime
+                }
+                
                 // Convert sets to array of dictionaries
                 let setsArray = exercise.sets.map { set -> [String: Any] in
                     return [
@@ -73,12 +78,17 @@ class WorkoutService {
     
     /// 워크아웃에 운동을 추가하는 메서드 (새로운 운동 구조: name, part, 그리고 빈 Sets 배열)
     func addExerciseToWorkout(workoutID: String, exercise: WorkoutExercise, completion: @escaping (Bool) -> Void) {
-        let exerciseData: [String: Any] = [
+        var exerciseData: [String: Any] = [
             "id": exercise.id,         // 고유 ID 저장
             "name": exercise.name,
             "part": exercise.part,
-            "Sets": [] // 초기 세트 배열 (빈 배열)
+            "sets": []  // 초기 세트 배열 (빈 배열)
         ]
+        
+        // Add restTime if available
+        if let restTime = exercise.restTime {
+            exerciseData["restTime"] = restTime
+        }
         
         db.collection("Workouts").document(workoutID).updateData([
             "exercises": FieldValue.arrayUnion([exerciseData])
