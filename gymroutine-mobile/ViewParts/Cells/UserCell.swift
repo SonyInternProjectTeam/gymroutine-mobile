@@ -9,31 +9,45 @@ import SwiftUI
 
 struct UserCell: View {
     
-    var user: User 
+    var recommendeduser: RecommendedUser
+    var user: User
+    let score: Int
+    
+    init(RecommendedUser: RecommendedUser) {
+        self.recommendeduser = RecommendedUser
+        self.user = RecommendedUser.user
+        self.score = RecommendedUser.score
+    }
+    
     
     var body: some View {
-        VStack {
-            HStack {
-                ProfilePhoto(photourl: user.profilePhoto)
-                VStack {
-                    if user.birthday != nil || !user.gender.isEmpty {
-                        Text(getAgeAndGenderText())
-                            .font(.caption)
-                            .fontWeight(.thin)
+        NavigationLink {
+            ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
+        } label: {
+            VStack {
+                HStack {
+                    ProfilePhoto(photourl: user.profilePhoto)
+                    VStack {
+                        if user.birthday != nil || !user.gender.isEmpty {
+                            Text(getAgeAndGenderText())
+                                .font(.caption)
+                                .fontWeight(.thin)
+                        }
+                        Text(user.name)
+                            .font(.subheadline)
+                            .fontWeight(.bold)
                     }
-                    Text(user.name)
-                        .font(.subheadline)
-                        .fontWeight(.bold)
+                    .frame(width: 56, height: 56)
+                    .foregroundStyle(.black)
                 }
-                .frame(width: 56, height: 56)
+                followButton()
+                    .frame(width: 130, height: 28)
             }
-            followButton()
-                .frame(width: 130, height: 28)
+            .frame(width: 156,height: 116)
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
-        .frame(width: 156,height: 116)
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
     
     private func getAgeAndGenderText() -> String {

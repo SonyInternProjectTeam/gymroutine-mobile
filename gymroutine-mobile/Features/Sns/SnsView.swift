@@ -136,7 +136,8 @@ struct SnsView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
                         ForEach(viewModel.recommendedUsers) { recommendedUser in
-                            recommendedUserCell(for: recommendedUser)
+//                            recommendedUserCell(for: recommendedUser)
+                            UserCell(RecommendedUser: recommendedUser)
                         }
                     }
                     .padding(.leading, 16)
