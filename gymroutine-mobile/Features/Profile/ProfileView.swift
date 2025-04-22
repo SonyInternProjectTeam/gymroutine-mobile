@@ -64,7 +64,7 @@ struct ProfileView: View {
             HStack(alignment: .bottom, spacing: 10) {
                 profileIcon(profileUrl: user.profilePhoto)
                     .padding(.vertical, 6)
-                followStatsView()
+                followStatsView(user: user)
             }
             .padding(.horizontal, 8)
             .frame(height: 280, alignment: .bottom)
@@ -191,10 +191,10 @@ extension ProfileView {
     }
     
     // MARK: - フォロースタッツ部分（フォロワー/フォローの一覧画面に遷移）
-    private func followStatsView() -> some View {
+    private func followStatsView(user: User) -> some View {
         HStack(spacing: 10) {
             NavigationLink {
-                FollowersListView(userID: viewModel.user?.uid ?? "")
+                FollowersListView(userID: user.uid)
             } label: {
                 VStack(spacing: 4) {
                     Text("フォロワー")
@@ -208,7 +208,7 @@ extension ProfileView {
             .hAlign(.center)
 
             NavigationLink {
-                FollowingListView(userID: viewModel.user?.uid ?? "")
+                FollowingListView(userID: user.uid)
             } label: {
                 VStack(spacing: 4) {
                     Text("フォロー中")
