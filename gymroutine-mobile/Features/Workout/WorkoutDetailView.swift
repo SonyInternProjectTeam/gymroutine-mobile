@@ -49,8 +49,10 @@ struct WorkoutDetailView: View {
             }
             // 오른쪽: "編集" 버튼
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button("編集") {
-                    viewModel.editWorkout()
+                if viewModel.isCurrentUser {
+                    Button("編集") {
+                        viewModel.editWorkout()
+                    }
                 }
             }
         }
@@ -138,20 +140,24 @@ struct WorkoutDetailView: View {
                         viewModel.showRestTimeSettings(for: index)
                     })
                         .onTapGesture {
-                            viewModel.onClickedExerciseSets(index: index)
+                            if viewModel.isCurrentUser {
+                                viewModel.onClickedExerciseSets(index: index)
+                            }
                         }
                         .overlay(alignment: .topTrailing) {
-                            Button(action: {
-                                viewModel.removeExercise(workoutExercise)
-                            }, label: {
-                                Image(systemName: "xmark")
-                                    .font(.headline)
-                                    .foregroundStyle(.white)
-                                    .padding(8)
-                                    .background(.red .opacity(0.5))
-                                    .clipShape(Circle())
-                                    .padding(10)
-                            })
+                            if viewModel.isCurrentUser {
+                                Button(action: {
+                                    viewModel.removeExercise(workoutExercise)
+                                }, label: {
+                                    Image(systemName: "xmark")
+                                        .font(.headline)
+                                        .foregroundStyle(.white)
+                                        .padding(8)
+                                        .background(.red .opacity(0.5))
+                                        .clipShape(Circle())
+                                        .padding(10)
+                                })
+                            }
                         }
                 }
             }
@@ -190,20 +196,28 @@ struct WorkoutDetailView: View {
         VStack(spacing: 0) {
             Divider()
             HStack {
-                Button {
-                    viewModel.addExercise()
-                } label: {
-                    Label("追加する", systemImage: "plus")
+                if viewModel.isCurrentUser {
+                    Button {
+                        viewModel.addExercise()
+                    } label: {
+                        Label("追加する", systemImage: "plus")
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    
+                    Button {
+                        print("📱 始める 버튼이 클릭되었습니다.")
+                        viewModel.startWorkout()
+                    } label: {
+                        Label("始める", systemImage: "play")
+                    }
+                    .buttonStyle(PrimaryButtonStyle()) 
+                } else {
+                    // 다른 사용자의 워크아웃인 경우 메시지 표시
+                    Text("他のユーザーのワークアウトは編集できません")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(SecondaryButtonStyle())
-                
-                Button {
-                    print("📱 始める 버튼이 클릭되었습니다.")
-                    viewModel.startWorkout()
-                } label: {
-                    Label("始める", systemImage: "play")
-                }
-                .buttonStyle(PrimaryButtonStyle()) 
             }
             .padding()
         }
