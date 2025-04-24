@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @StateObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: ProfileViewModel
     @Namespace var namespace
     
     // フォロワーとフォロー中の一覧画面に遷移するための状態変数
@@ -34,40 +34,22 @@ struct ProfileView: View {
             .onChange(of: viewModel.selectedPhotoItem) {
                 viewModel.handleSelectedPhotoItemChange(viewModel.selectedPhotoItem)
             }
-            // 隠しNavigationLink를 overlay로 배치（영향을 주지 않는 0 사이즈）
-            .overlay(
-                Group {
-                    // Deprecated NavigationLink 수정
-                    NavigationLink(value: "followers") {
-                        EmptyView()
-                    }
-                    NavigationLink(value: "following") {
-                        EmptyView()
-                    }
-                }
-                .frame(width: 0, height: 0)
-                .hidden()
-            )
-             // Navigation Destination 추가
-            .navigationDestination(isPresented: $showFollowers) {
-                FollowersListView(userID: viewModel.user?.uid ?? "")
-            }
-            .navigationDestination(isPresented: $showFollowing) {
-                FollowingListView(userID: viewModel.user?.uid ?? "")
-            }
             .navigationDestination(isPresented: $showEditProfile) {
                 if let user = viewModel.user, let router = router {
                     ProfileEditView(user: user, router: router)
                 }
             }
             .onAppear {
-                // 현재 사용자의 프로필을 볼 때만 데이터를 새로고침합니다.
-                if viewModel.isCurrentUser {
+                // Only load user data if the viewModel's user is not already set
+                // This prevents overwriting the profile when navigating from followers/following list
+                if viewModel.user == nil {
                     viewModel.loadUserData()
                 }
             }
         }
     }
+    
+    // MARK: - Private Helper Views
     
     private func profileContentView(user: User) -> some View {
         ScrollView {
@@ -87,7 +69,7 @@ struct ProfileView: View {
             HStack(alignment: .bottom, spacing: 10) {
                 profileIcon(profileUrl: user.profilePhoto)
                     .padding(.vertical, 6)
-                followStatsView()
+                followStatsView(user: user)
             }
             .padding(.horizontal, 8)
             .frame(height: 280, alignment: .bottom)
@@ -180,18 +162,21 @@ struct ProfileView: View {
 extension ProfileView {
     // MARK: - プロフィールアイコン部分
     private func profileIcon(profileUrl: String) -> some View {
-        ZStack {
+        ZStack(alignment: .bottomTrailing) {
             AsyncImage(url: URL(string: profileUrl)) { image in
                 image.resizable()
             } placeholder: {
                 Circle()
                     .fill(Color(UIColor.systemGray2))
-                    .strokeBorder(.white, lineWidth: 4)
             }
             .scaledToFill()
-            .frame(width: 112, height: 112)
             .clipShape(Circle())
-            
+            .overlay {
+                Circle()
+                    .strokeBorder(.white, lineWidth: 4)
+            }
+            .frame(width: 112, height: 112)
+
             // 自分のプロフィールの場合のみ、プロフィール写真変更ボタンを表示
             if viewModel.isCurrentUser {
                 PhotosPicker(
@@ -199,51 +184,49 @@ extension ProfileView {
                     matching: .images,
                     photoLibrary: .shared()
                 ) {
-                    Image(systemName: "plus.circle.fill")
+                    Image(systemName: "pencil.circle.fill")
                         .resizable()
                         .frame(width: 24, height: 24)
-                        .foregroundColor(.blue)
-                        .background(Color.white)
-                        .clipShape(Circle())
-                        .offset(x: 35, y: 35)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, .blue)
+                        .padding(8)
                 }
             }
         }
     }
     
     // MARK: - フォロースタッツ部分（フォロワー/フォローの一覧画面に遷移）
-    private func followStatsView() -> some View {
+    private func followStatsView(user: User) -> some View {
         HStack(spacing: 10) {
-            Button {
-                print("DEBUG: フォロワーボタンタップ")
-                showFollowers = true
+            NavigationLink {
+                FollowersListView(userID: user.uid, router: router)
             } label: {
-                VStack {
+                VStack(spacing: 4) {
                     Text("フォロワー")
-                        .font(.callout)
-                        .fontWeight(.semibold)
+                        .font(.system(size: 8))
+
                     Text("\(viewModel.followersCount)") // ViewModel에서 가져옴
-                        .font(.title3)
-                        .fontWeight(.semibold)
+                        .font(.system(size: 19, weight: .medium))
                 }
                 .foregroundColor(.primary)
             }
-            
-            Button {
-                print("DEBUG: フォロー中ボタンタップ")
-                showFollowing = true
+            .hAlign(.center)
+
+            NavigationLink {
+                FollowingListView(userID: user.uid, router: router)
             } label: {
-                VStack {
+                VStack(spacing: 4) {
                     Text("フォロー中")
-                        .font(.callout)
-                        .fontWeight(.semibold)
+                        .font(.system(size: 8))
+
                     Text("\(viewModel.followingCount)") // ViewModel에서 가져옴
-                        .font(.title3)
-                        .fontWeight(.semibold)
+                        .font(.system(size: 19, weight: .medium))
                 }
                 .foregroundColor(.primary)
             }
+            .hAlign(.center)
         }
+        .padding(.vertical, 16)
     }
     
     // MARK: - プロフィールアクションボタン（編集/フォロー）
@@ -278,6 +261,7 @@ extension ProfileView {
             Text(user.name)
                 .font(.system(size: 27))
                 .fontWeight(.bold)
+                .lineLimit(1)
             if let birthday = user.birthday {
                 let age = Calendar.current.dateComponents([.year], from: birthday, to: Date()).year ?? 0
                 Text("\(age)歳 \(user.gender)")
@@ -290,5 +274,7 @@ extension ProfileView {
 }
 
 #Preview {
-    ProfileView(viewModel: ProfileViewModel(), router: Router())
+    NavigationStack {
+        ProfileView(viewModel: ProfileViewModel(user: User(uid: "previewUser1", email: "preview@example.com", name: "Preview Useraaaaa")), router: Router())
+    }
 }
