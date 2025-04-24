@@ -165,14 +165,20 @@ final class ProfileViewModel: ObservableObject {
     
     /// Repository를 통해 워크아웃 데이터를 불러옵니다.
     func fetchWorkouts() async {
-        guard let userID = user?.uid else { return }
+        guard let userID = user?.uid else {
+            print("ERROR: fetchWorkouts - 사용자 ID가 없습니다")
+            return 
+        }
+        
+        print("DEBUG: 사용자 ID: \(userID)의 워크아웃 데이터를 불러옵니다")
         do {
             let fetchedWorkouts = try await workoutRepository.fetchWorkouts(for: userID)
+            print("DEBUG: 워크아웃 \(fetchedWorkouts.count)개 로드 완료")
             DispatchQueue.main.async {
                 self.workouts = fetchedWorkouts
             }
         } catch {
-            print("Failed to fetch workouts: \(error)")
+            print("ERROR: 워크아웃 로드 실패: \(error)")
         }
     }
 }

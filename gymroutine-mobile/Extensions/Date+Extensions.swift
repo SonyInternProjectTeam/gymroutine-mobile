@@ -44,4 +44,11 @@ extension Date {
         formatter.dateFormat = "M月d日（EEE）"
         return formatter.string(from: self)
     }
+    
+    func weekdayString(localeIdentifier: String = "en_US_POSIX") -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: localeIdentifier)
+        dateFormatter.dateFormat = "EEEE"
+        return dateFormatter.string(from: self)
+    }
 }

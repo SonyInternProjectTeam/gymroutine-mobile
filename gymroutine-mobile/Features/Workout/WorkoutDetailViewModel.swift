@@ -17,7 +17,6 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     @Published var isWorkoutInProgress = false // 워크아웃 진행 중 여부
     @Published var workoutSessionViewModel: WorkoutSessionViewModel? // 워크아웃 세션 뷰모델 참조
     @Published var showMiniWorkoutSession = false // 최소화된 워크아웃 세션 표시 여부
-    
     // 휴식 시간 설정 관련 속성
     @Published var showRestTimeSettingsSheet = false
     @Published var selectedRestTimeIndex: Int? = nil
@@ -27,6 +26,15 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     private let service = WorkoutService()
     private let workoutManager = AppWorkoutManager.shared
+    private let userManager = UserManager.shared
+    
+    /// 현재 사용자가 워크아웃의 소유자인지 확인하는 속성
+    var isCurrentUser: Bool {
+        guard let currentUser = userManager.currentUser else {
+            return false
+        }
+        return workout.userId == currentUser.uid
+    }
     
     init(workout: Workout) {
         self.workout = workout
@@ -60,18 +68,31 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     /// 워크아웃 편집 액션 (예: 편집 화면으로 이동)
     func editWorkout() {
+        guard isCurrentUser else {
+            UIApplication.showBanner(type: .error, message: "他のユーザーのワークアウトは編集できません")
+            return
+        }
         // 편집 화면 표시
         showEditView = true
     }
     
     /// 새 운동 추가 액션
     func addExercise() {
+        guard isCurrentUser else {
+            UIApplication.showBanner(type: .error, message: "他のユーザーのワークアウトにエクササイズを追加できません")
+            return
+        }
         // 운동 검색 시트를 보여줌
         searchExercisesFlg = true
     }
     
     /// 워크아웃 시작 액션
     func startWorkout() {
+        guard isCurrentUser else {
+            UIApplication.showBanner(type: .error, message: "他のユーザーのワークアウトを実行できません")
+            return
+        }
+        
         print("📱 워크아웃 시작 버튼이 클릭되었습니다.")
         
         // data sync before start workout
@@ -130,6 +151,11 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     /// removeExercise도 오버라이드하여 Firestore에 업데이트
     override func removeExercise(_ workoutExercise: WorkoutExercise) {
+        guard isCurrentUser else {
+            UIApplication.showBanner(type: .error, message: "他のユーザーのワークアウトは編集できません")
+            return
+        }
+        
         super.removeExercise(workoutExercise)
         // 삭제 작업은 동기적으로 처리하여 바로 시작해도 반영되도록 함
         Task {
@@ -144,12 +170,22 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     /// 운동 세트 수정을 위한 메서드
     func onClickedExerciseSets(index: Int) {
+        guard isCurrentUser else {
+            UIApplication.showBanner(type: .error, message: "他のユーザーのワークアウトは編集できません")
+            return
+        }
+        
         selectedIndex = index
         editExerciseSetsFlg = true
     }
     
     /// 운동 세트가 변경되었을 때 Firestore에 저장
     func updateExerciseSetAndSave(for workoutExercise: WorkoutExercise) {
+        guard isCurrentUser else {
+            UIApplication.showBanner(type: .error, message: "他のユーザーのワークアウトは編集できません")
+            return
+        }
+        
         // 기존 코드에 더 명확한 로깅 추가
         print("🔍 세트 업데이트 전: \(workoutExercise.name)의 세트: \(workoutExercise.sets)")
         
@@ -169,6 +205,11 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     /// 휴식 시간 설정 모달을 표시
     func showRestTimeSettings(for index: Int) {
+        guard isCurrentUser else {
+            UIApplication.showBanner(type: .error, message: "他のユーザーのワークアウトは編集できません")
+            return
+        }
+        
         selectedRestTimeIndex = index
         showRestTimeSettingsSheet = true
     }

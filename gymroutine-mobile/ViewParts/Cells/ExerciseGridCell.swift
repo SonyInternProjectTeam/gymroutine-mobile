@@ -11,6 +11,7 @@ import SwiftUI
 struct ExerciseGridCell: View {
     
     let exercise: Exercise
+    let isReadOnly: Bool
     var onTapPlusButton: (() -> Void)?
 
     var body: some View {
@@ -29,13 +30,15 @@ struct ExerciseGridCell: View {
                         .foregroundColor(.secondary)
 
                     Spacer()
-
-                    Button {
-                        onTapPlusButton?()
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.headline)
-                            .foregroundStyle(.main)
+                    
+                    if !isReadOnly {
+                        Button {
+                            onTapPlusButton?()
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.headline)
+                                .foregroundStyle(.main)
+                        }
                     }
                 }
 
@@ -55,5 +58,5 @@ struct ExerciseGridCell: View {
 }
 
 #Preview {
-    ExerciseGridCell(exercise: .mock())
+    ExerciseGridCell(exercise: .mock(), isReadOnly: true)
 }
