@@ -127,7 +127,7 @@ final class HomeViewModel: ObservableObject {
             }
         }
     }
-    
+
     private func setupSubscribers() {
         // Subscribe to StoryService's friendsStories updates
         storyService.$friendsStories
@@ -144,7 +144,6 @@ final class HomeViewModel: ObservableObject {
         print("Updated active stories: \(activeStoriesByUserID.count) users have stories.")
     }
     
-    /// Load following users and trigger story fetching
     func loadFollowingUsers() {
         Task {
             UIApplication.showLoading()
@@ -156,7 +155,6 @@ final class HomeViewModel: ObservableObject {
             switch result {
             case .success(let users):
                 self.followingUsers = users
-                // Start realtime updates instead of one-time load
                 storyService.startRealtimeUpdates(userId: currentUserID)
             case .failure(let error):
                 print("Failed to load following users: \(error.localizedDescription)")
@@ -186,8 +184,6 @@ final class HomeViewModel: ObservableObject {
             self.selectedUserForStory = nil
         }
     }
-    
-    // Manual refresh for realtime updates
     func refreshStories() {
         guard let currentUserID = UserManager.shared.currentUser?.uid else { return }
         storyService.startRealtimeUpdates(userId: currentUserID)
@@ -211,8 +207,7 @@ final class HomeViewModel: ObservableObject {
             UIApplication.showLoading()
             do {
                 let workouts = try await workoutRepository.fetchWorkouts(for: currentUserID)
-                let todayString = getTodayWeekdayString()
-                // Filter workouts that include today's weekday in their scheduledDays array
+                let todayString = Date().weekdayString()
                 let filteredWorkouts = workouts.filter { $0.scheduledDays.contains(todayString) }
                 DispatchQueue.main.async {
                     self.todaysWorkouts = filteredWorkouts
@@ -224,7 +219,7 @@ final class HomeViewModel: ObservableObject {
             UIApplication.hideLoading()
         }
     }
-    
+
     /// Load heatmap data for the current user
     func loadHeatmapData() {
         guard let currentUserID = UserManager.shared.currentUser?.uid else {
@@ -266,14 +261,5 @@ final class HomeViewModel: ObservableObject {
                 UIApplication.hideLoading()
             }
         }
-    }
-    
-    /// Returns today's weekday as a string (e.g., "Monday")
-    private func getTodayWeekdayString() -> String {
-        let dateFormatter = DateFormatter()
-        // locale and dateFormat should match the format stored in workout documents
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "EEEE" // ex) "Monday", "Tuesday", ...
-        return dateFormatter.string(from: Date())
     }
 }

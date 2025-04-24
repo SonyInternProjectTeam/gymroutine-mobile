@@ -45,12 +45,12 @@ class WorkoutExercisesManager: ObservableObject {
             part: exercise.part,
             sets: [ExerciseSet(reps: 0, weight: 0)])
         exercises.append(newWorkoutExercise)
-        UIApplication.showBanner(type: .success, message: "\(LocalizedStringKey(exercise.name))を追加しました")
+        UIApplication.showBanner(type: .success, message: "\(exercise.name)を追加しました。")
     }
     
     func removeExercise(_ workoutExercise: WorkoutExercise) {
         exercises.removeAll { $0.id == workoutExercise.id }
-        UIApplication.showBanner(type: .notice, message: "\(LocalizedStringKey(workoutExercise.name))を削除しました")
+        UIApplication.showBanner(type: .notice, message: "\(workoutExercise.name)を削除しました。")
     }
     
     func updateExerciseSet(for workoutExercise: WorkoutExercise) {

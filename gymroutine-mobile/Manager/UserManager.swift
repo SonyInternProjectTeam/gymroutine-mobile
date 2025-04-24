@@ -189,9 +189,7 @@ final class UserManager: ObservableObject { // Make final
             return .failure(error)
         }
     }
-    
-    // TODO : Move these to a dedicated FollowService/Repository
-    // follower count
+
     func fetchFollowersCount(userId: String) async -> Int {
         do {
             // Consider adding error handling or returning Result<Int, Error>

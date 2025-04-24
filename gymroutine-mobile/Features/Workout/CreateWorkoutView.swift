@@ -35,7 +35,7 @@ struct CreateWorkoutView: View {
             .contentMargins(.top, 16)
             .contentMargins(.bottom, 80)
         }
-        .sheet(isPresented: $viewModel.searchExercisesFlg) {
+        .fullScreenCover(isPresented: $viewModel.searchExercisesFlg) {
             ExerciseSearchView(exercisesManager: viewModel)
                 .presentationDragIndicator(.visible)
         }

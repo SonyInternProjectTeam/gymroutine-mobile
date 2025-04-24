@@ -26,7 +26,7 @@ struct RootView: View {
             )
             
         case .main(_):
-            MainView(router: router).environmentObject(UserManager.shared)
+            MainView(router: router)
         }
     }
 }

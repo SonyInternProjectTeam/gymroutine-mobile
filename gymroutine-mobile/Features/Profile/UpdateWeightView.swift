@@ -2,7 +2,7 @@ import SwiftUI
 
 struct UpdateWeightView: View {
     @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var userManager: UserManager // Access user info
+    @ObservedObject private var userManager = UserManager.shared
     
     @State private var weightInput: String = ""
     @State private var isLoading: Bool = false
