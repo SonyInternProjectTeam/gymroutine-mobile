@@ -16,6 +16,7 @@ struct HomeView: View {
     @State private var isShowTodayworkouts = true
     @State private var createWorkoutFlg = false
     @State private var showingUpdateWeightSheet = false
+    @State private var isShowingOnboarding = false
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -62,35 +63,54 @@ struct HomeView: View {
         VStack(spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    // 현재 사용자 프로필 이미지 및 이름 표시 (Use FollowingUserIcon)
+                    // 현재 사용자 프로필 이미지 및 이름 표시 (항상 맨 왼쪽에 표시)
                     if let currentUser = userManager.currentUser {
-                        FollowingUserIcon(user: currentUser, hasActiveStory: viewModel.userHasActiveStory(userId: currentUser.uid))
+                        let hasActiveStory = viewModel.userHasActiveStory(userId: currentUser.uid)
+                        let isActive = viewModel.activeFollowingUsers.contains(where: { $0.uid == currentUser.uid })
+                        
+                        // 현재 사용자는 항상 표시
+                        FollowingUserIcon(user: currentUser, hasActiveStory: hasActiveStory, isActive: isActive)
                             .onTapGesture {
                                 viewModel.showStories(for: currentUser)
                             }
                     }
                     
-                    // 팔로우 중인 사용자들 표시 (Keep as is)
+                    // 팔로우 중인 사용자들 중 스토리가 있거나 활동 중인 사용자만 표시
                     ForEach(viewModel.followingUsers, id: \.uid) { user in
-                        FollowingUserIcon(user: user, hasActiveStory: viewModel.userHasActiveStory(userId: user.uid))
+                        let hasActiveStory = viewModel.userHasActiveStory(userId: user.uid)
+                        let isActive = viewModel.activeFollowingUsers.contains(where: { $0.uid == user.uid })
+                        
+                        if hasActiveStory || isActive {
+                            FollowingUserIcon(
+                                user: user, 
+                                hasActiveStory: hasActiveStory,
+                                isActive: isActive
+                            )
                             .onTapGesture {
                                 viewModel.showStories(for: user)
                             }
+                        }
                     }
                 }
             }
             .contentMargins(.horizontal, 16)
             
-            // TOOD: 現在運動してる人表示
-
-            // Label("現在\(viewModel.followingUsers.count)人が筋トレしています！", systemImage: "flame")
-            //     .fontWeight(.semibold)
-            //     .padding(.horizontal)
-            //     .padding(.vertical, 8)
-            //     .hAlign(.leading)
-            //     .background(Color.red.opacity(0.3))
+            // Display count of active users
+            if !viewModel.activeFollowingUsers.isEmpty {
+                Label("現在\(viewModel.activeFollowingUsers.count)人が筋トレしています！", systemImage: "flame")
+                    .fontWeight(.semibold)
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                    .hAlign(.leading)
+                    .background(Color.red.opacity(0.3))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
 
             Divider().padding(.bottom, 5)
+        }
+        .onAppear {
+            viewModel.setupActiveUsersRealTimeListener()
+            viewModel.forceCheckActiveUsers()
         }
     }
     
@@ -252,36 +272,54 @@ struct HomeView: View {
 struct FollowingUserIcon: View {
     let user: User
     let hasActiveStory: Bool
-
+    let isActive: Bool
+    
+    init(user: User, hasActiveStory: Bool, isActive: Bool = false) {
+        self.user = user
+        self.hasActiveStory = hasActiveStory
+        self.isActive = isActive
+    }
+    
     var body: some View {
         VStack {
-            ZStack {
-                // Placeholder or AsyncImage for profile photo
-                if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
-                    AsyncImage(url: url) { image in
-                        image.resizable().aspectRatio(contentMode: .fill).frame(width: 60, height: 60).clipShape(Circle())
-                    } placeholder: {
-                        Circle().fill(Color.gray.opacity(0.3)).frame(width: 60, height: 60)
-                    }
-                } else {
-                    Image(systemName: "person.circle.fill") // Fallback icon
+            ZStack(alignment: .topTrailing) {
+                // User profile image with story ring if hasActiveStory
+                AsyncImage(url: URL(string: user.profilePhoto)) { image in
+                    image
                         .resizable()
-                        .scaledToFit()
-                        .frame(width: 60, height: 60)
-                        .foregroundColor(.gray.opacity(0.5))
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .foregroundStyle(.gray)
                 }
-
-                // Story Border (Burning Effect)
-                if hasActiveStory {
+                .frame(width: 64, height: 64)
+                .clipShape(Circle())
+                .overlay(
                     Circle()
-                        .stroke(LinearGradient(gradient: Gradient(colors: [.yellow, .orange, .red]), startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 3)
-                        .frame(width: 65, height: 65)
+                        .stroke(hasActiveStory ? Color.blue : Color.clear, lineWidth: 3)
+                )
+                
+                // Flame icon for active users
+                if isActive {
+                    Image(systemName: "flame.fill")
+                        .foregroundStyle(.red)
+                        .font(.system(size: 20))
+                        .background(
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 20, height: 20)
+                        )
+                        .offset(x: 5, y: -5)
                 }
             }
+            
+            // User name
             Text(user.name)
                 .font(.caption)
+                .foregroundStyle(.primary)
                 .lineLimit(1)
-                .frame(width: 60) // Adjust width if needed
+                .frame(width: 70)
         }
     }
 }
