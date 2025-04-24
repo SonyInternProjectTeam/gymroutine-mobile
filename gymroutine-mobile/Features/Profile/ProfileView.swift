@@ -44,7 +44,28 @@ struct ProfileView: View {
                 // This prevents overwriting the profile when navigating from followers/following list
                 if viewModel.user == nil {
                     viewModel.loadUserData()
+                } else {
+                    // Always refresh workouts when view appears
+                    Task {
+                        await viewModel.fetchWorkouts()
+                    }
                 }
+                
+                // Add observer for workout deletion notification
+                NotificationCenter.default.addObserver(
+                    forName: .workoutDeleted,
+                    object: nil,
+                    queue: .main
+                ) { _ in
+                    // Refresh workouts when notification is received
+                    Task {
+                        await viewModel.fetchWorkouts()
+                    }
+                }
+            }
+            .onDisappear {
+                // Remove the observer when the view disappears
+                NotificationCenter.default.removeObserver(self, name: .workoutDeleted, object: nil)
             }
         }
     }
