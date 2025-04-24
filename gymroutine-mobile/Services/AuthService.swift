@@ -181,4 +181,22 @@ class AuthService {
             }
         }
     }
+    
+    /// Firebase Authentication - delete account
+    func deleteAccount() async -> Bool {
+        do {
+            guard let user = Auth.auth().currentUser else { return false }
+            try await user.delete()
+            // Sign out after deletion
+            try? Auth.auth().signOut()
+            Task { @MainActor in
+                UserManager.shared.currentUser = nil
+                UserManager.shared.isLoggedIn = false
+            }
+            return true
+        } catch {
+            print("Error deleting user: \(error)")
+            return false
+        }
+    }
 }

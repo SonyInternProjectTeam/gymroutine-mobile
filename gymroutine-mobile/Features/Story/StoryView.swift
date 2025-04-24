@@ -276,6 +276,10 @@ struct WorkoutResultDetailView: View {
                     Text("Total Duration: \(formatDuration(result.duration))")
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.8))
+
+                    Text("Rest Time: \(formatDuration(result.restTime ?? 0))")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.8))
                 }
                 .padding(.bottom, 4)
                 

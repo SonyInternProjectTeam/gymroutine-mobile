@@ -54,9 +54,10 @@ struct WorkoutExercise: Identifiable, Codable {
     var name: String           // 운동 이름 (예: "benchpress")
     var part: String           // 운동 부위 (예: "chest")
     var sets: [ExerciseSet]    // 각 세트의 정보 (예: [{ reps: 12, weight: 50 }, ...])
+    var restTime: Int?         // 휴식 시간 (초 단위), nil일 경우 기본값(90초) 사용
     
     private enum CodingKeys: String, CodingKey {
-        case name, part, sets
+        case id, name, part, sets, restTime
     }
     
     static func mock() -> WorkoutExercise {
@@ -67,7 +68,8 @@ struct WorkoutExercise: Identifiable, Codable {
                 ExerciseSet(reps: 12, weight: 50.0),
                 ExerciseSet(reps: 10, weight: 55.0),
                 ExerciseSet(reps: 8, weight: 60.0)
-            ]
+            ],
+            restTime: 90
         )
     }
 }

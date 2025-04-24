@@ -17,6 +17,12 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     @Published var isWorkoutInProgress = false // 워크아웃 진행 중 여부
     @Published var workoutSessionViewModel: WorkoutSessionViewModel? // 워크아웃 세션 뷰모델 참조
     @Published var showMiniWorkoutSession = false // 최소화된 워크아웃 세션 표시 여부
+    // 휴식 시간 설정 관련 속성
+    @Published var showRestTimeSettingsSheet = false
+    @Published var selectedRestTimeIndex: Int? = nil
+    
+    // 편집 화면 표시 플래그
+    @Published var showEditView = false
     
     private let service = WorkoutService()
     private let workoutManager = AppWorkoutManager.shared
@@ -53,8 +59,8 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     /// 워크아웃 편집 액션 (예: 편집 화면으로 이동)
     func editWorkout() {
-        // 실제 편집 로직 구현 (예: 편집 모드 전환 혹은 편집 화면으로 푸시)
-        print("Edit workout tapped")
+        // 편집 화면 표시
+        showEditView = true
     }
     
     /// 새 운동 추가 액션
@@ -65,8 +71,26 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     /// 워크아웃 시작 액션
     func startWorkout() {
-        print("📱 워크아웃 시작 버튼이 클릭되었습니다.")
-        workoutManager.startWorkout(workout: workout)
+        
+        // data sync before start workout
+        Task {
+            do {
+                // sync data before start workout
+                try await refreshWorkoutDataSync()
+                // start workout with latest data
+                workoutManager.startWorkout(workout: workout)
+                
+                // refresh data after workout (when come back from workout session) 
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    self.refreshWorkoutData()
+                    print("🔄 워크아웃 세션 후 데이터 새로고침 예약됨")
+                }
+            } catch {
+                print("🔥 워크아웃 시작 전 데이터 동기화 실패: \(error)")
+                // even if failed, start workout
+                workoutManager.startWorkout(workout: workout)
+            }
+        }
     }
     
     /// CreateWorkoutViewModel에서 상속받은 appendExercise 메서드를 오버라이드하여 
@@ -105,7 +129,15 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     /// removeExercise도 오버라이드하여 Firestore에 업데이트
     override func removeExercise(_ workoutExercise: WorkoutExercise) {
         super.removeExercise(workoutExercise)
-        saveExercisesToFirestore()
+        // 삭제 작업은 동기적으로 처리하여 바로 시작해도 반영되도록 함
+        Task {
+            do {
+                try await saveExercisesToFirestoreSync()
+                print("✅ 운동 삭제 후 즉시 Firestore 동기화 완료")
+            } catch {
+                print("🔥 운동 삭제 후 Firestore 동기화 실패: \(error)")
+            }
+        }
     }
     
     /// 운동 세트 수정을 위한 메서드
@@ -131,5 +163,75 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
         
         // 모달을 닫고 세트 값이 제대로 업데이트되었는지 확인
         editExerciseSetsFlg = false
+    }
+    
+    /// 휴식 시간 설정 모달을 표시
+    func showRestTimeSettings(for index: Int) {
+        selectedRestTimeIndex = index
+        showRestTimeSettingsSheet = true
+    }
+    
+    // 지정된 인덱스의 운동 휴식 시간 업데이트 및 저장
+    func updateRestTimeForExercise(at index: Int, seconds: Int) {
+        guard index >= 0 && index < exercises.count else {
+            print("🔥 Invalid index for updating rest time: \(index)")
+            return
+        }
+        
+        // 로컬 배열 업데이트 (exercises는 let이므로 직접 수정 불가, ViewModel의 exercises 사용)
+        var exerciseToUpdate = self.exercises[index]
+        exerciseToUpdate.restTime = seconds
+        self.exercises[index] = exerciseToUpdate // Update the ViewModel's @Published array
+        
+        print("🕒 Rest time for exercise '\(exerciseToUpdate.name)' updated locally to \(seconds)s. Saving to Firestore...")
+
+        // Firestore에 변경 사항 저장
+        saveExercisesToFirestore() 
+    }
+    
+    /// Firebase에 동기적으로 저장하는 메서드
+    private func saveExercisesToFirestoreSync() async throws {
+        guard let workoutId = workout.id else {
+            print("Error: Cannot update workout without ID")
+            throw NSError(domain: "WorkoutDetailViewModel", code: 1, userInfo: [NSLocalizedDescriptionKey: "워크아웃 ID가 없습니다."])
+        }
+        
+        UIApplication.showLoading()
+        let result = await service.updateWorkoutExercises(workoutID: workoutId, exercises: exercises)
+        UIApplication.hideLoading()
+        
+        switch result {
+        case .success():
+            print("✅ 워크아웃 exercises 동기적 업데이트 성공")
+            return
+        case .failure(let error):
+            print("🔥 워크아웃 exercises 동기적 업데이트 실패: \(error.localizedDescription)")
+            UIApplication.showBanner(type: .error, message: "エクササイズの更新に失敗しました")
+            throw error
+        }
+    }
+    
+    /// Firebase에서 동기적으로 데이터 새로고침
+    private func refreshWorkoutDataSync() async throws {
+        guard let workoutId = workout.id else {
+            print("Error: Cannot refresh workout without ID")
+            throw NSError(domain: "WorkoutDetailViewModel", code: 2, userInfo: [NSLocalizedDescriptionKey: "워크아웃 ID가 없습니다."])
+        }
+        
+        UIApplication.showLoading()
+        do {
+            let refreshedWorkout = try await service.fetchWorkoutById(workoutID: workoutId)
+            await MainActor.run {
+                self.workout = refreshedWorkout
+                self.exercises = refreshedWorkout.exercises
+                print("✅ 워크아웃 데이터 동기적 새로고침 완료")
+            }
+            UIApplication.hideLoading()
+        } catch {
+            UIApplication.hideLoading()
+            print("🔥 워크아웃 동기적 새로고침 실패: \(error.localizedDescription)")
+            UIApplication.showBanner(type: .error, message: "データの更新に失敗しました")
+            throw error
+        }
     }
 }

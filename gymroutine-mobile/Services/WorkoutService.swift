@@ -49,6 +49,11 @@ class WorkoutService {
                     "part": exercise.part
                 ]
                 
+                // Add restTime if available
+                if let restTime = exercise.restTime {
+                    exerciseDict["restTime"] = restTime
+                }
+                
                 // Convert sets to array of dictionaries
                 let setsArray = exercise.sets.map { set -> [String: Any] in
                     return [
@@ -73,12 +78,17 @@ class WorkoutService {
     
     /// 워크아웃에 운동을 추가하는 메서드 (새로운 운동 구조: name, part, 그리고 빈 Sets 배열)
     func addExerciseToWorkout(workoutID: String, exercise: WorkoutExercise, completion: @escaping (Bool) -> Void) {
-        let exerciseData: [String: Any] = [
+        var exerciseData: [String: Any] = [
             "id": exercise.id,         // 고유 ID 저장
             "name": exercise.name,
             "part": exercise.part,
-            "Sets": [] // 초기 세트 배열 (빈 배열)
+            "sets": []  // 초기 세트 배열 (빈 배열)
         ]
+        
+        // Add restTime if available
+        if let restTime = exercise.restTime {
+            exerciseData["restTime"] = restTime
+        }
         
         db.collection("Workouts").document(workoutID).updateData([
             "exercises": FieldValue.arrayUnion([exerciseData])
@@ -116,11 +126,11 @@ class WorkoutService {
     func fetchUserWorkouts(uid: String) async -> [Workout]? {
         let db = Firestore.firestore()
         let workoutsRef = db.collection("Workouts").whereField("userId", isEqualTo: uid)
-
+        
         do {
             let snapshot = try await workoutsRef.getDocuments()
             var workouts: [Workout] = []
-
+            
             for document in snapshot.documents {
                 do {
                     let workout = try document.data(as: Workout.self)
@@ -147,6 +157,19 @@ class WorkoutService {
             }
             let options = documents.map { $0.documentID }
             completion(options)
+        }
+    }
+    
+    /// 특정 트레인의 운동 목록 불러오기
+    func fetchExercises(for train: String, completion: @escaping ([String]) -> Void) {
+        db.collection("Trains").document(train).collection("exercises").getDocuments { (snapshot, error) in
+            guard let documents = snapshot?.documents, error == nil else {
+                print("Error fetching exercises: \(String(describing: error))")
+                completion([])
+                return
+            }
+            let exercises = documents.map { $0.documentID }
+            completion(exercises)
         }
     }
     
@@ -209,4 +232,41 @@ class WorkoutService {
     }
     
     // TODO: Consider adding a function to fetch all results for a given month or date range if needed for Calendar view etc.
+
+    // MARK: - Workout Update
+
+    /// ワークアウトの基本情報（名前、メモなど）を更新するメソッド
+    func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String]? = nil) async -> Result<Void, Error> {
+        do {
+            // 更新するフィールドのみを含める
+            var updateData: [String: Any] = [
+                "name": name
+            ]
+            
+            // メモがある場合は追加
+            if let notes = notes {
+                updateData["notes"] = notes
+            } else {
+                // メモがない場合はフィールドを削除
+                updateData["notes"] = FieldValue.delete()
+            }
+            
+            // ルーチンの曜日がある場合は追加
+            if let scheduledDays = scheduledDays {
+                updateData["scheduledDays"] = scheduledDays
+            }
+            
+            try await db.collection("Workouts").document(workoutID).updateData(updateData)
+            return .success(())
+        } catch {
+            print("🔥 ワークアウト情報の更新エラー: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+
+    /// ワークアウトのエクササイズ順序を並べ替えるメソッド
+    func reorderWorkoutExercises(workoutID: String, exercises: [WorkoutExercise]) async -> Result<Void, Error> {
+        // 以前のupdateWorkoutExercisesメソッドと同じ動作ですが、目的を明確にするために別メソッドとして実装
+        return await updateWorkoutExercises(workoutID: workoutID, exercises: exercises)
+    }
 }

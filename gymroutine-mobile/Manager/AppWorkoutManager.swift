@@ -8,7 +8,8 @@ struct WorkoutSessionModel {
     let startTime: Date
     var elapsedTime: TimeInterval
     var completedSets: Set<String> = [] // 완료된 세트 정보 ("exerciseIndex-setIndex")
-    // TODO: 필요에 따라 운동별 실제 수행 데이터 (무게, 횟수 등) 추가
+    var totalRestTime: TimeInterval = 0 // total rest time in seconds
+    // TODO: add actual exercise data (weight, reps, etc.) if needed
 }
 
 @MainActor
@@ -63,6 +64,11 @@ class AppWorkoutManager: ObservableObject {
         }
 
         print("▶️ AppWorkoutManager: 워크아웃 시작 - \(workout.name)")
+        // workoutId를 전달하여 WorkoutSessionViewModel 초기화
+        guard let workoutId = workout.id else {
+            print("🔥 워크아웃 ID가 없습니다.")
+            return
+        }
         let sessionViewModel = WorkoutSessionViewModel(workout: workout)
         self.workoutSessionViewModel = sessionViewModel
         self.currentWorkout = workout
@@ -71,6 +77,9 @@ class AppWorkoutManager: ObservableObject {
         self.showResultView = false // 결과 화면 숨김
         self.completedWorkoutSession = nil
         
+        // 워크아웃 세션 시작 (이제 init에서 처리됨)
+        // sessionViewModel.startFromBeginning()
+
         // 사용자 isActive 상태를 true로 업데이트
         Task {
             let result = await userManager.updateUserActiveStatus(isActive: true)
@@ -175,7 +184,7 @@ class AppWorkoutManager: ObservableObject {
         
         let workoutResult = WorkoutResultModel(
             duration: Int(session.elapsedTime),
-            restTime: nil,
+            restTime: Int(session.totalRestTime),
             workoutID: session.workout.id,
             exercises: exercisesResult,
             notes: notes.isEmpty ? nil : notes,
