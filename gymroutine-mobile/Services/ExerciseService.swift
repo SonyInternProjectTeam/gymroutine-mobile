@@ -9,49 +9,45 @@ import Foundation
 import FirebaseFirestore
 import Firebase
 
-class ExerciseService {
-    func fetchAllExercises(for options: [String], completion: @escaping ([Exercise]) -> Void) {
-        let db = Firestore.firestore()
-        var exercises: [Exercise] = []
-        let group = DispatchGroup() // ✅ 여러 Firestore 요청을 동기적으로 관리
+final class ExerciseService {
+    private let db = Firestore.firestore()
 
-        for option in options {
-            group.enter() // ✅ Firestore 요청 시작
-            db.collection("Trains").document(option).collection("exercises").getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error getting documents: \(error.localizedDescription)")
-                    group.leave() // 요청 종료
-                    return
-                }
-                snapshot?.documents.forEach { document in
-                    do {
-                        let exercise = try document.data(as: Exercise.self)
-                        exercises.append(exercise)
-                    } catch {
-                        print("Error decoding document: \(error.localizedDescription)")
-                    }
-                }
-                group.leave() // ✅ Firestore 요청 종료
-            }
+    // エクササイズのフェッチ、名前と部位で絞り込み可能
+    func fetchExercises(name: String? = nil, part: ExercisePart? = nil, limit: Int = 20 ) async -> Result<[Exercise], Error> {
+        var query: Query = db.collection("Exercises")
+        
+        if let name, !name.isEmpty {
+            // 前方一致
+            query = query.whereField("name", isGreaterThanOrEqualTo: name).whereField("name", isLessThanOrEqualTo: name + "\u{f8ff}")
         }
         
-        // ✅ 모든 Firestore 요청이 끝나면 실행
-        group.notify(queue: .main) {
-            completion(exercises)
+        if let part {
+            query = query.whereField("part", isEqualTo: part.rawValue)
+        }
+        
+        query = query.limit(to: limit)
+        
+        do {
+            let snapshot = try await query.getDocuments()
+            let exercises = try snapshot.documents.compactMap { doc in
+                try doc.data(as: Exercise.self)
+            }
+            
+            return .success(exercises)
+        } catch {
+            return .failure(error)
         }
     }
-
     
-    func fetchTrainParts(completion: @escaping ([String]) -> Void) {
-        let db = Firestore.firestore()
-        db.collection("Trains").getDocuments { (snapshot, error) in
-            guard let documents = snapshot?.documents, error == nil else {
-                print("Error fetching train options: \(String(describing: error))")
-                completion([])
-                return
-            }
-            let options = documents.map { $0.documentID }
-            completion(options)
+    // idからエクササイズを取得
+    func fetchExerciseById(id: String) async -> Result<Exercise, Error> {
+        let docRef = db.collection("Exercises").document(id)
+        
+        do {
+            let exercise = try await docRef.getDocument(as: Exercise.self)
+            return .success(exercise)
+        } catch {
+            return .failure(error)
         }
     }
 }

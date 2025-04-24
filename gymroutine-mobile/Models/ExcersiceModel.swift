@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 struct Exercise: Codable, Hashable {
-    var name: String = ""
-    var description: String = ""
-    var img: String = ""
-    var part: String = ""
+    @DocumentID var id: String?
+    let key: String
+    let name: String
+    let description: String
+    let part: String
     
     func toExercisePart() -> ExercisePart? {
         return ExercisePart(rawValue: part)
@@ -19,9 +21,9 @@ struct Exercise: Codable, Hashable {
 
     static func mock() -> Exercise{
         return Exercise(
+            key: "sample",
             name: "サンプルエクササイズ",
             description: "サンプルの部位を鍛えることができます",
-            img: "https://picsum.photos/200",
             part: ExercisePart.arm.rawValue
         )
     }

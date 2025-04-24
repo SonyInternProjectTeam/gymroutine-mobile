@@ -10,7 +10,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
-    @EnvironmentObject var userManager: UserManager
+    @ObservedObject private var userManager = UserManager.shared
     @ObservedObject private var workoutManager = AppWorkoutManager.shared
     
     @State private var isShowTodayworkouts = true
@@ -171,7 +171,7 @@ struct HomeView: View {
                 Text("\(user.name)の情報")
                     .font(.title2.bold())
                     .hAlign(.leading)
-                
+
                 HStack {
                     // Total Days
                     VStack(spacing: 16) {

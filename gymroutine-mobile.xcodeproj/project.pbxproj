@@ -54,7 +54,6 @@
 		00CDC44F2D845E8E003B18EB /* ExerciseSearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4022D845E8E003B18EB /* ExerciseSearchField.swift */; };
 		00CDC4502D845E8E003B18EB /* PasswordField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4032D845E8E003B18EB /* PasswordField.swift */; };
 		00CDC4512D845E8E003B18EB /* ProgressTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4052D845E8E003B18EB /* ProgressTabBar.swift */; };
-		00CDC4522D845E8E003B18EB /* ExercisePartToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4072D845E8E003B18EB /* ExercisePartToggle.swift */; };
 		00CDC4532D845E8E003B18EB /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC40A2D845E8E003B18EB /* FollowingListView.swift */; };
 		00CDC4542D845E8E003B18EB /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC40B2D845E8E003B18EB /* ProfileView.swift */; };
 		00CDC45A2D845E8E003B18EB /* WorkoutProcessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4122D845E8E003B18EB /* WorkoutProcessView.swift */; };
@@ -190,7 +189,6 @@
 		00CDC4022D845E8E003B18EB /* ExerciseSearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSearchField.swift; sourceTree = "<group>"; };
 		00CDC4032D845E8E003B18EB /* PasswordField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordField.swift; sourceTree = "<group>"; };
 		00CDC4052D845E8E003B18EB /* ProgressTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTabBar.swift; sourceTree = "<group>"; };
-		00CDC4072D845E8E003B18EB /* ExercisePartToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePartToggle.swift; sourceTree = "<group>"; };
 		00CDC40A2D845E8E003B18EB /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
 		00CDC40B2D845E8E003B18EB /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		00CDC4122D845E8E003B18EB /* WorkoutProcessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutProcessView.swift; sourceTree = "<group>"; };
@@ -463,7 +461,6 @@
 			isa = PBXGroup;
 			children = (
 				00CDC4852D87A608003B18EB /* CheckBoxStyle.swift */,
-				00CDC4072D845E8E003B18EB /* ExercisePartToggle.swift */,
 			);
 			path = Toggles;
 			sourceTree = "<group>";
@@ -949,7 +946,6 @@
 				00CDC4862D87A60D003B18EB /* CheckBoxStyle.swift in Sources */,
 				00CDC4502D845E8E003B18EB /* PasswordField.swift in Sources */,
 				00CDC4512D845E8E003B18EB /* ProgressTabBar.swift in Sources */,
-				00CDC4522D845E8E003B18EB /* ExercisePartToggle.swift in Sources */,
 				00CDC4532D845E8E003B18EB /* FollowingListView.swift in Sources */,
 				00CDC4542D845E8E003B18EB /* ProfileView.swift in Sources */,
 				00CDC45A2D845E8E003B18EB /* WorkoutProcessView.swift in Sources */,

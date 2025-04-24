@@ -137,6 +137,7 @@ struct WorkoutDetailView: View {
                     WorkoutExerciseCell(workoutExercise: workoutExercise, onRestTimeClicked: {
                         viewModel.showRestTimeSettings(for: index)
                     })
+                    
                         .onTapGesture {
                             viewModel.onClickedExerciseSets(index: index)
                         }
