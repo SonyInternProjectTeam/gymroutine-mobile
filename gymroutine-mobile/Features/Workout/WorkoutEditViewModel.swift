@@ -8,6 +8,7 @@ final class WorkoutEditViewModel: WorkoutExercisesManager {
     @Published var showExerciseSearch = false
     @Published var showError = false
     @Published var errorMessage = ""
+    @Published var showDeleteConfirmAlert = false // State for delete confirmation alert
     
     init(workout: Workout) {
         self.workout = workout
@@ -74,6 +75,30 @@ final class WorkoutEditViewModel: WorkoutExercisesManager {
         self.errorMessage = message
         self.showError = true
         UIApplication.showBanner(type: .error, message: "更新に失敗しました")
+    }
+    
+    // MARK: - Workout Deletion
+    
+    func deleteWorkout() async -> Bool {
+        UIApplication.showLoading()
+        guard let workoutId = workout.id else {
+            showError(message: "ワークアウトIDがありません")
+            UIApplication.hideLoading()
+            return false
+        }
+        
+        let result = await service.deleteWorkout(workoutID: workoutId)
+        UIApplication.hideLoading()
+        
+        switch result {
+        case .success:
+            print("✅ Successfully deleted workout: \(workoutId)")
+            UIApplication.showBanner(type: .success, message: "ワークアウトを削除しました")
+            return true // Indicate success
+        case .failure(let error):
+            showError(message: "ワークアウトの削除に失敗しました: \(error.localizedDescription)")
+            return false // Indicate failure
+        }
     }
     
     // WorkoutExercisesManagerのappendExerciseをオーバーライド
