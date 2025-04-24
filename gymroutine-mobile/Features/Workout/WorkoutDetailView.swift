@@ -7,9 +7,15 @@
 
 import SwiftUI
 
+// Add notification name for workout deletion
+extension Notification.Name {
+    static let workoutDeleted = Notification.Name("workoutDeleted")
+}
+
 struct WorkoutDetailView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel: WorkoutDetailViewModel
+    @State private var workoutDeleted = false // State to track deletion
     
     var body: some View {
         // NavigationStack(또는 NavigationView) 내부에서 뷰를 표시
@@ -50,8 +56,9 @@ struct WorkoutDetailView: View {
             // 오른쪽: "編集" 버튼
             ToolbarItem(placement: .navigationBarTrailing) {
                 if viewModel.isCurrentUser {
+                    // Use button to trigger sheet presentation instead of NavigationLink
                     Button("編集") {
-                        viewModel.editWorkout()
+                        viewModel.showEditView = true
                     }
                 }
             }
@@ -66,7 +73,7 @@ struct WorkoutDetailView: View {
             viewModel.refreshWorkoutData()
         } content: {
             NavigationView {
-                WorkoutEditView(workout: viewModel.workout)
+                WorkoutEditView(workout: viewModel.workout, workoutDeleted: $workoutDeleted)
             }
         }
         
@@ -87,6 +94,18 @@ struct WorkoutDetailView: View {
         .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { _ in
             print("⏱️ 주기적인 워크아웃 데이터 갱신")
             viewModel.refreshWorkoutData()
+        }
+        // Detect when deletion happens in EditView
+        .onChange(of: workoutDeleted) { deleted in
+            if deleted {
+                // Post notification when workout is deleted
+                NotificationCenter.default.post(
+                    name: .workoutDeleted, 
+                    object: nil,
+                    userInfo: ["workoutId": viewModel.workout.id ?? ""]
+                )
+                dismiss() // Dismiss DetailView when workout is deleted
+            }
         }
     }
     

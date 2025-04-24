@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WorkoutEditView: View {
     @Environment(\.dismiss) var dismiss
+    @Binding var workoutDeleted: Bool
     @StateObject var viewModel: WorkoutEditViewModel
     @State private var workoutName: String
     @State private var workoutNotes: String
@@ -12,12 +13,13 @@ struct WorkoutEditView: View {
     
     let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
     
-    init(workout: Workout) {
+    init(workout: Workout, workoutDeleted: Binding<Bool>) {
         let viewModel = WorkoutEditViewModel(workout: workout)
         self._viewModel = StateObject(wrappedValue: viewModel)
         self._workoutName = State(initialValue: workout.name)
         self._workoutNotes = State(initialValue: workout.notes ?? "")
         self._selectedDays = State(initialValue: workout.scheduledDays ?? [])
+        self._workoutDeleted = workoutDeleted
     }
     
     var body: some View {
@@ -42,11 +44,11 @@ struct WorkoutEditView: View {
             .contentMargins(.bottom, 80)
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
-        // 下部保存ボタン
-        .overlay(alignment: .bottom) {
-            buttonBox
-                .background(Color(UIColor.systemGray6))
-        }
+        // // 下部保存ボタン
+        // .overlay(alignment: .bottom) {
+        //     buttonBox
+        //         .background(Color(UIColor.systemGray6))
+        // }
         // ナビゲーションバー設定
         .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
@@ -82,6 +84,19 @@ struct WorkoutEditView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text(viewModel.errorMessage)
+        }
+        .alert("ワークアウト削除確認", isPresented: $viewModel.showDeleteConfirmAlert) {
+            Button("削除", role: .destructive) {
+                Task {
+                    if await viewModel.deleteWorkout() {
+                        workoutDeleted = true
+                        dismiss()
+                    }
+                }
+            }
+            Button("キャンセル", role: .cancel) { }
+        } message: {
+            Text("「\(workoutName)」を完全に削除しますか？この操作は取り消せません。")
         }
     }
     
@@ -189,30 +204,51 @@ struct WorkoutEditView: View {
                 .shadow(color: Color.black.opacity(0.05), radius: 1, y: 1)
                 .environment(\.editMode, .constant(.active))
             }
+            
+            // 削除ボタンセクション
+            deleteButtonSection
         }
     }
     
-    // 下部ボタン
-    private var buttonBox: some View {
-        VStack(spacing: 0) {
+    // 下部ボタン ()
+    // private var buttonBox: some View {
+    //     VStack(spacing: 0) {
+    //         Divider()
+    //         Button {
+    //             // エクササイズ追加シートを表示
+    //             viewModel.showExerciseSearch = true
+    //         } label: {
+    //             Label("エクササイズを追加", systemImage: "plus")
+    //                 .font(.headline)
+    //                 .frame(maxWidth: .infinity)
+    //                 .padding()
+    //         }
+    //         .buttonStyle(PrimaryButtonStyle())
+    //         .padding()
+    //     }
+    //     .sheet(isPresented: $viewModel.showExerciseSearch) {
+    //         // エクササイズ検索画面
+    //         ExerciseSearchView(exercisesManager: viewModel)
+    //             .presentationDragIndicator(.visible)
+    //     }
+    // }
+    
+    // 新しい削除ボタンセクション
+    private var deleteButtonSection: some View {
+        VStack(spacing: 16) {
             Divider()
-            Button {
-                // エクササイズ追加シートを表示
-                viewModel.showExerciseSearch = true
+            Button(role: .destructive) {
+                viewModel.showDeleteConfirmAlert = true // Show confirmation alert
             } label: {
-                Label("エクササイズを追加", systemImage: "plus")
+                Label("ワークアウト削除", systemImage: "trash")
                     .font(.headline)
+                    .foregroundColor(.red)
                     .frame(maxWidth: .infinity)
                     .padding()
             }
-            .buttonStyle(PrimaryButtonStyle())
-            .padding()
+            .padding([.horizontal, .bottom]) // Add padding
         }
-        .sheet(isPresented: $viewModel.showExerciseSearch) {
-            // エクササイズ検索画面
-            ExerciseSearchView(exercisesManager: viewModel)
-                .presentationDragIndicator(.visible)
-        }
+        .background(Color(UIColor.systemGray6))
     }
 }
 
@@ -229,7 +265,7 @@ struct WorkoutEditView_Previews: PreviewProvider {
                 isRoutine: true,
                 scheduledDays: ["Monday", "Wednesday", "Friday"],
                 exercises: [.mock(), .mock()]
-            ))
+            ), workoutDeleted: .constant(false))
         }
     }
 } 

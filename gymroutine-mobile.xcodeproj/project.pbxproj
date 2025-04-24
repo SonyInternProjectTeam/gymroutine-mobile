@@ -54,11 +54,9 @@
 		00CDC44F2D845E8E003B18EB /* ExerciseSearchField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4022D845E8E003B18EB /* ExerciseSearchField.swift */; };
 		00CDC4502D845E8E003B18EB /* PasswordField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4032D845E8E003B18EB /* PasswordField.swift */; };
 		00CDC4512D845E8E003B18EB /* ProgressTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4052D845E8E003B18EB /* ProgressTabBar.swift */; };
-		00CDC4532D845E8E003B18EB /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC40A2D845E8E003B18EB /* FollowingListView.swift */; };
 		00CDC4542D845E8E003B18EB /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC40B2D845E8E003B18EB /* ProfileView.swift */; };
 		00CDC45A2D845E8E003B18EB /* WorkoutProcessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4122D845E8E003B18EB /* WorkoutProcessView.swift */; };
 		00CDC45B2D845E8E003B18EB /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4142D845E8E003B18EB /* CalendarView.swift */; };
-		00CDC45C2D845E8E003B18EB /* FollowersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4152D845E8E003B18EB /* FollowersListView.swift */; };
 		00CDC45D2D845E8E003B18EB /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4162D845E8E003B18EB /* HomeView.swift */; };
 		00CDC45E2D845E8E003B18EB /* InitProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4172D845E8E003B18EB /* InitProfileSetupView.swift */; };
 		00CDC45F2D845E8E003B18EB /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4182D845E8E003B18EB /* LoginView.swift */; };
@@ -97,6 +95,8 @@
 		273750F82DB14902003D031D /* WeightHistoryGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273750F62DB14902003D031D /* WeightHistoryGraphView.swift */; };
 		273751362DB15132003D031D /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273751352DB1512B003D031D /* ProfileEditView.swift */; };
 		273751382DB15147003D031D /* ProfileEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273751372DB1513F003D031D /* ProfileEditViewModel.swift */; };
+		275100A02DBA237600116001 /* FollowersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2751009E2DBA237600116001 /* FollowersListView.swift */; };
+		275100A12DBA237600116001 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2751009F2DBA237600116001 /* FollowingListView.swift */; };
 		275C71532DACD2C300579962 /* GlobalWorkoutSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */; };
 		275C71612DAD432300579962 /* GlobalWorkoutSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C71602DAD432300579962 /* GlobalWorkoutSessionView.swift */; };
 		276F872D2DB1D98E00E8435E /* ResultService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276F872C2DB1D98E00E8435E /* ResultService.swift */; };
@@ -189,11 +189,9 @@
 		00CDC4022D845E8E003B18EB /* ExerciseSearchField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSearchField.swift; sourceTree = "<group>"; };
 		00CDC4032D845E8E003B18EB /* PasswordField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordField.swift; sourceTree = "<group>"; };
 		00CDC4052D845E8E003B18EB /* ProgressTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTabBar.swift; sourceTree = "<group>"; };
-		00CDC40A2D845E8E003B18EB /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
 		00CDC40B2D845E8E003B18EB /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		00CDC4122D845E8E003B18EB /* WorkoutProcessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutProcessView.swift; sourceTree = "<group>"; };
 		00CDC4142D845E8E003B18EB /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
-		00CDC4152D845E8E003B18EB /* FollowersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowersListView.swift; sourceTree = "<group>"; };
 		00CDC4162D845E8E003B18EB /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		00CDC4172D845E8E003B18EB /* InitProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitProfileSetupView.swift; sourceTree = "<group>"; };
 		00CDC4182D845E8E003B18EB /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -231,6 +229,8 @@
 		273750F62DB14902003D031D /* WeightHistoryGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightHistoryGraphView.swift; sourceTree = "<group>"; };
 		273751352DB1512B003D031D /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		273751372DB1513F003D031D /* ProfileEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewModel.swift; sourceTree = "<group>"; };
+		2751009E2DBA237600116001 /* FollowersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowersListView.swift; sourceTree = "<group>"; };
+		2751009F2DBA237600116001 /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
 		275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalWorkoutSessionView.swift; sourceTree = "<group>"; };
 		275C71602DAD432300579962 /* GlobalWorkoutSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalWorkoutSessionView.swift; sourceTree = "<group>"; };
 		276F872C2DB1D98E00E8435E /* ResultService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultService.swift; sourceTree = "<group>"; };
@@ -492,8 +492,6 @@
 			isa = PBXGroup;
 			children = (
 				00CDC4132D845E8E003B18EB /* Workout */,
-				00CDC40A2D845E8E003B18EB /* FollowingListView.swift */,
-				00CDC4152D845E8E003B18EB /* FollowersListView.swift */,
 				00CDC41A2D845E8E003B18EB /* PasswordResetView.swift */,
 			);
 			path = Views;
@@ -632,6 +630,8 @@
 		00CDC4742D8464B5003B18EB /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				2751009E2DBA237600116001 /* FollowersListView.swift */,
+				2751009F2DBA237600116001 /* FollowingListView.swift */,
 				273751372DB1513F003D031D /* ProfileEditViewModel.swift */,
 				273751352DB1512B003D031D /* ProfileEditView.swift */,
 				00CDC40B2D845E8E003B18EB /* ProfileView.swift */,
@@ -925,6 +925,8 @@
 				00CDC4412D845E8E003B18EB /* SignupViewModel.swift in Sources */,
 				00CDC4422D845E8E003B18EB /* SplashViewModel.swift in Sources */,
 				00CDC4442D845E8E003B18EB /* WorkoutProcessViewModel.swift in Sources */,
+				275100A02DBA237600116001 /* FollowersListView.swift in Sources */,
+				275100A12DBA237600116001 /* FollowingListView.swift in Sources */,
 				272779ED2DA8BD6E00166807 /* StoryModel.swift in Sources */,
 				00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */,
 				277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */,
@@ -946,12 +948,10 @@
 				00CDC4862D87A60D003B18EB /* CheckBoxStyle.swift in Sources */,
 				00CDC4502D845E8E003B18EB /* PasswordField.swift in Sources */,
 				00CDC4512D845E8E003B18EB /* ProgressTabBar.swift in Sources */,
-				00CDC4532D845E8E003B18EB /* FollowingListView.swift in Sources */,
 				00CDC4542D845E8E003B18EB /* ProfileView.swift in Sources */,
 				00CDC45A2D845E8E003B18EB /* WorkoutProcessView.swift in Sources */,
 				00CDC45B2D845E8E003B18EB /* CalendarView.swift in Sources */,
 				860018D02D9B72BA00C9F2C6 /* SnsViewModel.swift in Sources */,
-				00CDC45C2D845E8E003B18EB /* FollowersListView.swift in Sources */,
 				00CDC45D2D845E8E003B18EB /* HomeView.swift in Sources */,
 				00CDC45E2D845E8E003B18EB /* InitProfileSetupView.swift in Sources */,
 				00CDC45F2D845E8E003B18EB /* LoginView.swift in Sources */,

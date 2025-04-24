@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FollowersListView: View {
     let userID: String
+    let router: Router?
     @State private var followers: [User] = []
     @State private var errorMessage: String? = nil
     private let followService = FollowService()
@@ -21,7 +22,7 @@ struct FollowersListView: View {
                     .foregroundColor(.red)
             } else {
                 ForEach(followers, id: \.uid) { user in
-                    NavigationLink(destination: ProfileView(viewModel: ProfileViewModel(user: user), router: nil)) {
+                    NavigationLink(destination: ProfileView(viewModel: ProfileViewModel(user: user), router: router)) {
                         HStack {
                             if let url = URL(string: user.profilePhoto), !user.profilePhoto.isEmpty {
                                 AsyncImage(url: url) { image in

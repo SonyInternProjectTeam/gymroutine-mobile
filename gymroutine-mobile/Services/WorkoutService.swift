@@ -269,4 +269,17 @@ class WorkoutService {
         // 以前のupdateWorkoutExercisesメソッドと同じ動作ですが、目的を明確にするために別メソッドとして実装
         return await updateWorkoutExercises(workoutID: workoutID, exercises: exercises)
     }
+    
+    // MARK: - Workout Deletion
+    
+    /// Firestoreからワークアウトドキュメントを削除するメソッド
+    func deleteWorkout(workoutID: String) async -> Result<Void, Error> {
+        do {
+            try await db.collection("Workouts").document(workoutID).delete()
+            return .success(())
+        } catch {
+            print("🔥 ワークアウトの削除エラー (ID: \(workoutID)): \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
 }
