@@ -17,7 +17,6 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     @Published var isWorkoutInProgress = false // 워크아웃 진행 중 여부
     @Published var workoutSessionViewModel: WorkoutSessionViewModel? // 워크아웃 세션 뷰모델 참조
     @Published var showMiniWorkoutSession = false // 최소화된 워크아웃 세션 표시 여부
-    
     // 휴식 시간 설정 관련 속성
     @Published var showRestTimeSettingsSheet = false
     @Published var selectedRestTimeIndex: Int? = nil

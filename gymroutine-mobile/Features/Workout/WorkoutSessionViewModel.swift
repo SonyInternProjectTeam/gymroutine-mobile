@@ -27,7 +27,6 @@ final class WorkoutSessionViewModel: ObservableObject {
     @Published var remainingRestSeconds = 90
     private var restTimer: Timer?
     private var player: AVAudioPlayer?
-    
     // 총 휴식 시간 추적을 위한 변수
     private var restStartTime: Date?
     private var totalRestTime: TimeInterval = 0
@@ -197,7 +196,6 @@ final class WorkoutSessionViewModel: ObservableObject {
                 startRestTimer()
             }
         }
-        
         // 상태가 변경될 때마다 Firebase에 저장
         saveExercisesToFirestore()
     }
@@ -318,7 +316,6 @@ final class WorkoutSessionViewModel: ObservableObject {
         
         // 휴식 시작 시간 기록
         restStartTime = Date()
-        
         restTimer?.invalidate()
         restTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
             guard let self = self else {

@@ -79,7 +79,7 @@ class AppWorkoutManager: ObservableObject {
         
         // 워크아웃 세션 시작 (이제 init에서 처리됨)
         // sessionViewModel.startFromBeginning()
-        
+
         // 사용자 isActive 상태를 true로 업데이트
         Task {
             let result = await userManager.updateUserActiveStatus(isActive: true)

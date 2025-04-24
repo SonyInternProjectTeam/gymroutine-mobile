@@ -91,7 +91,7 @@ struct WorkoutSessionView: View {
             }
             
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { 
+                Button(action: {
                     // 워크아웃 종료 알림창 표시
                     showEndWorkoutAlert = true
                 }) {
@@ -345,7 +345,7 @@ struct WorkoutSessionView: View {
                     
                     // 운동 이미지와 진행률
                     exerciseProgressCircle(exercise: exercise)
-                    
+
                     // 휴식 시간 설정
                     restTimeSettingView(exercise: exercise)
                     
