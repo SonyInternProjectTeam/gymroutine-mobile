@@ -61,8 +61,10 @@ struct ProfileView: View {
                 }
             }
             .onAppear {
-                // Refresh user data when ProfileView appears (e.g., after returning from ProfileEditView)
-                viewModel.loadUserData()
+                // 현재 사용자의 프로필을 볼 때만 데이터를 새로고침합니다.
+                if viewModel.isCurrentUser {
+                    viewModel.loadUserData()
+                }
             }
         }
     }
