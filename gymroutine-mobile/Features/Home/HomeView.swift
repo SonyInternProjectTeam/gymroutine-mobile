@@ -63,18 +63,16 @@ struct HomeView: View {
         VStack(spacing: 16) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    // 현재 사용자 프로필 이미지 및 이름 표시 (Use FollowingUserIcon)
+                    // 현재 사용자 프로필 이미지 및 이름 표시 (항상 맨 왼쪽에 표시)
                     if let currentUser = userManager.currentUser {
                         let hasActiveStory = viewModel.userHasActiveStory(userId: currentUser.uid)
                         let isActive = viewModel.activeFollowingUsers.contains(where: { $0.uid == currentUser.uid })
                         
-                        // 현재 사용자는 스토리가 있거나 활동 중일 때만 표시
-                        if hasActiveStory || isActive {
-                            FollowingUserIcon(user: currentUser, hasActiveStory: hasActiveStory, isActive: isActive)
-                                .onTapGesture {
-                                    viewModel.showStories(for: currentUser)
-                                }
-                        }
+                        // 현재 사용자는 항상 표시
+                        FollowingUserIcon(user: currentUser, hasActiveStory: hasActiveStory, isActive: isActive)
+                            .onTapGesture {
+                                viewModel.showStories(for: currentUser)
+                            }
                     }
                     
                     // 팔로우 중인 사용자들 중 스토리가 있거나 활동 중인 사용자만 표시
