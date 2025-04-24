@@ -62,7 +62,9 @@ struct ProfileView: View {
             }
             .onAppear {
                 // Refresh user data when ProfileView appears (e.g., after returning from ProfileEditView)
-                viewModel.loadUserData()
+                if viewModel.isCurrentUser {
+                    viewModel.loadUserData()
+                }
             }
         }
     }

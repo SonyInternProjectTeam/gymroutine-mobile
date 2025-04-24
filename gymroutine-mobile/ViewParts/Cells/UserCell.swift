@@ -10,40 +10,32 @@ import SwiftUI
 struct UserCell: View {
     
     var recommendeduser: RecommendedUser
-    var user: User
-    let score: Int
-    
-    init(RecommendedUser: RecommendedUser) {
-        self.recommendeduser = RecommendedUser
-        self.user = RecommendedUser.user
-        self.score = RecommendedUser.score
-    }
-    
     
     var body: some View {
         NavigationLink {
-            ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
+            ProfileView(viewModel: ProfileViewModel(user: recommendeduser.user), router: nil)
         } label: {
             VStack {
                 HStack {
-                    ProfilePhoto(photourl: user.profilePhoto)
+                    ProfilePhoto(photourl: recommendeduser.user.profilePhoto)
                     VStack {
-                        if user.birthday != nil || !user.gender.isEmpty {
+                        if recommendeduser.user.birthday != nil || !recommendeduser.user.gender.isEmpty {
                             Text(getAgeAndGenderText())
                                 .font(.caption)
                                 .fontWeight(.thin)
                         }
-                        Text(user.name)
+                        Text(recommendeduser.user.name)
                             .font(.subheadline)
                             .fontWeight(.bold)
                     }
                     .frame(width: 56, height: 56)
                     .foregroundStyle(.black)
                 }
-                followButton()
-                    .frame(width: 130, height: 28)
+//                今回はProfileViewでフォローを行う
+//                followButton(viewModel:ProfileViewModel(user: recommendeduser.user))
+//                    .frame(width: 130, height: 28)
             }
-            .frame(width: 156,height: 116)
+            .frame(width: 156,height: 86)
             .background(Color.white)
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
@@ -54,7 +46,7 @@ struct UserCell: View {
         var result = ""
         
         // 생일이 있으면 나이 계산
-        if let birthday = user.birthday {
+        if let birthday = recommendeduser.user.birthday {
             let calendar = Calendar.current
             let ageComponents = calendar.dateComponents([.year], from: birthday, to: Date())
             if let age = ageComponents.year {
@@ -63,8 +55,8 @@ struct UserCell: View {
         }
         
         // 성별 추가
-        if !user.gender.isEmpty {
-            result += user.gender
+        if !recommendeduser.user.gender.isEmpty {
+            result += recommendeduser.user.gender
         }
         
         return result.trimmingCharacters(in: .whitespaces)
@@ -117,9 +109,9 @@ struct UserListView:View {
 
 
 @ViewBuilder
-private func followButton() -> some View {
+private func followButton(viewModel: ProfileViewModel) -> some View {
     Button(action: {
-        // フォロー処理
+        viewModel.follow()
     }) {
         Text("フォロー")
             .foregroundColor(.black)

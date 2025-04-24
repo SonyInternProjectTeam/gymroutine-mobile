@@ -136,67 +136,17 @@ struct SnsView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
                         ForEach(viewModel.recommendedUsers) { recommendedUser in
-//                            recommendedUserCell(for: recommendedUser)
-                            UserCell(RecommendedUser: recommendedUser)
+                            UserCell(recommendeduser: recommendedUser)
                         }
                     }
                     .padding(.leading, 16)
                     .padding(.trailing, 8)
+                    .padding(.vertical,8)
                 }
             }
 
             Spacer()
         }
-    }
-
-    /// 추천 사용자 셀 뷰
-    private func recommendedUserCell(for recommendedUser: RecommendedUser) -> some View {
-        let user = recommendedUser.user
-        
-        return NavigationLink {
-            ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
-        } label: {
-            VStack(alignment: .center, spacing: 8) {
-                ZStack(alignment: .bottomTrailing) {
-                    // 프로필 이미지
-                    profileImageView(for: user)
-                        .frame(width: 100, height: 100)
-                        .shadow(radius: 3)
-                    
-                    // 매칭 퍼센트 뱃지
-                    Text("\(recommendedUser.matchPercentage)%")
-                        .font(.caption)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(Color.blue)
-                        .clipShape(Capsule())
-                        .offset(x: 0, y: 3)
-                }
-                
-                // 사용자 이름
-                Text(user.name)
-                    .font(.headline)
-                    .lineLimit(1)
-                
-                // 추천 이유
-                Text(recommendedUser.recommendationReason)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.center)
-                    .frame(width: 120)
-            }
-            .frame(width: 130)
-            .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(UIColor.systemBackground))
-                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
     }
 
     /// 사용자의 프로필 정보를 표시하는 뷰 (필요에 따라 리팩토링)
