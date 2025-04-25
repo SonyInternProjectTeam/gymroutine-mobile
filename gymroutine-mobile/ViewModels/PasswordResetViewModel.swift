@@ -1,7 +1,3 @@
-
-
-
-
 import Foundation
 import FirebaseAuth
 import Combine
