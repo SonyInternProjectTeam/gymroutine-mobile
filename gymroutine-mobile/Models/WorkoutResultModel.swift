@@ -12,6 +12,7 @@ struct WorkoutResult: Codable, Identifiable {
     var duration: Int?
     var exercises: [ExerciseResult]?
     var memo: String?
+    var restTime: Int?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -22,6 +23,7 @@ struct WorkoutResult: Codable, Identifiable {
         case duration
         case exercises
         case memo = "notes"
+        case restTime
     }
 }
 

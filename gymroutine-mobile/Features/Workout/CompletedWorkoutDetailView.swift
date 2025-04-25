@@ -62,6 +62,9 @@ struct CompletedWorkoutDetailView: View {
                 durationView(duration: duration)
             }
             
+            if let restTime = result.restTime {
+                restTimeView(restTime: restTime)
+            }            
             // 세트 수 정보
             if let exercises = result.exercises {
                 totalSetsView(exercises: exercises)
@@ -103,6 +106,19 @@ struct CompletedWorkoutDetailView: View {
                 .font(.headline)
             Spacer()
             Text("\(duration / 60)分 \(duration % 60)秒")
+                .font(.body)
+        }
+        .padding(.horizontal)
+        .padding(.top, 4)
+    }
+
+    @ViewBuilder
+    private func restTimeView(restTime: Int) -> some View {
+        HStack {
+            Label("休憩時間", systemImage: "clock")
+                .font(.headline)
+            Spacer()
+            Text("\(restTime / 60)分 \(restTime % 60)秒")
                 .font(.body)
         }
         .padding(.horizontal)
