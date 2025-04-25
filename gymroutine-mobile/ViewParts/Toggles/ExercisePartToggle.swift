@@ -20,7 +20,7 @@ struct ExercisePartToggle: View {
     }
 
     var body: some View {
-        Text(partName)
+        Text(LocalizedStringKey(partName))
             .padding(.vertical, 8)
             .foregroundStyle(Color.black)
             .hAlign(.center)

@@ -21,16 +21,17 @@ class ExerciseSearchViewModel: ObservableObject {
     init() {
         fetchAll()
     }
+    
     func fetchAll() {
         service.fetchTrainParts { options in
             DispatchQueue.main.async {
                 self.trainOptions = options
-                self.fetchAllExercises(options:self.trainOptions)
+                self.fetchAllExercises(options: self.trainOptions)
             }
         }
     }
     
-    func fetchAllExercises(options:[String]) {
+    func fetchAllExercises(options: [String]) {
         service.fetchAllExercises(for: options) { exercises in
             DispatchQueue.main.async {
                 self.allExercises = exercises
@@ -67,25 +68,27 @@ class ExerciseSearchViewModel: ObservableObject {
     }
     
     func toggleExercisePart(part: ExercisePart) {
-        if let index =  selectedExerciseParts.firstIndex(of: part) {
+        if let index = selectedExerciseParts.firstIndex(of: part) {
             selectedExerciseParts.remove(at: index)
         } else {
             selectedExerciseParts.append(part)
         }
     }
     
-    func onTapExercisePartToggle(part: ExercisePart){
+    func onTapExercisePartToggle(part: ExercisePart) {
         toggleExercisePart(part: part)
         searchExercisePart()
     }
-
+    
+    // 수정된 onTapExercisePlusButton: Exercise 객체를 받아 WorkoutExercise를 생성하여 추가합니다.
     func onTapExercisePlusButton(workoutID: String, exercise: Exercise) {
-        addExerciseToWorkout(
-            workoutID: workoutID,
-            exerciseName: exercise.name,
-            part: exercise.part
-        ) { success in
-            // TODO: 画面遷移
+        let newWorkoutExercise = WorkoutExercise(
+            id: UUID().uuidString,
+            name: exercise.name,
+            part: exercise.part,
+            sets: [] // 초기 세트 배열은 빈 배열
+        )
+        addExerciseToWorkout(workoutID: workoutID, exercise: newWorkoutExercise) { success in
             if success {
                 print("운동 추가 성공 ✅")
             } else {
@@ -93,12 +96,9 @@ class ExerciseSearchViewModel: ObservableObject {
             }
         }
     }
-
-    func addExerciseToWorkout(workoutID: String, exerciseName: String, part: String, completion: @escaping (Bool) -> Void) {
-        workoutService.addExerciseToWorkout(workoutID: workoutID, exerciseName: exerciseName, part: part) { success in
-            DispatchQueue.main.async {
-                completion(success) // UI 업데이트를 위해 메인 스레드에서 실행
-            }
-        }
+    
+    // 수정된 addExerciseToWorkout: WorkoutExercise 객체를 전달합니다.
+    func addExerciseToWorkout(workoutID: String, exercise: WorkoutExercise, completion: @escaping (Bool) -> Void) {
+        workoutService.addExerciseToWorkout(workoutID: workoutID, exercise: exercise, completion: completion)
     }
 }

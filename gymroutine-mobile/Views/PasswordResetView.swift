@@ -21,6 +21,7 @@ struct PasswordResetView: View {
             }
             .padding(.bottom, 16)
             .padding([.top, .horizontal], 24)
+            .background()
             .navigationTitle("パスワードのリセット")
             .navigationBarTitleDisplayMode(.inline)
         }
@@ -62,10 +63,7 @@ struct PasswordResetView: View {
 
     private var resetStatusMessage: some View {
         Group {
-            if let errorMessage = viewModel.errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-            } else if viewModel.isResetLinkSent {
+            if viewModel.isResetLinkSent {
                 Text("リセットリンクを送信しました。メールを確認してください。")
                     .foregroundColor(.green)
             }
