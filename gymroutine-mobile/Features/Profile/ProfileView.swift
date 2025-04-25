@@ -71,7 +71,6 @@ struct ProfileView: View {
     }
     
     // MARK: - Private Helper Views
-    
     private func profileContentView(user: User) -> some View {
         ScrollView {
             VStack(spacing: 24) {
@@ -93,7 +92,8 @@ struct ProfileView: View {
                 followStatsView(user: user)
             }
             .padding(.horizontal, 8)
-            .frame(height: 280, alignment: .bottom)
+            // 上段の空白の高さを調整
+            .frame(height: 220, alignment: .bottom)
             .background(
                 LinearGradient(
                     gradient: Gradient(stops: [
