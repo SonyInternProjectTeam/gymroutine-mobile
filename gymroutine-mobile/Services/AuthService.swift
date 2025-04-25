@@ -199,4 +199,34 @@ class AuthService {
             return false
         }
     }
+    
+    func sendPasswordReset(email: String, birthday: Date, completion: @escaping (Result<Void, Error>) -> Void) {
+        self.db.collection("Users").whereField("email", isEqualTo: email).getDocuments { (snapshot, error) in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let documents = snapshot?.documents, documents.count == 1,
+                  let data = documents.first?.data(),
+                  let storedBirthday = (data["birthday"] as? Timestamp)?.dateValue() else {
+                completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))
+                return
+            }
+            
+            let calendar = Calendar.current
+            if !calendar.isDate(storedBirthday, inSameDayAs: birthday) {
+                completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))
+                return
+            }
+            
+            Auth.auth().sendPasswordReset(withEmail: email) { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(()))
+                }
+            }
+        }
+    }
 }
