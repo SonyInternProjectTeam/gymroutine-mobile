@@ -283,7 +283,7 @@ struct FollowingUserIcon: View {
     var body: some View {
         VStack {
             ZStack(alignment: .topTrailing) {
-                ProfileIcon(profileUrl: user.profilePhoto, size: .medium)
+                ProfileIcon(profileUrl: user.profilePhoto, size: .medium1)
                     .overlay(
                         Circle()
                             .stroke(hasActiveStory ? Color.blue : Color.clear, lineWidth: 3)

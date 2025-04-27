@@ -14,13 +14,15 @@ struct ProfileIcon: View {
 
     enum SizeType {
         case large  // ProfileView
-        case medium // FollowersList, FollowingList, HomeView etc...
+        case medium1 // HomeView etc...
+        case medium2    // FollowersList, FollowingList etc...
         case small  // StoryView
 
         var dimension: CGFloat {
             switch self {
             case .large: return 112
-            case .medium: return 64
+            case .medium1: return 64
+            case .medium2: return 48
             case .small: return 32
             }
         }
@@ -28,14 +30,14 @@ struct ProfileIcon: View {
         var borderColor: Color {
             switch self {
             case .large: return .white
-            case .medium, .small: return Color.gray.opacity(0.5)
+            case .medium1, .medium2, .small: return Color.gray.opacity(0.5)
             }
         }
 
         var lineWidth: CGFloat {
             switch self {
             case .large: return 4
-            case .medium, .small: return 1
+            case .medium1, .medium2, .small: return 1
             }
         }
     }
@@ -70,14 +72,18 @@ struct ProfileIcon: View {
         VStack {
             ProfileIcon(profileUrl: "https://firebasestorage.googleapis.com:443/v0/b/gymroutine-b7b6c.appspot.com/o/profile_photos%2FAhGAfsGPU8cwvsONT2duSFcQGdJ2.jpg?alt=media&token=ff276c63-7f22-46d4-86bb-7afaab1ab933", size: .small)
 
-            ProfileIcon(profileUrl: "https://firebasestorage.googleapis.com:443/v0/b/gymroutine-b7b6c.appspot.com/o/profile_photos%2FAhGAfsGPU8cwvsONT2duSFcQGdJ2.jpg?alt=media&token=ff276c63-7f22-46d4-86bb-7afaab1ab933", size: .medium)
+            ProfileIcon(profileUrl: "https://firebasestorage.googleapis.com:443/v0/b/gymroutine-b7b6c.appspot.com/o/profile_photos%2FAhGAfsGPU8cwvsONT2duSFcQGdJ2.jpg?alt=media&token=ff276c63-7f22-46d4-86bb-7afaab1ab933", size: .medium2)
+
+            ProfileIcon(profileUrl: "https://firebasestorage.googleapis.com:443/v0/b/gymroutine-b7b6c.appspot.com/o/profile_photos%2FAhGAfsGPU8cwvsONT2duSFcQGdJ2.jpg?alt=media&token=ff276c63-7f22-46d4-86bb-7afaab1ab933", size: .medium1)
 
             ProfileIcon(profileUrl: "https://firebasestorage.googleapis.com:443/v0/b/gymroutine-b7b6c.appspot.com/o/profile_photos%2FAhGAfsGPU8cwvsONT2duSFcQGdJ2.jpg?alt=media&token=ff276c63-7f22-46d4-86bb-7afaab1ab933", size: .large)
         }
         VStack {
             ProfileIcon(profileUrl: "", size: .small)
 
-            ProfileIcon(profileUrl: "", size: .medium)
+            ProfileIcon(profileUrl: "", size: .medium2)
+
+            ProfileIcon(profileUrl: "", size: .medium1)
 
             ProfileIcon(profileUrl: "", size: .large)
         }
