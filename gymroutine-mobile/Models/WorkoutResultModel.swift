@@ -83,6 +83,18 @@ struct ExerciseResultModel: Codable, Hashable {
     let exerciseName: String
     let setsCompleted: Int
     let sets: [SetResultModel]
+    
+    static var mock: ExerciseResultModel {
+        ExerciseResultModel(
+            exerciseName: "ベンチプレス",
+            setsCompleted: 3,
+            sets: [
+                SetResultModel(Reps: 10, Weight: 50.0),
+                SetResultModel(Reps: 8, Weight: 55.0),
+                SetResultModel(Reps: 6, Weight: 60.0)
+            ]
+        )
+    }
 }
 
 // 注意: このモデルは古い構造です。代わりにWorkoutResultを使用してください

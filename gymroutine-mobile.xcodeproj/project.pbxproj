@@ -75,6 +75,8 @@
 		00CDC4902D87B17A003B18EB /* ExerciseGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */; };
 		00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */; };
 		00D3E1BF2DBDD8D300590F92 /* WorkoutSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D3E1BE2DBDD8D300590F92 /* WorkoutSortView.swift */; };
+		00D3E1C12DBE321B00590F92 /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D3E1C02DBE321600590F92 /* Int+Extensions.swift */; };
+		00D3E1C32DBE334300590F92 /* ExerciseResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D3E1C22DBE334300590F92 /* ExerciseResultCell.swift */; };
 		271A76992DAEA87C00C294D5 /* HeatmapCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A76982DAEA87C00C294D5 /* HeatmapCalendarView.swift */; };
 		271A769B2DAEA88A00C294D5 /* HeatmapRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A769A2DAEA88A00C294D5 /* HeatmapRepository.swift */; };
 		271A769D2DAEA89100C294D5 /* HeatmapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A769C2DAEA89100C294D5 /* HeatmapService.swift */; };
@@ -213,6 +215,8 @@
 		00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseGridCell.swift; sourceTree = "<group>"; };
 		00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseCell.swift; sourceTree = "<group>"; };
 		00D3E1BE2DBDD8D300590F92 /* WorkoutSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSortView.swift; sourceTree = "<group>"; };
+		00D3E1C02DBE321600590F92 /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
+		00D3E1C22DBE334300590F92 /* ExerciseResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseResultCell.swift; sourceTree = "<group>"; };
 		271A76982DAEA87C00C294D5 /* HeatmapCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapCalendarView.swift; sourceTree = "<group>"; };
 		271A769A2DAEA88A00C294D5 /* HeatmapRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapRepository.swift; sourceTree = "<group>"; };
 		271A769C2DAEA89100C294D5 /* HeatmapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapService.swift; sourceTree = "<group>"; };
@@ -336,6 +340,7 @@
 		00CDC3D42D845E8E003B18EB /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				00D3E1C02DBE321600590F92 /* Int+Extensions.swift */,
 				0074075F2D9BC74A00808964 /* Array+Extensions.swift */,
 				0074075D2D9BC70900808964 /* Date+Extensions.swift */,
 				00CDC3D32D845E8E003B18EB /* View+Extensions.swift */,
@@ -435,6 +440,7 @@
 				00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */,
 				00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */,
 				79EE75972D9D0932004A5B27 /* ExerciseImageCell.swift */,
+				00D3E1C22DBE334300590F92 /* ExerciseResultCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -898,6 +904,7 @@
 			files = (
 				00CDC4282D845E8E003B18EB /* gymroutine_mobileApp.swift in Sources */,
 				00CDC4292D845E8E003B18EB /* Router.swift in Sources */,
+				00D3E1C32DBE334300590F92 /* ExerciseResultCell.swift in Sources */,
 				00CDC42A2D845E8E003B18EB /* View+Extensions.swift in Sources */,
 				00CDC42B2D845E8E003B18EB /* UserManager.swift in Sources */,
 				275C71612DAD432300579962 /* GlobalWorkoutSessionView.swift in Sources */,
@@ -1003,6 +1010,7 @@
 				00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */,
 				00CDC4662D845E8E003B18EB /* SplashView.swift in Sources */,
 				00CDC4672D845E8E003B18EB /* WelcomeView.swift in Sources */,
+				00D3E1C12DBE321B00590F92 /* Int+Extensions.swift in Sources */,
 				27D6A86B2D9D9AA3004D3F2B /* AppWorkoutManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
