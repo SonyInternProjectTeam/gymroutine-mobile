@@ -74,6 +74,7 @@
 		00CDC4882D87A699003B18EB /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4872D87A699003B18EB /* ExerciseDetailView.swift */; };
 		00CDC4902D87B17A003B18EB /* ExerciseGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */; };
 		00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */; };
+		00D3E1BF2DBDD8D300590F92 /* WorkoutSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D3E1BE2DBDD8D300590F92 /* WorkoutSortView.swift */; };
 		271A76992DAEA87C00C294D5 /* HeatmapCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A76982DAEA87C00C294D5 /* HeatmapCalendarView.swift */; };
 		271A769B2DAEA88A00C294D5 /* HeatmapRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A769A2DAEA88A00C294D5 /* HeatmapRepository.swift */; };
 		271A769D2DAEA89100C294D5 /* HeatmapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A769C2DAEA89100C294D5 /* HeatmapService.swift */; };
@@ -211,6 +212,7 @@
 		00CDC4872D87A699003B18EB /* ExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailView.swift; sourceTree = "<group>"; };
 		00CDC48F2D87B17A003B18EB /* ExerciseGridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseGridCell.swift; sourceTree = "<group>"; };
 		00CDC4912D87F0CD003B18EB /* WorkoutExerciseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExerciseCell.swift; sourceTree = "<group>"; };
+		00D3E1BE2DBDD8D300590F92 /* WorkoutSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSortView.swift; sourceTree = "<group>"; };
 		271A76982DAEA87C00C294D5 /* HeatmapCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapCalendarView.swift; sourceTree = "<group>"; };
 		271A769A2DAEA88A00C294D5 /* HeatmapRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapRepository.swift; sourceTree = "<group>"; };
 		271A769C2DAEA89100C294D5 /* HeatmapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapService.swift; sourceTree = "<group>"; };
@@ -684,6 +686,7 @@
 			children = (
 				27361FED2D9B858800457D2C /* WorkoutDetailViewModel.swift */,
 				27361FEB2D9B858100457D2C /* WorkoutDetailView.swift */,
+				00D3E1BE2DBDD8D300590F92 /* WorkoutSortView.swift */,
 			);
 			path = WorkoutDetail;
 			sourceTree = "<group>";
@@ -963,6 +966,7 @@
 				27361FEE2D9B858800457D2C /* WorkoutDetailViewModel.swift in Sources */,
 				00CDC44B2D845E8E003B18EB /* SelectableButtonStyle.swift in Sources */,
 				275C71532DACD2C300579962 /* GlobalWorkoutSessionView.swift in Sources */,
+				00D3E1BF2DBDD8D300590F92 /* WorkoutSortView.swift in Sources */,
 				007407602D9BC75000808964 /* Array+Extensions.swift in Sources */,
 				003AF5DA2D8BE9F60019B3AF /* UIApplication+Extensions.swift in Sources */,
 				00CDC44C2D845E8E003B18EB /* WorkoutCell.swift in Sources */,

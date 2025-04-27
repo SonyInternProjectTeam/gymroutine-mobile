@@ -14,7 +14,7 @@ extension Notification.Name {
 
 struct WorkoutDetailView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject var viewModel: WorkoutDetailViewModel
+    @ObservedObject var viewModel: WorkoutDetailViewModel
     @State private var workoutDeleted = false // State to track deletion
     
     var body: some View {
@@ -37,22 +37,10 @@ struct WorkoutDetailView: View {
             buttonBox
                 .background(Color(UIColor.systemGray6))
         }
-        // **기본 백 버튼 숨김 + Inline Title**
-        .navigationBarBackButtonHidden(true)
+        .navigationTitle("ワークアウト詳細")
         .navigationBarTitleDisplayMode(.inline)
         // Toolbar로 커스텀 구성
         .toolbar {
-            // 왼쪽: 커스텀 Back 버튼 + 타이틀
-            ToolbarItem(placement: .navigationBarLeading) {
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(.blue)
-                    }
-                    Text("ワークアウト詳細")
-                        .font(.headline)
-                }
-            }
             // 오른쪽: "編集" 버튼
             ToolbarItem(placement: .navigationBarTrailing) {
                 if viewModel.isCurrentUser {
@@ -62,6 +50,14 @@ struct WorkoutDetailView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $viewModel.workoutSortFlg, onDismiss: {
+            viewModel.refreshWorkoutData()
+        }) {
+            WorkoutSortView()
+                .environmentObject(viewModel)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $viewModel.searchExercisesFlg) {
             ExerciseSearchView(exercisesManager: viewModel)
@@ -90,11 +86,6 @@ struct WorkoutDetailView: View {
             print("📱 앱이 활성화되어 워크아웃 데이터 갱신")
             viewModel.refreshWorkoutData()
         }
-        // 주기적으로 데이터 새로고침 (30초마다)
-        .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { _ in
-            print("⏱️ 주기적인 워크아웃 데이터 갱신")
-            viewModel.refreshWorkoutData()
-        }
         // Detect when deletion happens in EditView
         .onChange(of: workoutDeleted) { deleted in
             if deleted {
@@ -111,8 +102,14 @@ struct WorkoutDetailView: View {
     
     private var workoutInfoBox: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(viewModel.workout.name)
-                .font(.title2.bold())
+            HStack(spacing: 16) {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(.gray)
+                    .frame(width: 8)
+                
+                Text(viewModel.workout.name)
+                    .font(.title2.bold())
+            }
             
             // Display scheduled days if it's a routine
             if viewModel.workout.isRoutine && !viewModel.workout.scheduledDays.isEmpty {
@@ -137,8 +134,18 @@ struct WorkoutDetailView: View {
     
     private var exercisesBox: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("エクササイズ")
-                .font(.headline)
+            HStack {
+                Text("エクササイズ")
+                    .font(.headline)
+                Spacer()
+                if viewModel.isCurrentUser {
+                    Button(action: {
+                        viewModel.workoutSortFlg = true
+                    }, label: {
+                        Text("並び替え")
+                    })
+                }
+            }
             
             ForEach(Array(viewModel.exercises.enumerated()), id: \.element.id) { index, workoutExercise in
                 HStack {
@@ -173,7 +180,7 @@ struct WorkoutDetailView: View {
                                         .font(.headline)
                                         .foregroundStyle(.white)
                                         .padding(8)
-                                        .background(.red .opacity(0.5))
+                                        .background(.red)
                                         .clipShape(Circle())
                                         .padding(10)
                                 })
@@ -241,5 +248,11 @@ struct WorkoutDetailView: View {
             }
             .padding()
         }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: Workout.mock))
     }
 }
