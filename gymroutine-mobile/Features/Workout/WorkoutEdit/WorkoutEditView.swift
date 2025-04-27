@@ -18,7 +18,7 @@ struct WorkoutEditView: View {
         self._viewModel = StateObject(wrappedValue: viewModel)
         self._workoutName = State(initialValue: workout.name)
         self._workoutNotes = State(initialValue: workout.notes ?? "")
-        self._selectedDays = State(initialValue: workout.scheduledDays ?? [])
+        self._selectedDays = State(initialValue: workout.scheduledDays)
         self._workoutDeleted = workoutDeleted
     }
     
@@ -26,29 +26,25 @@ struct WorkoutEditView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 24) {
-                    // ワークアウト名
-                    workoutInfoBox
+                    nameBox
+                    
+                    notesBox
                     
                     // ルーチン曜日（ルーチンの場合のみ表示）
                     if viewModel.workout.isRoutine {
                         routineDaysBox
                     }
                     
-                    // エクササイズリスト（ドラッグ可能）
-                    exercisesBox
+                    deleteButtonSection
                 }
                 .padding()
             }
+            .scrollDismissesKeyboard(.immediately)
             .background(Color.gray.opacity(0.1))
             .contentMargins(.top, 16)
             .contentMargins(.bottom, 80)
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
-        // // 下部保存ボタン
-        // .overlay(alignment: .bottom) {
-        //     buttonBox
-        //         .background(Color(UIColor.systemGray6))
-        // }
         // ナビゲーションバー設定
         .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
@@ -100,35 +96,36 @@ struct WorkoutEditView: View {
         }
     }
     
-    // ワークアウト基本情報（名前、メモ）
-    private var workoutInfoBox: some View {
-        VStack(spacing: 16) {
-            // ワークアウト名フィールド
-            VStack(alignment: .leading, spacing: 8) {
-                Text("ワークアウト名")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-                
-                TextField("ワークアウト名を入力", text: $workoutName)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .shadow(color: Color.black.opacity(0.05), radius: 1, y: 1)
-            }
+    private var nameBox: some View {
+        VStack(alignment: .leading) {
+            Text("ワークアウト名")
+                .font(.headline)
             
-            // メモフィールド
-            VStack(alignment: .leading, spacing: 8) {
-                Text("メモ")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-                
-                TextEditor(text: $workoutNotes)
-                    .padding(4)
-                    .frame(height: 100)
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .shadow(color: Color.black.opacity(0.05), radius: 1, y: 1)
-            }
+            TextField("ワークアウト名を入力", text: $workoutName)
+                .fieldBackground()
+                .submitLabel(.done)
+                .clipped()
+                .shadow(radius: 1)
+        }
+    }
+    
+    private var notesBox: some View {
+        VStack(alignment: .leading) {
+            Text("メモ")
+                .font(.headline)
+            
+            TextField(
+                "メモを残す...",
+                text: $workoutNotes,
+                axis: .vertical
+            )
+            .submitLabel(.done)
+            .frame(maxHeight: 248)
+            .padding(12)
+            .background(Color(UIColor.systemGray6))
+            .clipShape(.rect(cornerRadius: 10))
+            .clipped()
+            .shadow(radius: 1)
         }
     }
     
@@ -166,72 +163,6 @@ struct WorkoutEditView: View {
             .shadow(color: Color.black.opacity(0.05), radius: 1, y: 1)
         }
     }
-    
-    // エクササイズリスト（ドラッグで順序変更可能）
-    private var exercisesBox: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("エクササイズ")
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
-            // エクササイズがない場合
-            if viewModel.exercises.isEmpty {
-                Text("エクササイズがありません")
-                    .foregroundColor(.gray)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(8)
-                    .shadow(color: Color.black.opacity(0.05), radius: 1, y: 1)
-            } else {
-                // エクササイズリスト（ドラッグ可能）
-                List {
-                    ForEach(Array(viewModel.exercises.enumerated()), id: \.element.id) { index, exercise in
-                        WorkoutListCell(
-                            index: index + 1,
-                            exercise: exercise,
-                            showDragHandle: false
-                        )
-                    }
-                    .onMove { from, to in
-                        viewModel.moveExercise(from: from, to: to)
-                    }
-                }
-                .listStyle(PlainListStyle())
-                .frame(minHeight: CGFloat(viewModel.exercises.count * 80))
-                .background(Color.white)
-                .cornerRadius(8)
-                .shadow(color: Color.black.opacity(0.05), radius: 1, y: 1)
-                .environment(\.editMode, .constant(.active))
-            }
-            
-            // 削除ボタンセクション
-            deleteButtonSection
-        }
-    }
-    
-    // 下部ボタン ()
-    // private var buttonBox: some View {
-    //     VStack(spacing: 0) {
-    //         Divider()
-    //         Button {
-    //             // エクササイズ追加シートを表示
-    //             viewModel.showExerciseSearch = true
-    //         } label: {
-    //             Label("エクササイズを追加", systemImage: "plus")
-    //                 .font(.headline)
-    //                 .frame(maxWidth: .infinity)
-    //                 .padding()
-    //         }
-    //         .buttonStyle(PrimaryButtonStyle())
-    //         .padding()
-    //     }
-    //     .sheet(isPresented: $viewModel.showExerciseSearch) {
-    //         // エクササイズ検索画面
-    //         ExerciseSearchView(exercisesManager: viewModel)
-    //             .presentationDragIndicator(.visible)
-    //     }
-    // }
     
     // 新しい削除ボタンセクション
     private var deleteButtonSection: some View {
