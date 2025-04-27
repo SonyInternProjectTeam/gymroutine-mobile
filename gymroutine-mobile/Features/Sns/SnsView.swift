@@ -13,8 +13,10 @@ struct SnsView: View {
     @State private var searchMode: Bool = false
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 0) {
             searchBarView
+
+            Divider()
 
             if searchMode {
                 searchResultsView
@@ -52,37 +54,44 @@ struct SnsView: View {
                         isFocused = false
                         searchMode = false
                         viewModel.searchName = ""
+                        viewModel.lastSearchedName = ""
                         viewModel.userDetails = []
                     }
                 }
             }
         }
         .padding(.horizontal, 16)
+        .padding(.bottom, 16)
     }
 
     private var searchResultsView: some View {
         Group {
             // 검색 결과 / 오류 / 결과 없음 표시
             if let errorMessage = viewModel.errorMessage {
-                Text("Error: \(errorMessage)")
-                    .foregroundColor(.red)
+                Text("\(errorMessage)")
+                    .foregroundColor(.secondary)
                     .padding()
                     .vAlign(.top)
-            } else if viewModel.userDetails.isEmpty {
-                Text("No results found")
-                    .foregroundColor(.gray)
+            } else if viewModel.userDetails.isEmpty && !viewModel.lastSearchedName.isEmpty {
+                Text("「\(viewModel.lastSearchedName)」に一致するユーザーがいません")
+                    .foregroundColor(.secondary)
                     .padding()
                     .vAlign(.top)
             } else {
-                List(viewModel.userDetails, id: \.uid) { user in
-                    NavigationLink {
-                        ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
-                    } label: {
-                        userProfileView(for: user)
+                ScrollView {
+                    LazyVStack {
+                        ForEach(viewModel.userDetails, id: \.uid) { user in
+                            NavigationLink {
+                                ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
+                            } label: {
+                                UserCell(user: user)
+                            }
+                        }
                     }
                 }
             }
         }
+        .contentMargins(.top, 16)
     }
 
     private var recommendedUsersView: some View {
@@ -147,19 +156,9 @@ struct SnsView: View {
 
             Spacer()
         }
+        .padding(.top, 16)
     }
 
-    /// 사용자의 프로필 정보를 표시하는 뷰 (필요에 따라 리팩토링)
-    private func userProfileView(for user: User) -> some View {
-        HStack {
-            profileImageView(for: user)
-                .frame(width: 50, height: 50)
-            
-            Text(user.name)
-                .font(.headline)
-        }
-    }
-    
     /// 프로필 이미지 뷰
     private func profileImageView(for user: User) -> some View {
         Group {
