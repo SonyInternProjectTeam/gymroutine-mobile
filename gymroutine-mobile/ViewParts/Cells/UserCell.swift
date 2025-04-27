@@ -14,13 +14,32 @@ struct UserCell: View {
     let user: User
 
     var body: some View {
-        HStack {
-            ProfileIcon(profileUrl: user.profilePhoto, size: .medium)
+        HStack(spacing: 12) {
+            ProfileIcon(profileUrl: user.profilePhoto, size: .medium2)
+
             Text(user.name)
+                .font(.headline)
+                .foregroundColor(.primary)
+                .lineLimit(2)
         }
+        .hAlign(.leading)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
     }
 }
 
 #Preview {
-    UserCell(user: User(uid: "previewUser1", email: "preview@example.com", name: "Preview User"))
+    NavigationStack {
+        ScrollView {
+            VStack(spacing: 0) {
+                ForEach(1..<11) { i in
+                    NavigationLink(destination: {Text("a")}) {
+                        UserCell(user: User(uid: "previewUser1", email: "preview@example.com", name: "Preview User"))
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.mainBackground)
+    }
 }
