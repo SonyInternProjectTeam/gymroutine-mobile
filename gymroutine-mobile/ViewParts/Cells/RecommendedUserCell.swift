@@ -17,7 +17,7 @@ struct RecommendedUserCell: View {
         } label: {
             VStack {
                 HStack {
-                    ProfilePhoto(photourl: recommendeduser.user.profilePhoto)
+                    ProfileIcon(profileUrl: recommendeduser.user.profilePhoto, size: .medium)
                     VStack {
                         if recommendeduser.user.birthday != nil || !recommendeduser.user.gender.isEmpty {
                             Text(getAgeAndGenderText())
