@@ -283,23 +283,12 @@ struct FollowingUserIcon: View {
     
     var body: some View {
         VStack {
-            ZStack(alignment: .bottomTrailing) {
-                // User profile image with story ring if hasActiveStory
-                AsyncImage(url: URL(string: user.profilePhoto)) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .foregroundStyle(.gray)
-                }
-                .frame(width: 70, height: 70)
-                .clipShape(Circle())
-                .overlay(
-                    Circle()
-                        .stroke(hasActiveStory ? .main : .clear, lineWidth: 4)
-                )
+            ZStack(alignment: .topTrailing) {
+                ProfileIcon(profileUrl: user.profilePhoto, size: .medium1)
+                    .overlay(
+                        Circle()
+                            .stroke(hasActiveStory ? Color.blue : Color.clear, lineWidth: 4)
+                    )
                 
                 // Flame icon for active users
                 if isActive {

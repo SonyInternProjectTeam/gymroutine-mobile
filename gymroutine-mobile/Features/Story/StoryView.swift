@@ -108,27 +108,7 @@ struct StoryView: View {
                 destination: ProfileView(viewModel: ProfileViewModel(user: viewModel.user), router: nil)
                 , label: {
                     HStack {
-                        Group {
-                            if let profileUrl = URL(string: viewModel.user.profilePhoto), !viewModel.user.profilePhoto.isEmpty {
-                                AsyncImage(url: profileUrl) { image in
-                                    image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 36, height: 36)
-                                        .clipShape(Circle())
-                                } placeholder: {
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.3))
-                                        .frame(width: 36, height: 36)
-                                }
-                            } else {
-                                Image(systemName: "person.circle.fill")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 36, height: 36)
-                                    .foregroundColor(.white.opacity(0.8))
-                            }
-                        }
+                        ProfileIcon(profileUrl: viewModel.user.profilePhoto, size: .small)
                         
                         VStack(alignment: .leading, spacing: 2) {
                             Text(viewModel.user.name)

@@ -17,15 +17,9 @@ extension View {
         self
             .frame(maxHeight: .infinity, alignment: alignment)
     }
-
-    @ViewBuilder
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape(RoundedCorner(radius: radius, corners: corners))
-    }
 }
 
 // MARK: - modifier
-
 extension View {
     func fieldBackground() -> some View {
         self
@@ -36,14 +30,24 @@ extension View {
                     .cornerRadius(10)
             )
     }
+
+    func blinking(duration: Double = 1) -> some View {
+        modifier(BlinkViewModifier(duration: duration))
+    }
 }
 
-struct RoundedCorner: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
+// MARK: - スケルトン
+struct BlinkViewModifier: ViewModifier {
+    let duration: Double
+    @State private var blinking: Bool = false
 
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
+    func body(content: Content) -> some View {
+        content
+            .opacity(blinking ? 0.3 : 1)
+            .animation(.easeInOut(duration: duration).repeatForever(), value: blinking)
+            .onAppear {
+                // Animation will only start when blinking value changes
+                blinking.toggle()
+            }
     }
 }
