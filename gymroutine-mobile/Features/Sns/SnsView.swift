@@ -96,7 +96,7 @@ struct SnsView: View {
 
     private var recommendedUsersView: some View {
         // 추천 사용자 영역
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(spacing: 10) {
             HStack {
                 Image(systemName: "person.2")
                 Text("おすすめユーザー")
@@ -125,6 +125,7 @@ struct SnsView: View {
                 }
             } else if let error = viewModel.recommendationsError {
                 Text(error)
+                    .hAlign(.center)
                     .foregroundColor(.red)
                     .font(.subheadline)
                     .padding(.horizontal, 16)
@@ -145,7 +146,7 @@ struct SnsView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
                         ForEach(viewModel.recommendedUsers) { recommendedUser in
-                            RecommendedUserCell(recommendeduser: recommendedUser)
+                            RecommendedUserCell(user: recommendedUser.user)
                         }
                     }
                     .padding(.leading, 16)
