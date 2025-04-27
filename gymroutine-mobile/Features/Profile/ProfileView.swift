@@ -208,7 +208,7 @@ extension ProfileView {
     private func followStatsView(user: User) -> some View {
         HStack(spacing: 10) {
             NavigationLink {
-                FollowersListView(userID: user.uid, router: router)
+                FollowListView(userID: user.uid, listType: .followers, router: router)
             } label: {
                 VStack(spacing: 4) {
                     Text("フォロワー")
@@ -222,7 +222,7 @@ extension ProfileView {
             .hAlign(.center)
 
             NavigationLink {
-                FollowingListView(userID: user.uid, router: router)
+                FollowListView(userID: user.uid, listType: .following, router: router)
             } label: {
                 VStack(spacing: 4) {
                     Text("フォロー中")
