@@ -253,6 +253,7 @@ struct ExerciseSearchView: View {
                             isReadOnly: isReadOnly,
                             onAddButtonTapped: {
                                 exercisesManager.appendExercise(exercise: exercise)
+                                dismiss()
                             }
                         )
                     } label: {
@@ -261,6 +262,7 @@ struct ExerciseSearchView: View {
                             isReadOnly: isReadOnly,
                             onTapPlusButton: {
                                 exercisesManager.appendExercise(exercise: exercise)
+                                dismiss()
                             })
                     }
                 }

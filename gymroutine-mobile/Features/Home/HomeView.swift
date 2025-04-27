@@ -253,7 +253,7 @@ struct HomeView: View {
             Button {
                 createWorkoutFlg.toggle()
             } label: {
-                Label("ルーティーン追加", systemImage: "plus")
+                Label("ワークアウト作成", systemImage: "plus")
             }
             .buttonStyle(SecondaryButtonStyle())
             

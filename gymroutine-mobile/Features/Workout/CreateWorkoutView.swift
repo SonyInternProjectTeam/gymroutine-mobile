@@ -31,13 +31,13 @@ struct CreateWorkoutView: View {
                 }
                 .padding()
             }
+            .scrollDismissesKeyboard(.immediately)
             .background(Color.gray.opacity(0.1))
             .contentMargins(.top, 16)
             .contentMargins(.bottom, 80)
         }
         .fullScreenCover(isPresented: $viewModel.searchExercisesFlg) {
             ExerciseSearchView(exercisesManager: viewModel)
-                .presentationDragIndicator(.visible)
         }
         .overlay(alignment: .bottom) {
             buttonBox
@@ -117,11 +117,18 @@ extension CreateWorkoutView {
             Text("メモ")
                 .font(.headline)
             
-            TextField("追加情報を入力する...", text: $viewModel.notes, axis: .vertical)
-                .fieldBackground()
-                .submitLabel(.done)
-                .clipped()
-                .shadow(radius: 1)
+            TextField(
+                "メモを残す...",
+                text: $viewModel.notes,
+                axis: .vertical
+            )
+            .submitLabel(.done)
+            .frame(maxHeight: 248)
+            .padding(12)
+            .background(Color(UIColor.systemGray6))
+            .clipShape(.rect(cornerRadius: 10))
+            .clipped()
+            .shadow(radius: 1)
         }
     }
     
@@ -157,7 +164,7 @@ extension CreateWorkoutView {
                                     .font(.headline)
                                     .foregroundStyle(.white)
                                     .padding(8)
-                                    .background(.red .opacity(0.5))
+                                    .background(.red)
                                     .clipShape(Circle())
                                     .padding(10)
                             })
