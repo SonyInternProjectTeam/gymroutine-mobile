@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UserCell: View {
+struct RecommendedUserCell: View {
     
     var recommendeduser: RecommendedUser
     
