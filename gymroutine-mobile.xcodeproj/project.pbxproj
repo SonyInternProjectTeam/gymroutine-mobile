@@ -644,21 +644,18 @@
 		00CDC47D2D85C1FB003B18EB /* Workout */ = {
 			isa = PBXGroup;
 			children = (
+				00D3E1BD2DBDCBBB00590F92 /* WorkoutEdit */,
+				00D3E1BC2DBDCA7300590F92 /* WorkoutDetail */,
+				00D3E1BB2DBDCA5B00590F92 /* CreateWorkout */,
 				276F87762DB2957000E8435E /* EditSetView.swift */,
 				276F87742DB28EBF00E8435E /* RestTimeSettingsView.swift */,
 				276F87302DB1DA7100E8435E /* CompletedWorkoutDetailView.swift */,
-				27277A162DABA83B00166807 /* WorkoutEditView.swift */,
-				27277A172DABA83B00166807 /* WorkoutEditViewModel.swift */,
 				275C71602DAD432300579962 /* GlobalWorkoutSessionView.swift */,
 				275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */,
 				277739FB2DA5EF4D0006397D /* WorkoutResultView.swift */,
 				27D6A86C2D9D9ABE004D3F2B /* MiniWorkoutView.swift */,
 				27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */,
 				27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */,
-				27361FED2D9B858800457D2C /* WorkoutDetailViewModel.swift */,
-				27361FEB2D9B858100457D2C /* WorkoutDetailView.swift */,
-				00CDC4802D85C3FC003B18EB /* CreateWorkoutViewModel.swift */,
-				00CDC47E2D85C218003B18EB /* CreateWorkoutView.swift */,
 			);
 			path = Workout;
 			sourceTree = "<group>";
@@ -671,6 +668,33 @@
 				009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */,
 			);
 			path = Exercise;
+			sourceTree = "<group>";
+		};
+		00D3E1BB2DBDCA5B00590F92 /* CreateWorkout */ = {
+			isa = PBXGroup;
+			children = (
+				00CDC4802D85C3FC003B18EB /* CreateWorkoutViewModel.swift */,
+				00CDC47E2D85C218003B18EB /* CreateWorkoutView.swift */,
+			);
+			path = CreateWorkout;
+			sourceTree = "<group>";
+		};
+		00D3E1BC2DBDCA7300590F92 /* WorkoutDetail */ = {
+			isa = PBXGroup;
+			children = (
+				27361FED2D9B858800457D2C /* WorkoutDetailViewModel.swift */,
+				27361FEB2D9B858100457D2C /* WorkoutDetailView.swift */,
+			);
+			path = WorkoutDetail;
+			sourceTree = "<group>";
+		};
+		00D3E1BD2DBDCBBB00590F92 /* WorkoutEdit */ = {
+			isa = PBXGroup;
+			children = (
+				27277A162DABA83B00166807 /* WorkoutEditView.swift */,
+				27277A172DABA83B00166807 /* WorkoutEditViewModel.swift */,
+			);
+			path = WorkoutEdit;
 			sourceTree = "<group>";
 		};
 		272779E72DA8BAD700166807 /* Story */ = {
