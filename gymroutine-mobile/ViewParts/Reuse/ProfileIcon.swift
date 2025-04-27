@@ -43,7 +43,7 @@ struct ProfileIcon: View {
     var body: some View {
         Group {
             if let url = URL(string: profileUrl), !profileUrl.isEmpty {
-                AsyncImage(url: URL(string: profileUrl)) { image in
+                AsyncImage(url: url) { image in
                     image.resizable()
                 } placeholder: {
                     Color(.init(gray: 0.8, alpha: 1.0))
