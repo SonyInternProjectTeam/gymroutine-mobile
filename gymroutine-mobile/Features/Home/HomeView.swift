@@ -282,12 +282,12 @@ struct FollowingUserIcon: View {
     }
     
     var body: some View {
-        VStack {
-            ZStack(alignment: .topTrailing) {
+        VStack(spacing: 12) {
+            ZStack(alignment: .bottomTrailing) {
                 ProfileIcon(profileUrl: user.profilePhoto, size: .medium1)
                     .overlay(
                         Circle()
-                            .stroke(hasActiveStory ? Color.blue : Color.clear, lineWidth: 4)
+                            .stroke(hasActiveStory ? .main : .clear, lineWidth: 4)
                     )
                 
                 // Flame icon for active users
