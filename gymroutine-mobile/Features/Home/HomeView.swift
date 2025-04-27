@@ -93,17 +93,18 @@ struct HomeView: View {
                     }
                 }
             }
+            .contentMargins(.vertical, 4)
             .contentMargins(.horizontal, 16)
             
             // Display count of active users
             if !viewModel.activeFollowingUsers.isEmpty {
-                Label("現在\(viewModel.activeFollowingUsers.count)人が筋トレしています！", systemImage: "flame")
+                Label("現在\(viewModel.activeFollowingUsers.count)名が筋トレしています！", systemImage: "flame")
+                    .foregroundStyle(.white)
                     .fontWeight(.semibold)
                     .padding(.horizontal)
                     .padding(.vertical, 8)
                     .hAlign(.leading)
-                    .background(Color.red.opacity(0.3))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .background(Color.red.gradient)
             }
 
             Divider().padding(.bottom, 5)
@@ -253,7 +254,7 @@ struct HomeView: View {
             Button {
                 createWorkoutFlg.toggle()
             } label: {
-                Label("ルーティーン追加", systemImage: "plus")
+                Label("ワークアウト作成", systemImage: "plus")
             }
             .buttonStyle(SecondaryButtonStyle())
             
@@ -286,20 +287,17 @@ struct FollowingUserIcon: View {
                 ProfileIcon(profileUrl: user.profilePhoto, size: .medium1)
                     .overlay(
                         Circle()
-                            .stroke(hasActiveStory ? Color.blue : Color.clear, lineWidth: 3)
+                            .stroke(hasActiveStory ? Color.blue : Color.clear, lineWidth: 4)
                     )
                 
                 // Flame icon for active users
                 if isActive {
                     Image(systemName: "flame.fill")
-                        .foregroundStyle(.red)
-                        .font(.system(size: 20))
-                        .background(
-                            Circle()
-                                .fill(Color.white)
-                                .frame(width: 20, height: 20)
-                        )
-                        .offset(x: 5, y: -5)
+                        .font(.system(size: 14))
+                        .foregroundStyle(.orange.gradient)
+                        .padding(8)
+                        .background(Circle().fill(.main))
+                        .offset(x: 4, y: 4)
                 }
             }
             

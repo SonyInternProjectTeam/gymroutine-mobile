@@ -3,207 +3,150 @@ import FirebaseFirestore // Import Firestore to use Timestamp
 // import Kingfisher // Assuming you use Kingfisher for image loading
 
 struct StoryView: View {
-    @StateObject var viewModel: StoryViewModel
+    @ObservedObject var viewModel: StoryViewModel
     @Environment(\.dismiss) var dismiss // To close the view
-    @State private var progressValue: CGFloat = 0
-    @State private var timer: Timer? = nil
-    @State private var storyDuration: Double = 5.0 // 5 seconds per story
     
     // UI관련 상태 변수
     @State private var showCloseButton = true
     @State private var showControls = true
     
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                // Progress Indicators
-                HStack(spacing: 4) {
-                    ForEach(0..<viewModel.stories.count, id: \.self) { index in
-                        StoryProgressBar(
-                            progress: index == viewModel.currentStoryIndex ? progressValue : (index < viewModel.currentStoryIndex ? 1 : 0)
-                        )
-                    }
+        NavigationStack {
+            VStack {
+                VStack(spacing: 16) {
+                    progressBarBox
+                    
+                    userHeaderBox
                 }
-                .padding(.top, 10)
-                .padding(.horizontal, 12)
+                .padding()
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.black.opacity(0.3), .clear]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
                 
-                // User Header
-                HStack(spacing: 12) {
-                    ProfileIcon(profileUrl: viewModel.user.profilePhoto, size: .small)
+                contentBox()
+            }
+            .background(Color.gray.opacity(0.1))
+            .statusBar(hidden: true)
+            .edgesIgnoringSafeArea(.all)
+            .onReceive(viewModel.viewDismissalModePublisher) { shouldDismiss in
+                if shouldDismiss {
+                    dismiss()
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func contentBox() -> some View {
+        if viewModel.isLoading {
+            VStack(spacing: 16) {
+                ProgressView()
+                
+                Text("Loading...")
+                    .foregroundStyle(.secondary)
+                    .font(.subheadline)
+            }
+        } else if let errorMessage = viewModel.errorMessage {
+            VStack(spacing: 16) {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.system(size: 45))
+                    .foregroundColor(.yellow)
+                
+                Text(errorMessage)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+            }
+        } else if let workoutResult = viewModel.workoutResult {
+            ScrollView(showsIndicators: false) {
+                WorkoutResultDetailView(result: workoutResult)
+            }
+            .padding()
+            .frame(maxHeight: .infinity)
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onEnded { value in
+                        let dragDistance = abs(value.translation.width) + abs(value.translation.height)
+                        if dragDistance < 16 { // ほぼ動いてない＝タップ判定
+                            let tapLocation = value.startLocation
+                            let screenWidth = UIScreen.main.bounds.width
+                            let tapRatio = tapLocation.x / screenWidth
 
-                    // 사용자 정보
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(viewModel.user.name)
-                            .font(.subheadline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            
-                        if stories.indices.contains(viewModel.currentStoryIndex) {
-                            let story = stories[viewModel.currentStoryIndex]
-                            Text(story.createdAt.dateValue(), style: .relative)
-                                .font(.caption2)
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    // 닫기 버튼
-                    if showCloseButton {
-                        Button {
-                            stopTimer()
-                            dismiss()
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.black.opacity(0.4))
-                                    .frame(width: 36, height: 36)
-                                
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(.white)
+                            if tapRatio < 0.2 {
+                                viewModel.previousStory()
+                            } else if tapRatio > 0.8 {
+                                viewModel.advanceStory()
                             }
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        .contentShape(Rectangle())
                     }
-                }
-                .padding(.top, 10)
-                .padding(.horizontal, 16)
-                
-                // Main Content
-                ZStack(alignment: .center) {
-                    // 로딩, 에러, 컨텐츠 표시
-                    if viewModel.isLoading {
-                        VStack {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            Text("Loading...")
-                                .foregroundColor(.white.opacity(0.7))
-                                .font(.subheadline)
-                                .padding(.top, 8)
-                        }
-                    } else if let errorMessage = viewModel.errorMessage {
-                        VStack {
-                            Image(systemName: "exclamationmark.triangle")
-                                .font(.system(size: 40))
-                                .foregroundColor(.yellow)
-                                .padding(.bottom, 8)
-                            
-                            Text("Error loading content")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .padding(.bottom, 4)
-                            
-                            Text(errorMessage)
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 24)
-                        }
-                    } else if let workoutResult = viewModel.workoutResult {
-                        WorkoutResultDetailView(result: workoutResult)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                    } else {
-                        Text("No workout data available")
-                            .foregroundColor(.white.opacity(0.7))
-                            .font(.body)
-                    }
-                    
-                    // 좌우 탭 영역 (항상 존재)
-                    HStack(spacing: 0) {
-                        // 이전 스토리 영역
-                        Rectangle()
-                            .fill(Color.clear)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                resetProgressAndNavigate(isPrevious: true)
-                            }
-                            .frame(width: UIScreen.main.bounds.width * 0.3)
-                        
-                        // 중앙 영역 (일시정지/재생)
-                        Rectangle()
-                            .fill(Color.clear)
-                            .contentShape(Rectangle())
-                            .onLongPressGesture(minimumDuration: .infinity, pressing: { isPressing in
-                                if isPressing {
-                                    // Long press started - pause timer
-                                    stopTimer()
-                                    withAnimation {
-                                        showControls = false
-                                    }
-                                } else {
-                                    // Long press ended - resume timer
-                                    startTimer()
-                                    withAnimation {
-                                        showControls = true
-                                    }
-                                }
-                            }) {
-                                // This won't be triggered due to minimumDuration: .infinity
-                            }
-                            .frame(width: UIScreen.main.bounds.width * 0.4)
-                        
-                        // 다음 스토리 영역
-                        Rectangle()
-                            .fill(Color.clear)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                resetProgressAndNavigate(isPrevious: false)
-                            }
-                            .frame(width: UIScreen.main.bounds.width * 0.3)
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .statusBar(hidden: true)
-        .edgesIgnoringSafeArea(.all)
-        .onAppear {
-            startTimer()
-        }
-        .onDisappear {
-            stopTimer()
-        }
-    }
-    
-    // 타이머 관련 메소드
-    private func startTimer() {
-        stopTimer() // 기존 타이머가 있다면 중지
-        
-        // 새 타이머 시작
-        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-            if progressValue < 1.0 {
-                progressValue += 0.05 / storyDuration
-            } else {
-                resetProgressAndNavigate(isPrevious: false)
-            }
-        }
-    }
-    
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-    }
-    
-    private func resetProgressAndNavigate(isPrevious: Bool) {
-        stopTimer()
-        progressValue = 0
-        
-        if isPrevious {
-            viewModel.previousStory()
+            )
         } else {
-            if viewModel.currentStoryIndex < viewModel.stories.count - 1 {
-                viewModel.advanceStory()
-            } else {
-                dismiss() // 마지막 스토리이므로 뷰 닫기
+            Text("ワークアウトデータが見つかりません。")
+                .foregroundStyle(.secondary)
+                .font(.body)
+        }
+    }
+    
+    // Progress Indicators
+    private var progressBarBox: some View {
+        HStack(spacing: 4) {
+            ForEach(0..<viewModel.stories.count, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(index < viewModel.currentStoryIndex ? .white : .secondary)
+                    .frame(height: 6)
             }
         }
-        
-        startTimer()
+    }
+    private var userHeaderBox: some View {
+        HStack(spacing: 12) {
+            NavigationLink(
+                destination: ProfileView(viewModel: ProfileViewModel(user: viewModel.user), router: nil)
+                , label: {
+                    HStack {
+                        ProfileIcon(profileUrl: viewModel.user.profilePhoto, size: .small)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(viewModel.user.name)
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                
+                            if stories.indices.contains(viewModel.currentStoryIndex) {
+                                let story = stories[viewModel.currentStoryIndex]
+                                Text(story.createdAt.dateValue(), style: .relative)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+            })
+            .tint(.primary)
+            
+            Spacer()
+            
+            // 닫기 버튼
+            if showCloseButton {
+                Button {
+                    dismiss()
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(Color.black.opacity(0.4))
+                            .frame(width: 36, height: 36)
+                        
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                .contentShape(Rectangle())
+            }
+        }
     }
     
     // 현재 스토리 배열에 쉽게 접근하기 위한 속성
@@ -212,169 +155,85 @@ struct StoryView: View {
     }
 }
 
-// 개선된 스토리 프로그래스 바
-struct StoryProgressBar: View {
-    var progress: CGFloat // 0.0 to 1.0
-    
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                // 배경 바
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.white.opacity(0.3))
-                    .frame(width: geometry.size.width, height: 2)
-                
-                // 진행 바
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(Color.white)
-                    .frame(width: geometry.size.width * progress, height: 2)
-            }
-        }
-        .frame(height: 2)
-    }
-}
-
 // 워크아웃 결과 상세 뷰 (기존 뷰에서 디자인 개선)
 struct WorkoutResultDetailView: View {
     let result: WorkoutResultModel
 
     var body: some View {
-        ScrollView {
+        VStack(alignment: .leading, spacing: 16) {
+            // 헤더: 워크아웃 제목 및 요약
+            workoutTimeBox
+            
+            customDivider
+            
+            // 운동 목록
             VStack(alignment: .leading, spacing: 16) {
-                // 헤더: 워크아웃 제목 및 요약
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Image(systemName: "figure.strengthtraining.traditional")
-                            .font(.title2)
-                            .foregroundColor(.yellow)
-                        
-                        Text("Workout")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                    }
-                    
-                    Text("Total Duration: \(formatDuration(result.duration))")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.8))
-
-                    Text("Rest Time: \(formatDuration(result.restTime ?? 0))")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.8))
+                
+                Label("エクササイズ", systemImage: "flame.fill")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                ForEach(result.exercises.indices, id: \.self) { index in
+                    ExerciseResultCell(
+                        exerciseIndex: index + 1,
+                        exercise: result.exercises[index]
+                    )
                 }
-                .padding(.bottom, 4)
+            }
+            
+            // 노트 (있는 경우)
+            if let notes = result.notes, !notes.isEmpty {
                 
-                // 구분선
-                Rectangle()
-                    .fill(LinearGradient(
-                        gradient: Gradient(colors: [.clear, .white.opacity(0.3), .clear]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ))
-                    .frame(height: 1)
-                    .padding(.vertical, 4)
+                customDivider
                 
-                // 운동 목록
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Exercises")
+                VStack(alignment: .leading, spacing: 8) {
+                    Label("ノート", systemImage: "note.text")
                         .font(.headline)
                         .fontWeight(.semibold)
-                        .foregroundColor(.white)
                     
-                    ForEach(result.exercises, id: \.self) { exercise in
-                        ExerciseCard(exercise: exercise)
-                    }
-                }
-                
-                // 노트 (있는 경우)
-                if let notes = result.notes, !notes.isEmpty {
-                    Rectangle()
-                        .fill(LinearGradient(
-                            gradient: Gradient(colors: [.clear, .white.opacity(0.3), .clear]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ))
-                        .frame(height: 1)
-                        .padding(.vertical, 4)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Image(systemName: "note.text")
-                                .foregroundColor(.yellow)
-                            Text("Notes")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                        }
-                        
-                        Text(notes)
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.9))
-                            .padding(.horizontal, 4)
-                    }
+                    Text(notes)
+                        .font(.subheadline)
+                        .padding(.horizontal, 4)
                 }
             }
-            .padding(.vertical, 16)
         }
     }
     
-    // Helper function to format duration
-    private func formatDuration(_ totalSeconds: Int) -> String {
-        let hours = totalSeconds / 3600
-        let minutes = (totalSeconds % 3600) / 60
-        let seconds = totalSeconds % 60
-        
-        if hours > 0 {
-            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%02d:%02d", minutes, seconds)
-        }
+    private var customDivider: some View {
+        Rectangle()
+            .fill(LinearGradient(
+                gradient: Gradient(colors: [.clear, .primary.opacity(0.3), .clear]),
+                startPoint: .leading,
+                endPoint: .trailing
+            ))
+            .frame(height: 2)
     }
-}
-
-// 운동 카드 (각 운동 표시)
-struct ExerciseCard: View {
-    let exercise: ExerciseResultModel
     
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // 운동 이름
-            Text(exercise.exerciseName)
-                .font(.body)
-                .fontWeight(.medium)
-                .foregroundColor(.white)
+    private var workoutTimeBox: some View {
+        HStack(spacing: 16) {
+            timeCell(title: "運動時間", value: result.duration)
             
-            // 세트 정보
-            VStack(alignment: .leading, spacing: 4) {
-                ForEach(exercise.sets.indices, id: \.self) { index in
-                    let set = exercise.sets[index]
-                    HStack {
-                        Text("Set \(index + 1)")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.7))
-                            .frame(width: 55, alignment: .leading)
-                        
-                        Text("\(set.Reps) reps")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                        
-                        if let weight = set.Weight {
-                            Text("•")
-                                .foregroundColor(.white.opacity(0.5))
-                            Text("\(weight, specifier: "%.1f") kg")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                        }
-                        
-                        Spacer()
-                    }
-                }
-            }
-            .padding(.leading, 8)
+            timeCell(title: "休憩時間", value: result.restTime ?? 0)
         }
-        .padding(12)
-        .background(Color.white.opacity(0.1))
-        .cornerRadius(10)
+    }
+    
+    @ViewBuilder
+    private func timeCell(title: String, value: Int) -> some View {
+        VStack(spacing: 16) {
+            Text(title)
+                .foregroundStyle(.secondary)
+                .font(.caption)
+                .hAlign(.leading)
+            
+            Text(value.formattedDuration)
+                .font(.title2.bold())
+                .hAlign(.center)
+        }
+        .padding()
+        .frame(height: 108)
+        .background(.background)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
     }
 }
 
@@ -408,4 +267,4 @@ struct StoryView_Previews: PreviewProvider {
         
         return StoryView(viewModel: viewModel)
     }
-} 
+}

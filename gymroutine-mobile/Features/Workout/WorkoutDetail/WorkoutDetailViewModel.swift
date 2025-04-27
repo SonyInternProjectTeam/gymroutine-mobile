@@ -10,6 +10,7 @@ import SwiftUI
 @MainActor
 final class WorkoutDetailViewModel: WorkoutExercisesManager {
     @Published var workout: Workout
+    @Published var workoutSortFlg = false
     @Published var searchExercisesFlg = false
     @Published var editExerciseSetsFlg = false
     @Published var selectedIndex: Int? = nil
@@ -64,6 +65,10 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
             }
             UIApplication.hideLoading()
         }
+    }
+    
+    func moveExercise(from source: IndexSet, to destination: Int) {
+        exercises.move(fromOffsets: source, toOffset: destination)
     }
     
     /// 워크아웃 편집 액션 (예: 편집 화면으로 이동)
