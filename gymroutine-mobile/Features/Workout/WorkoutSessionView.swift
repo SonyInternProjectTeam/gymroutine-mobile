@@ -253,7 +253,7 @@ struct WorkoutSessionView: View {
                         let isCompleted = isExerciseCompleted(index: index)
 
                         Circle()
-                            .fill(isCurrentIndex || isCompleted ? .green2 : Color(.systemGray5))
+                            .fill(isCurrentIndex || isCompleted ? .main : Color(.systemGray5))
                             .frame(width: isCurrentIndex ? 32 : 16)
                             .overlay {
                                 if isCurrentIndex {
@@ -271,7 +271,7 @@ struct WorkoutSessionView: View {
 
                         if index != viewModel.exercisesManager.exercises.count - 1 {
                             RoundedRectangle(cornerRadius: 2)
-                                .fill(isCompleted ? .green2 : Color(.systemGray5))
+                                .fill(isCompleted ? .main : Color(.systemGray5))
                                 .frame(width: 16, height: 4)
                         }
                     }
