@@ -1,3 +1,8 @@
+
+
+
+
+
 import SwiftUI
 import FirebaseFirestore
 
@@ -8,11 +13,11 @@ struct CompletedWorkoutDetailView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                workoutContentView
-            }
-            .padding(.bottom, 30)
+            workoutContentView
+                .padding()
         }
+        
+        .background(Color.gray.opacity(0.1))
         .navigationTitle("ワークアウト結果")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -51,32 +56,36 @@ struct CompletedWorkoutDetailView: View {
     // 운동 결과 상세 정보 뷰
     @ViewBuilder
     private func workoutDetailView(result: WorkoutResult) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 24) {
             // 헤더: 운동명과 완료 시각
             workoutHeaderView(result: result)
             
-            Divider()
+            CustomDivider()
             
-            // 운동 시간 정보
-            if let duration = result.duration {
-                durationView(duration: duration)
+            HStack(spacing: 16) {
+                
+                if let duration = result.duration {
+                    timeCell(title: "運動時間", value: duration)
+                }
+                
+                if let restTime = result.restTime {
+                    timeCell(title: "休憩時間", value: restTime)
+                }
             }
-            
-            if let restTime = result.restTime {
-                restTimeView(restTime: restTime)
-            }            
             // 세트 수 정보
             if let exercises = result.exercises {
                 totalSetsView(exercises: exercises)
             }
             
-            Divider()
+            CustomDivider()
             
             // 운동 상세 정보
             exercisesListView(exercises: result.exercises)
             
             // 메모 섹션
             if let memo = result.memo, !memo.isEmpty {
+                CustomDivider()
+                
                 memoView(memo: memo)
             }
         }
@@ -85,44 +94,41 @@ struct CompletedWorkoutDetailView: View {
     // 운동명과 완료 시각 헤더 뷰
     @ViewBuilder
     private func workoutHeaderView(result: WorkoutResult) -> some View {
-        Text(viewModel.workoutName ?? "不明なワークアウト")
-            .font(.largeTitle)
-            .fontWeight(.bold)
-            .padding(.horizontal)
-            .padding(.top)
-        
-        if let date = result.createdAt?.dateValue() {
-            Text("完了日時: \(date.formatted(date: .long, time: .shortened))")
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
+        VStack(alignment: .leading) {
+            HStack(spacing: 12) {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(.gray)
+                    .frame(width: 8)
+                
+                Text(viewModel.workoutName ?? "不明なワークアウト")
+                    .font(.title).bold()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.1)
+            }
+            
+            if let date = result.createdAt?.dateValue() {
+                Text("完了日時: \(date.formatted(date: .long, time: .shortened))")
+                    .foregroundColor(.secondary)
+            }
         }
     }
     
-    // 운동 시간 정보 뷰
     @ViewBuilder
-    private func durationView(duration: Int) -> some View {
-        HStack {
-            Label("運動時間", systemImage: "clock")
-                .font(.headline)
-            Spacer()
-            Text("\(duration / 60)分 \(duration % 60)秒")
-                .font(.body)
+    private func timeCell(title: String, value: Int) -> some View {
+        VStack(spacing: 16) {
+            Text(title)
+                .foregroundStyle(.secondary)
+                .font(.caption)
+                .hAlign(.leading)
+            
+            Text("\(value / 60)分 \(value % 60)秒")
+                .font(.title2.bold())
+                .hAlign(.center)
         }
-        .padding(.horizontal)
-        .padding(.top, 4)
-    }
-
-    @ViewBuilder
-    private func restTimeView(restTime: Int) -> some View {
-        HStack {
-            Label("休憩時間", systemImage: "clock")
-                .font(.headline)
-            Spacer()
-            Text("\(restTime / 60)分 \(restTime % 60)秒")
-                .font(.body)
-        }
-        .padding(.horizontal)
-        .padding(.top, 4)
+        .padding(12)
+        .background(.background)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
     }
     
     // 총 세트 수 정보 뷰
@@ -145,13 +151,26 @@ struct CompletedWorkoutDetailView: View {
     @ViewBuilder
     private func exercisesListView(exercises: [ExerciseResult]?) -> some View {
         if let exercises = exercises, !exercises.isEmpty {
-            Text("エクササイズ")
+            Label("エクササイズ", systemImage: "flame.fill")
                 .font(.headline)
-                .padding(.horizontal)
-                .padding(.top, 4)
+                .fontWeight(.semibold)
             
-            ForEach(exercises, id: \.id) { exercise in
-                exerciseCard(exercise: exercise)
+            ForEach(exercises.indices, id: \.self) { index in
+                let exercise = exercises[index]
+                
+                ExerciseResultCell(
+                    exerciseIndex: index + 1,
+                    exercise: ExerciseResultModel(
+                        exerciseName: exercise.exerciseName,
+                        setsCompleted: exercise.setsCompleted ?? 0,
+                        sets: exercise.sets?.map { set in
+                            SetResultModel(
+                                Reps: set.reps ?? 0,
+                                Weight: set.weight
+                            )
+                        } ?? []
+                    )
+                )
             }
         } else {
             Text("エクササイズ情報がありません")
@@ -164,93 +183,14 @@ struct CompletedWorkoutDetailView: View {
     @ViewBuilder
     private func memoView(memo: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("メモ")
+            Label("ノート", systemImage: "note.text")
                 .font(.headline)
-                .padding(.horizontal)
-                .padding(.top, 4)
+                .fontWeight(.semibold)
             
             Text(memo)
-                .font(.body)
-                .padding(.horizontal)
-                .padding(.bottom, 4)
-        }
-        .background(Color(.systemGray6))
-        .cornerRadius(8)
-        .padding(.horizontal)
-    }
-    
-    // 세트별 정보 행 뷰
-    @ViewBuilder
-    private func setRowView(index: Int, set: ExerciseSetResult) -> some View {
-        HStack {
-            Text("セット \(index + 1)")
                 .font(.subheadline)
-                .frame(width: 60, alignment: .leading)
-            Text("\(String(format: "%.1f", set.weight ?? 0))kg")
-                .font(.subheadline)
-                .frame(width: 60, alignment: .center)
-            Text("\(set.reps ?? 0)")
-                .font(.subheadline)
-                .frame(width: 60, alignment: .center)
-            Spacer()
+                .padding(.horizontal, 4)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(index % 2 == 0 ? Color(.systemBackground) : Color(.systemGray6))
-    }
-    
-    // 운동 카드 뷰
-    @ViewBuilder
-    private func exerciseCard(exercise: ExerciseResult) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(exercise.exerciseName)
-                .font(.title3)
-                .fontWeight(.semibold)
-                .padding(.horizontal)
-            
-            if let sets = exercise.sets, !sets.isEmpty {
-                VStack(spacing: 0) {
-                    // 헤더
-                    setsHeaderView
-                    
-                    // 세트 정보
-                    ForEach(Array(sets.enumerated()), id: \.offset) { index, set in
-                        setRowView(index: index, set: set)
-                    }
-                }
-                .cornerRadius(8)
-                .padding(.horizontal)
-                .padding(.bottom, 8)
-            } else {
-                Text("セット情報なし")
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal)
-                    .padding(.bottom, 8)
-            }
-        }
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .padding(.horizontal)
-        .padding(.vertical, 4)
-    }
-    
-    // 세트 헤더 뷰
-    private var setsHeaderView: some View {
-        HStack {
-            Text("セット")
-                .fontWeight(.semibold)
-                .frame(width: 60, alignment: .leading)
-            Text("重量")
-                .fontWeight(.semibold)
-                .frame(width: 60, alignment: .center)
-            Text("回数")
-                .fontWeight(.semibold)
-                .frame(width: 60, alignment: .center)
-            Spacer()
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(Color(.systemGray5))
     }
 }
 

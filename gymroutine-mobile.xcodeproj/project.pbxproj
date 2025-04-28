@@ -77,6 +77,7 @@
 		00D3E1BF2DBDD8D300590F92 /* WorkoutSortView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D3E1BE2DBDD8D300590F92 /* WorkoutSortView.swift */; };
 		00D3E1C12DBE321B00590F92 /* Int+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D3E1C02DBE321600590F92 /* Int+Extensions.swift */; };
 		00D3E1C32DBE334300590F92 /* ExerciseResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D3E1C22DBE334300590F92 /* ExerciseResultCell.swift */; };
+		00D3E1EA2DBE79AF00590F92 /* CustomDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D3E1E92DBE79AF00590F92 /* CustomDivider.swift */; };
 		271A76992DAEA87C00C294D5 /* HeatmapCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A76982DAEA87C00C294D5 /* HeatmapCalendarView.swift */; };
 		271A769B2DAEA88A00C294D5 /* HeatmapRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A769A2DAEA88A00C294D5 /* HeatmapRepository.swift */; };
 		271A769D2DAEA89100C294D5 /* HeatmapService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 271A769C2DAEA89100C294D5 /* HeatmapService.swift */; };
@@ -218,6 +219,7 @@
 		00D3E1BE2DBDD8D300590F92 /* WorkoutSortView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSortView.swift; sourceTree = "<group>"; };
 		00D3E1C02DBE321600590F92 /* Int+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extensions.swift"; sourceTree = "<group>"; };
 		00D3E1C22DBE334300590F92 /* ExerciseResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseResultCell.swift; sourceTree = "<group>"; };
+		00D3E1E92DBE79AF00590F92 /* CustomDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDivider.swift; sourceTree = "<group>"; };
 		271A76982DAEA87C00C294D5 /* HeatmapCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapCalendarView.swift; sourceTree = "<group>"; };
 		271A769A2DAEA88A00C294D5 /* HeatmapRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapRepository.swift; sourceTree = "<group>"; };
 		271A769C2DAEA89100C294D5 /* HeatmapService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapService.swift; sourceTree = "<group>"; };
@@ -750,6 +752,7 @@
 			isa = PBXGroup;
 			children = (
 				79A0A1202DBDE72D00DF56F6 /* ProfileIcon.swift */,
+				00D3E1E92DBE79AF00590F92 /* CustomDivider.swift */,
 			);
 			path = Reuse;
 			sourceTree = "<group>";
@@ -961,6 +964,7 @@
 				00CDC43C2D845E8E003B18EB /* LoginViewModel.swift in Sources */,
 				27277A182DABA83B00166807 /* WorkoutEditViewModel.swift in Sources */,
 				27277A192DABA83B00166807 /* WorkoutEditView.swift in Sources */,
+				00D3E1EA2DBE79AF00590F92 /* CustomDivider.swift in Sources */,
 				27D6A8672D9D9322004D3F2B /* WorkoutSessionViewModel.swift in Sources */,
 				00CDC43D2D845E8E003B18EB /* MainViewModel.swift in Sources */,
 				276F87772DB2957000E8435E /* EditSetView.swift in Sources */,

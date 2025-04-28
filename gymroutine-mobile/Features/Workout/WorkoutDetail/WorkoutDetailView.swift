@@ -52,7 +52,7 @@ struct WorkoutDetailView: View {
             }
         }
         .sheet(isPresented: $viewModel.workoutSortFlg, onDismiss: {
-            viewModel.refreshWorkoutData()
+            viewModel.saveExercisesToFirestore()
         }) {
             WorkoutSortView()
                 .environmentObject(viewModel)
