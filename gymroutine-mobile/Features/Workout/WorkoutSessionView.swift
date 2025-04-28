@@ -512,16 +512,31 @@ struct WorkoutSessionView: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(Array(viewModel.exercisesManager.exercises.enumerated()), id: \.element.id) { index, exercise in
-                        exerciseCard(exercise: exercise, index: index)
-                            .id(index)
-                            .opacity(viewModel.currentExerciseIndex == index ? 1.0 : 0.7)
-                            .scaleEffect(viewModel.currentExerciseIndex == index ? 1.0 : 0.98)
-                            .onTapGesture {
-                                withAnimation {
-                                    viewModel.currentExerciseIndex = index
-                                    scrollProxy.scrollTo(index, anchor: .center)
-                                }
+                        let isCurrentExercise = index == viewModel.currentExerciseIndex
+                        let isCompleted = isExerciseCompleted(index: index)
+
+                        WorkoutExerciseCard(
+                            workoutExercise: exercise,
+                            index: index,
+                            isCurrentExercise: isCurrentExercise,
+                            isCompleted: isCompleted,
+                            onAddClicked: {
+                                viewModel.addSetToExercise(at: index)
+                            },
+                            onToggleSetCompletion: { setIndex in
+                                viewModel.toggleSetCompletion(exerciseIndex: index, setIndex: setIndex)
+                            },
+                            isSetCompleted: { setIndex in
+                                viewModel.isSetCompleted(exerciseIndex: index, setIndex: setIndex)
                             }
+                        )
+                        .id(index)
+                        .onTapGesture {
+                            withAnimation {
+                                viewModel.currentExerciseIndex = index
+                                scrollProxy.scrollTo(index, anchor: .center)
+                            }
+                        }
                     }
                 }
                 .padding()
@@ -531,82 +546,6 @@ struct WorkoutSessionView: View {
                     scrollProxy.scrollTo(newIndex, anchor: .center)
                 }
             }
-        }
-    }
-    
-    private func exerciseCard(exercise: WorkoutExercise, index: Int) -> some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 16) {
-                // 순서 표시
-                Text("\(index + 1)")
-                    .font(.headline)
-                    .foregroundStyle(.blue)
-                    .frame(width: 24)
-                
-                // 운동 정보
-                HStack {
-                    Image(systemName: "figure.strengthtraining.traditional")
-                        .font(.title2)
-                        .frame(width: 40, height: 40)
-                        .background(Color.gray.opacity(0.2))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    
-                    Text(exercise.name)
-                        .font(.headline)
-                }
-                
-                Spacer()
-            }
-            .padding()
-            
-            // 세트 목록
-            VStack(spacing: 0) {
-                // 헤더
-                HStack {
-                    Text("セット")
-                        .frame(width: 60, alignment: .leading)
-                    Text("kg")
-                        .frame(width: 60, alignment: .leading)
-                    Text("レップ数")
-                        .frame(width: 60, alignment: .leading)
-                    Text("状態")
-                        .frame(width: 60, alignment: .leading)
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-                .background(Color.gray.opacity(0.1))
-                
-                // 세트 리스트
-                ForEach(Array(exercise.sets.enumerated()), id: \.offset) { setIndex, set in
-                    HStack {
-                        Text("\(setIndex + 1)")
-                            .frame(width: 60, alignment: .leading)
-                        Text(String(format: "%.1f", set.weight))
-                            .frame(width: 60, alignment: .leading)
-                        Text("\(set.reps)")
-                            .frame(width: 60, alignment: .leading)
-                        
-                        Button(action: {
-                            viewModel.toggleSetCompletion(exerciseIndex: index, setIndex: setIndex)
-                        }) {
-                            Image(systemName: viewModel.isSetCompleted(exerciseIndex: index, setIndex: setIndex) ? "checkmark.circle.fill" : "circle")
-                                .foregroundStyle(viewModel.isSetCompleted(exerciseIndex: index, setIndex: setIndex) ? .green : .secondary)
-                        }
-                        .frame(width: 60, alignment: .leading)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    
-                    if setIndex < exercise.sets.count - 1 {
-                        Divider()
-                            .padding(.horizontal)
-                    }
-                }
-            }
-            .background(Color(UIColor.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 
@@ -794,8 +733,151 @@ struct WorkoutSessionView: View {
         AppWorkoutManager.shared.completeWorkout(session: completedSession)
         dismiss()
     }
-    
+}
 
+fileprivate
+struct WorkoutExerciseCard: View {
+
+    @State private var isExpanded: Bool = true
+    var workoutExercise: WorkoutExercise
+    var index: Int
+    var isCurrentExercise: Bool
+    var isCompleted: Bool
+    var onAddClicked: (() -> Void)
+    var onToggleSetCompletion: ((Int) -> Void)
+    var isSetCompleted: ((Int) -> Bool)
+
+    var body: some View {
+        HStack {
+            VStack {
+                Group {
+                    if isCurrentExercise {
+                        Image(systemName: "flame.fill")
+                    } else {
+                        Text("\(index + 1)")
+                    }
+                }
+                .fontWeight(.semibold)
+                .frame(width: 32, height: 32)
+                .background(
+                    Circle()
+                        .fill(isCurrentExercise || isCompleted ? .main : Color(.systemGray5))
+                )
+
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(isCurrentExercise || isCompleted ? .main : Color(.systemGray5))
+                    .frame(width: 4)
+            }
+
+            VStack(spacing: 10) {
+                // Exercise Info
+                HStack(spacing: 16) {
+                    ExerciseImageCell(imageName: workoutExercise.name)
+                        .frame(width: 56, height: 56)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(LocalizedStringKey(workoutExercise.part))
+                            .font(.caption)
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(.secondary.opacity(0.4), lineWidth: 2)
+                            )
+
+                        Text(LocalizedStringKey(workoutExercise.name))
+                            .font(.headline)
+                    }
+
+                    Spacer()
+
+                    Button {
+                        withAnimation {
+                            isExpanded.toggle()
+                        }
+                    } label: {
+                        Image(systemName: "chevron.right.circle")
+                            .resizable()
+                            .foregroundColor(.secondary)
+                            .frame(width: 32, height: 32)
+                            .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                    }
+                }
+
+                if isExpanded {
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text("メニュー")
+
+                            Spacer()
+
+                            Button(action: {
+                                onAddClicked()
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "plus")
+                                    Text("追加")
+                                        .font(.subheadline)
+                                        .bold()
+                                }
+                                .foregroundStyle(.black)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 4)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.white)
+                                        .stroke(Color.gray, lineWidth: 1)
+                                )
+                            }
+                        }
+
+                        Divider()
+
+                        // Menu Table
+                        VStack(spacing: 16) {
+                            HStack(spacing: 0) {
+                                Text("セット")
+                                    .hAlign(.center)
+                                Text("重さ（kg）")
+                                    .hAlign(.center)
+                                Text("レップ数")
+                                    .hAlign(.center)
+                                Text("状況")
+                                    .hAlign(.center)
+                            }
+                            .font(.caption)
+
+                            ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { setIndex, set in
+                                let isCompleted = isSetCompleted(setIndex)
+                                HStack(spacing: 0) {
+                                    Text("\(setIndex + 1)").hAlign(.center)
+
+                                    Text(String(format: "%.1f", set.weight)).hAlign(.center)
+
+                                    Text("\(set.reps)").hAlign(.center)
+
+                                    Button(action: {
+                                        onToggleSetCompletion(setIndex)
+                                    }) {
+                                        Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
+                                            .foregroundStyle(isCompleted ? .green : .secondary)
+                                    }
+                                    .hAlign(.center)
+                                }
+                                .font(.subheadline)
+                            }
+                        }
+                    }
+                    .padding(8)
+                    .background(Color(.systemGray6).cornerRadius(8))
+                }
+            }
+            .padding(16)
+            .background(Color.white)
+            .clipShape(.rect(cornerRadius: 8))
+            .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
+        }
+    }
 }
 
 #Preview {
