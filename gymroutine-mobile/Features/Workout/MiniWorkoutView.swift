@@ -4,6 +4,7 @@ struct MiniWorkoutView: View {
     @ObservedObject var workoutManager = AppWorkoutManager.shared
     // タイマーをリアルタイムで更新するためのトリガー
     @State private var timerTrigger = Date()
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         VStack(spacing: 0) {
@@ -98,6 +99,9 @@ struct MiniWorkoutView: View {
             Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                 timerTrigger = Date() // 状態変数を更新してビューをリフレッシュ
             }
+            
+            // Log screen view
+            analyticsService.logScreenView(screenName: "MiniWorkout")
         }
         // 画面が更新されるたびにtimerTriggerを更新してビューをリフレッシュ
         .id(timerTrigger)

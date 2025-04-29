@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 // Add notification name for workout deletion
 extension Notification.Name {
@@ -14,9 +15,19 @@ extension Notification.Name {
 
 struct WorkoutDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @StateObject var viewModel: WorkoutDetailViewModel
     @State private var workoutDeleted = false // State to track deletion
     private let analyticsService = AnalyticsService.shared
+    
+    var onBack: (() -> Void)?
+    var onDelete: (() -> Void)?
+    
+    init(workoutId: String, onBack: (() -> Void)? = nil, onDelete: (() -> Void)? = nil) {
+        _viewModel = StateObject(wrappedValue: WorkoutDetailViewModel(workoutId: workoutId))
+        self.onBack = onBack
+        self.onDelete = onDelete
+    }
     
     var body: some View {
         // NavigationStack(또는 NavigationView) 내부에서 뷰를 표시
@@ -104,7 +115,7 @@ struct WorkoutDetailView: View {
             viewModel.refreshWorkoutData()
             
             // Log screen view
-            analyticsService.logScreenView(screenName: "WorkoutDetail")
+            analyticsService.logScreenView(screenName: "WorkoutDetail", parameters: ["workout_id": viewModel.workout.id ?? ""])
             
             // Log workout detail viewed
             analyticsService.logEvent("workout_detail_viewed", parameters: [
