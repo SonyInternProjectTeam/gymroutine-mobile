@@ -125,27 +125,7 @@ struct WeightHistoryGraphView: View {
             }
             
             if let history = weightHistory, !filteredHistory.isEmpty {
-                // Selected entry details - now shown ABOVE the chart
-                if let selectedEntry = selectedEntry {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("日付: \(formatDate(selectedEntry.date.dateValue()))")
-                                .font(.subheadline)
-                            Text("体重: \(String(format: "%.1f", selectedEntry.weight)) kg")
-                                .font(.subheadline)
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 12)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(8)
-                        
-                        Spacer()
-                    }
-                    .transition(.opacity)
-                    .animation(.easeInOut, value: selectedEntry)
-                }
-                
-                // Chart view
+                // 차트 뷰
                 chartView
             } else {
                 Text("体重履歴のデータがありません。")
@@ -195,27 +175,64 @@ struct WeightHistoryGraphView: View {
         .chartYAxis(.visible)
         .chartOverlay { proxy in
             GeometryReader { geometry in
-                Rectangle()
-                    .fill(Color.clear)
-                    .contentShape(Rectangle())
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                let location = value.location
-                                
-                                // Get x-coordinate in chart's coordinate space
-                                guard let xDate = proxy.value(atX: location.x, as: Date.self) else { return }
-                                
-                                // Find the closest data point
-                                let closest = filteredHistory.min { entry1, entry2 in
-                                    let date1 = entry1.date.dateValue()
-                                    let date2 = entry2.date.dateValue()
-                                    return abs(date1.timeIntervalSince(xDate)) < abs(date2.timeIntervalSince(xDate))
+                ZStack(alignment: .topLeading) {
+                    // 터치 제스처를 위한 투명 영역
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    let location = value.location
+                                    
+                                    // Get x-coordinate in chart's coordinate space
+                                    guard let xDate = proxy.value(atX: location.x, as: Date.self) else { return }
+                                    
+                                    // Find the closest data point
+                                    let closest = filteredHistory.min { entry1, entry2 in
+                                        let date1 = entry1.date.dateValue()
+                                        let date2 = entry2.date.dateValue()
+                                        return abs(date1.timeIntervalSince(xDate)) < abs(date2.timeIntervalSince(xDate))
+                                    }
+                                    
+                                    selectedEntry = closest
                                 }
-                                
-                                selectedEntry = closest
-                            }
-                    )
+                        )
+                    
+                    // 선택된 데이터 포인트 정보 표시
+                    if let selectedEntry = selectedEntry, 
+                       let selectedDate = selectedEntry.date.dateValue().timeIntervalSince1970 as Double?,
+                       let chartMinX = proxy.value(atX: 0, as: Date.self)?.timeIntervalSince1970,
+                       let chartMaxX = proxy.value(atX: geometry.size.width, as: Date.self)?.timeIntervalSince1970 {
+                        
+                        // 선택된 X 위치 계산
+                        let dateRange = chartMaxX - chartMinX
+                        let datePosition = (selectedDate - chartMinX) / dateRange
+                        let xPosition = datePosition * geometry.size.width
+                        
+                        // 데이터 라벨 표시 위치 계산 (화면 경계 고려)
+                        let labelWidth: CGFloat = 150
+                        let labelHeight: CGFloat = 60
+                        let padding: CGFloat = 10
+                        
+                        // 왼쪽이나 오른쪽 경계에 가까울 때 위치 조정
+                        let adjustedX = min(max(xPosition - labelWidth/2, padding), 
+                                            geometry.size.width - labelWidth - padding)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("日付: \(formatDate(selectedEntry.date.dateValue()))")
+                                .font(.caption)
+                            Text("体重: \(String(format: "%.1f", selectedEntry.weight)) kg")
+                                .font(.caption)
+                        }
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 10)
+                        .background(Color.white.opacity(0.9))
+                        .cornerRadius(6)
+                        .shadow(color: Color.black.opacity(0.1), radius: 2)
+                        .position(x: adjustedX + labelWidth/2, y: 30)
+                    }
+                }
             }
         }
         .frame(height: 200)
