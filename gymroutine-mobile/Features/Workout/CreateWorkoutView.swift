@@ -12,6 +12,7 @@ struct CreateWorkoutView: View {
     
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel = CreateWorkoutViewModel()
+    private let analyticsService = AnalyticsService.shared
     let columns: [GridItem] = Array(repeating: .init(.flexible()),
                                             count: 3)
     
@@ -44,6 +45,10 @@ struct CreateWorkoutView: View {
                 .background(Color(UIColor.systemGray6))
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "CreateWorkout")
+        }
     }
 }
 
@@ -148,10 +153,26 @@ extension CreateWorkoutView {
                     WorkoutExerciseCell(workoutExercise: workoutExercise)
                         .onTapGesture {
                             viewModel.onClickedExerciseSets(index: index)
+                            
+                            // Log exercise set edit
+                            analyticsService.logUserAction(
+                                action: "edit_exercise_sets",
+                                itemId: workoutExercise.id,
+                                itemName: workoutExercise.name,
+                                contentType: "workout_creation"
+                            )
                         }
                         .overlay(alignment: .topTrailing) {
                             Button(action: {
                                 viewModel.removeExercise(workoutExercise)
+                                
+                                // Log exercise removal
+                                analyticsService.logUserAction(
+                                    action: "remove_exercise",
+                                    itemId: workoutExercise.id,
+                                    itemName: workoutExercise.name,
+                                    contentType: "workout_creation"
+                                )
                             }, label: {
                                 Image(systemName: "xmark")
                                     .font(.headline)
@@ -176,6 +197,12 @@ extension CreateWorkoutView {
             
             Button {
                 viewModel.onClickedAddExerciseButton()
+                
+                // Log add exercise button tap
+                analyticsService.logUserAction(
+                    action: "add_exercise_button_tap",
+                    contentType: "workout_creation"
+                )
             } label: {
                 Text("エクササイズを追加する")
                     .font(.headline)
@@ -193,6 +220,12 @@ extension CreateWorkoutView {
             HStack {
                 Button {
                     dismiss()
+                    
+                    // Log cancel workout creation
+                    analyticsService.logUserAction(
+                        action: "cancel_workout_creation",
+                        contentType: "workout_creation"
+                    )
                 } label: {
                     Label("キャンセル", systemImage: "xmark")
                 }
@@ -201,6 +234,15 @@ extension CreateWorkoutView {
                 
                 Button {
                     viewModel.onClickedCreateWorkoutButton() {
+                        // Log workout creation
+                        analyticsService.logEvent("workout_created", parameters: [
+                            "workout_name": viewModel.workoutName,
+                            "is_routine": viewModel.isRoutine,
+                            "has_notes": !viewModel.notes.isEmpty,
+                            "exercise_count": viewModel.exercises.count,
+                            "scheduled_days": viewModel.isRoutine ? viewModel.selectedDays.map { $0.rawValue }.joined(separator: ",") : ""
+                        ])
+                        
                         dismiss()
                     }
                 } label: {

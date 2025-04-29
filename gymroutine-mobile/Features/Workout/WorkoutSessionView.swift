@@ -23,6 +23,7 @@ struct WorkoutSessionView: View {
     @State private var selectedExerciseIndex = 0
     @State private var showEndWorkoutAlert = false // 종료 알림을 위해 필요
     @State private var showEditSetSheet = false
+    private let analyticsService = AnalyticsService.shared
     var onEndWorkout: (() -> Void)? = nil // 워크아웃 종료 콜백
     
     init(viewModel: WorkoutSessionViewModel, onEndWorkout: (() -> Void)? = nil) {
@@ -42,6 +43,11 @@ struct WorkoutSessionView: View {
                 Button(action: { 
                     withAnimation {
                         viewModel.toggleViewMode()
+                        // Log view mode change
+                        analyticsService.logUserAction(
+                            action: "toggle_view_mode",
+                            contentType: viewModel.isDetailView ? "detail_view" : "list_view"
+                        )
                     }
                 }) {
                     HStack {
@@ -79,6 +85,11 @@ struct WorkoutSessionView: View {
                 Button(action: { 
                     // 모달 닫기 - 워크아웃은 계속 진행
                     dismiss() 
+                    // Log minimize action
+                    analyticsService.logUserAction(
+                        action: "minimize_workout_session",
+                        contentType: "workout_session"
+                    )
                 }) {
                     Text("最小化")
                         .foregroundStyle(.blue)
@@ -94,6 +105,11 @@ struct WorkoutSessionView: View {
                 Button(action: {
                     // 워크아웃 종료 알림창 표시
                     showEndWorkoutAlert = true
+                    // Log end workout button tap
+                    analyticsService.logUserAction(
+                        action: "end_workout_button_tap",
+                        contentType: "workout_session"
+                    )
                 }) {
                     Text("終了")
                         .foregroundStyle(.red)
@@ -110,6 +126,15 @@ struct WorkoutSessionView: View {
             Button("キャンセル", role: .cancel) { }
             Button("完了") {
                 viewModel.confirmWorkoutCompletion()
+                // Log workout completion confirmation
+                let workout = viewModel.workout
+                let elapsedTime = Date().timeIntervalSince(viewModel.startTime)
+                analyticsService.logWorkoutCompleted(
+                    workoutId: workout.id ?? "",
+                    workoutName: workout.name,
+                    duration: elapsedTime,
+                    completedExercises: viewModel.exercisesManager.exercises.count
+                )
             }
         } message: {
             Text("ワークアウトを完了しますか？")
@@ -121,6 +146,11 @@ struct WorkoutSessionView: View {
                 // 그냥 종료
                 onEndWorkout?()
                 dismiss()
+                // Log workout exit without saving
+                analyticsService.logUserAction(
+                    action: "workout_exit_without_saving",
+                    contentType: "workout_session"
+                )
             }
             Button("結果を保存", role: .none) {
                 // 결과 저장 후 종료
@@ -145,6 +175,15 @@ struct WorkoutSessionView: View {
                     reps: editingSet.reps,
                     onSave: { weight, reps in
                         viewModel.updateSetInfo(weight: weight, reps: reps)
+                        // Log set update event
+                        if let exercise = viewModel.currentExercise {
+                            analyticsService.logUserAction(
+                                action: "update_set_info",
+                                itemId: exercise.id,
+                                itemName: exercise.name,
+                                contentType: "exercise_set"
+                            )
+                        }
                     }
                 )
                 .presentationDetents([.medium])
@@ -168,11 +207,32 @@ struct WorkoutSessionView: View {
                         if selectedExerciseIndex == viewModel.currentExerciseIndex {
                             viewModel.updateRestTimeFromCurrentExercise()
                         }
+                        
+                        // Log rest time update
+                        analyticsService.logUserAction(
+                            action: "update_rest_time",
+                            itemId: updatedExercise.id,
+                            itemName: updatedExercise.name,
+                            contentType: "exercise_rest_time"
+                        )
                     }
                 )
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
             }
+        }
+        .onAppear {
+            // Log screen view event when workout session appears
+            analyticsService.logScreenView(screenName: "WorkoutSession")
+            
+            // Log workout started event
+            let workout = viewModel.workout
+            analyticsService.logWorkoutStarted(
+                workoutId: workout.id ?? "",
+                workoutName: workout.name,
+                isRoutine: workout.isRoutine,
+                exerciseCount: viewModel.exercisesManager.exercises.count
+            )
         }
     }
     
@@ -761,8 +821,8 @@ struct WorkoutSessionView: View {
         
         // 세션 중 업데이트된 운동 정보로 새 워크아웃 모델 생성
         let updatedWorkout = Workout(
-            id: viewModel.workout.id,
-            userId: viewModel.workout.userId,
+            id: viewModel.workout.id ?? "",
+            userId: viewModel.workout.userId ?? "",
             name: viewModel.workout.name,
             createdAt: viewModel.workout.createdAt,
             notes: viewModel.workout.notes,
@@ -779,6 +839,46 @@ struct WorkoutSessionView: View {
             completedSets: viewModel.completedSets,
             totalRestTime: viewModel.getTotalRestTime()
         )
+        
+        // Log workout completion
+        analyticsService.logWorkoutCompleted(
+            workoutId: updatedWorkout.id ?? "",
+            workoutName: updatedWorkout.name,
+            duration: finalElapsedTime,
+            completedExercises: viewModel.exercisesManager.exercises.count
+        )
+        
+        // Log exercises completed
+        for exercise in viewModel.exercisesManager.exercises {
+            let completedSets = exercise.sets.filter { set in 
+                let exerciseIndex = viewModel.exercisesManager.exercises.firstIndex(where: { $0.id == exercise.id }) ?? 0
+                let setIndex = exercise.sets.firstIndex(where: { $0.id == set.id }) ?? 0
+                return viewModel.isSetCompleted(exerciseIndex: exerciseIndex, setIndex: setIndex)
+            }.count
+            
+            let totalReps = exercise.sets.filter { set in
+                let exerciseIndex = viewModel.exercisesManager.exercises.firstIndex(where: { $0.id == exercise.id }) ?? 0
+                let setIndex = exercise.sets.firstIndex(where: { $0.id == set.id }) ?? 0
+                return viewModel.isSetCompleted(exerciseIndex: exerciseIndex, setIndex: setIndex)
+            }.reduce(0) { $0 + $1.reps }
+            
+            let completedSetsWithWeight = exercise.sets.filter { set in
+                let exerciseIndex = viewModel.exercisesManager.exercises.firstIndex(where: { $0.id == exercise.id }) ?? 0
+                let setIndex = exercise.sets.firstIndex(where: { $0.id == set.id }) ?? 0
+                return viewModel.isSetCompleted(exerciseIndex: exerciseIndex, setIndex: setIndex) && set.weight > 0
+            }
+            
+            let averageWeight = completedSetsWithWeight.isEmpty ? 0.0 :
+                completedSetsWithWeight.map { $0.weight }.reduce(0.0, +) / Double(completedSetsWithWeight.count)
+            
+            analyticsService.logExerciseCompleted(
+                exerciseName: exercise.name,
+                workoutId: updatedWorkout.id ?? "",
+                sets: completedSets,
+                reps: totalReps,
+                weight: averageWeight > 0 ? averageWeight : nil
+            )
+        }
         
         // AppWorkoutManager의 completeWorkout 호출하여 결과 화면으로 이동
         AppWorkoutManager.shared.completeWorkout(session: completedSession)
