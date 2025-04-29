@@ -35,6 +35,28 @@ class AnalyticsService {
         ])
     }
     
+    /// 회원가입 이벤트 로깅
+    /// - Parameters:
+    ///   - method: 회원가입 방식 (예: "email", "google", "apple" 등)
+    ///   - success: 회원가입 성공 여부
+    func logSignUp(method: String, success: Bool) {
+        Analytics.logEvent(AnalyticsEventSignUp, parameters: [
+            AnalyticsParameterMethod: method,
+            "success": success
+        ])
+    }
+    
+    /// 로그인 이벤트 로깅
+    /// - Parameters:
+    ///   - method: 로그인 방식 (예: "email", "google", "apple" 등)
+    ///   - success: 로그인 성공 여부
+    func logLogin(method: String, success: Bool) {
+        Analytics.logEvent(AnalyticsEventLogin, parameters: [
+            AnalyticsParameterMethod: method,
+            "success": success
+        ])
+    }
+    
     /// 사용자 액션 이벤트 로깅
     /// - Parameters:
     ///   - action: 수행된 액션 (예: "button_tap", "swipe", 등)
@@ -122,4 +144,4 @@ class AnalyticsService {
     func setUserProperty(name: String, value: String?) {
         Analytics.setUserProperty(value, forName: name)
     }
-} 
+}
