@@ -8,6 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseAnalytics
+import FirebaseCore
 
 @main
 struct gymroutine_mobileApp: App {
