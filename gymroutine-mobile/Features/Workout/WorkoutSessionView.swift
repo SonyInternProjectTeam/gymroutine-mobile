@@ -257,8 +257,10 @@ struct WorkoutSessionView: View {
                             .frame(width: isCurrentIndex ? 32 : 16)
                             .overlay {
                                 if isCurrentIndex {
-                                    Text("🔥")
+                                    Image(systemName: "flame.fill")
+                                        .fontWeight(.semibold)
                                 }
+
                             }
                             .id(index)
                             .onTapGesture {
@@ -539,7 +541,8 @@ struct WorkoutSessionView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
             }
             .onChange(of: viewModel.currentExerciseIndex) { newIndex in
                 withAnimation {
