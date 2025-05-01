@@ -521,6 +521,7 @@ struct WorkoutSessionView: View {
                             workoutExercise: exercise,
                             index: index,
                             isCurrentExercise: isCurrentExercise,
+                            currentSetIndex: viewModel.currentSetIndex,
                             isCompleted: isCompleted,
                             onAddClicked: {
                                 viewModel.addSetToExercise(at: index)
@@ -745,6 +746,7 @@ struct WorkoutExerciseCard: View {
     var workoutExercise: WorkoutExercise
     var index: Int
     var isCurrentExercise: Bool
+    var currentSetIndex: Int
     var isCompleted: Bool
     var onAddClicked: (() -> Void)
     var onToggleSetCompletion: ((Int) -> Void)
@@ -837,7 +839,7 @@ struct WorkoutExerciseCard: View {
                         Divider()
 
                         // Menu Table
-                        VStack(spacing: 16) {
+                        VStack(spacing: 4) {
                             HStack(spacing: 0) {
                                 Text("セット")
                                     .hAlign(.center)
@@ -850,24 +852,28 @@ struct WorkoutExerciseCard: View {
                             }
                             .font(.caption)
 
-                            ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { setIndex, set in
-                                let isCompleted = isSetCompleted(setIndex)
-                                HStack(spacing: 0) {
-                                    Text("\(setIndex + 1)").hAlign(.center)
+                            VStack(spacing: 0) {
+                                ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { setIndex, set in
+                                    let isCompleted = isSetCompleted(setIndex)
+                                    HStack(spacing: 0) {
+                                        Text("\(setIndex + 1)").hAlign(.center)
 
-                                    Text(String(format: "%.1f", set.weight)).hAlign(.center)
+                                        Text(String(format: "%.1f", set.weight)).hAlign(.center)
 
-                                    Text("\(set.reps)").hAlign(.center)
+                                        Text("\(set.reps)").hAlign(.center)
 
-                                    Button(action: {
-                                        onToggleSetCompletion(setIndex)
-                                    }) {
-                                        Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                                            .foregroundStyle(isCompleted ? .green : .secondary)
+                                        Button(action: {
+                                            onToggleSetCompletion(setIndex)
+                                        }) {
+                                            Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
+                                                .foregroundStyle(isCompleted ? .green : .secondary)
+                                        }
+                                        .hAlign(.center)
                                     }
-                                    .hAlign(.center)
+                                    .font(.subheadline)
+                                    .padding(.vertical, 8)
+                                    .background(isCurrentExercise && setIndex == currentSetIndex ? Color.blue.opacity(0.1) : Color.clear)
                                 }
-                                .font(.subheadline)
                             }
                         }
                     }
