@@ -340,7 +340,7 @@ struct WorkoutSessionView: View {
                 .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
                 .foregroundColor(.main)
                 .rotationEffect(Angle(degrees: 270.0))
-                .animation(.spring(response: 0.5, dampingFraction: 0.7), value: viewModel.currentExerciseProgress)
+                .animation(.easeOut, value: viewModel.currentExerciseProgress)
         }
         .frame(width: 230, height: 230)
         .onTapGesture {
