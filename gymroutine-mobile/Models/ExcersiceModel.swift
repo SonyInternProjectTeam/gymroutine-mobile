@@ -14,6 +14,7 @@ struct Exercise: Codable, Hashable {
     let name: String
     let description: String
     let part: String
+    let detailedPart: String
     
     func toExercisePart() -> ExercisePart? {
         return ExercisePart(rawValue: part)
@@ -24,7 +25,8 @@ struct Exercise: Codable, Hashable {
             key: "sample",
             name: "サンプルエクササイズ",
             description: "サンプルの部位を鍛えることができます",
-            part: ExercisePart.arm.rawValue
+            part: ExercisePart.arm.rawValue,
+            detailedPart: "biceps"
         )
     }
 }
