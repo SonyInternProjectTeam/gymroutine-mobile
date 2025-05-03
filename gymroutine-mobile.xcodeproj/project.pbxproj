@@ -37,11 +37,9 @@
 		00CDC43B2D845E8E003B18EB /* InitProfileSetupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3EB2D845E8E003B18EB /* InitProfileSetupViewModel.swift */; };
 		00CDC43C2D845E8E003B18EB /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3EC2D845E8E003B18EB /* LoginViewModel.swift */; };
 		00CDC43D2D845E8E003B18EB /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3ED2D845E8E003B18EB /* MainViewModel.swift */; };
-		00CDC43E2D845E8E003B18EB /* PasswordResetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3EE2D845E8E003B18EB /* PasswordResetViewModel.swift */; };
 		00CDC43F2D845E8E003B18EB /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3EF2D845E8E003B18EB /* ProfileViewModel.swift */; };
 		00CDC4412D845E8E003B18EB /* SignupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F12D845E8E003B18EB /* SignupViewModel.swift */; };
 		00CDC4422D845E8E003B18EB /* SplashViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F22D845E8E003B18EB /* SplashViewModel.swift */; };
-		00CDC4442D845E8E003B18EB /* WorkoutProcessViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F42D845E8E003B18EB /* WorkoutProcessViewModel.swift */; };
 		00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F62D845E8E003B18EB /* CapsuleButtonStyle.swift */; };
 		00CDC4462D845E8E003B18EB /* CircleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F72D845E8E003B18EB /* CircleButtonStyle.swift */; };
 		00CDC4482D845E8E003B18EB /* PrimaryButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC3F92D845E8E003B18EB /* PrimaryButtonStyle.swift */; };
@@ -55,13 +53,11 @@
 		00CDC4502D845E8E003B18EB /* PasswordField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4032D845E8E003B18EB /* PasswordField.swift */; };
 		00CDC4512D845E8E003B18EB /* ProgressTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4052D845E8E003B18EB /* ProgressTabBar.swift */; };
 		00CDC4542D845E8E003B18EB /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC40B2D845E8E003B18EB /* ProfileView.swift */; };
-		00CDC45A2D845E8E003B18EB /* WorkoutProcessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4122D845E8E003B18EB /* WorkoutProcessView.swift */; };
 		00CDC45B2D845E8E003B18EB /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4142D845E8E003B18EB /* CalendarView.swift */; };
 		00CDC45D2D845E8E003B18EB /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4162D845E8E003B18EB /* HomeView.swift */; };
 		00CDC45E2D845E8E003B18EB /* InitProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4172D845E8E003B18EB /* InitProfileSetupView.swift */; };
 		00CDC45F2D845E8E003B18EB /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4182D845E8E003B18EB /* LoginView.swift */; };
 		00CDC4602D845E8E003B18EB /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC4192D845E8E003B18EB /* MainView.swift */; };
-		00CDC4612D845E8E003B18EB /* PasswordResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC41A2D845E8E003B18EB /* PasswordResetView.swift */; };
 		00CDC4622D845E8E003B18EB /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC41B2D845E8E003B18EB /* RootView.swift */; };
 		00CDC4642D845E8E003B18EB /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC41D2D845E8E003B18EB /* SignupView.swift */; };
 		00CDC4652D845E8E003B18EB /* SnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00CDC41E2D845E8E003B18EB /* SnsView.swift */; };
@@ -95,6 +91,12 @@
 		273750F82DB14902003D031D /* WeightHistoryGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273750F62DB14902003D031D /* WeightHistoryGraphView.swift */; };
 		273751362DB15132003D031D /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273751352DB1512B003D031D /* ProfileEditView.swift */; };
 		273751382DB15147003D031D /* ProfileEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273751372DB1513F003D031D /* ProfileEditViewModel.swift */; };
+		27475F622DC4A9000065C420 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F5F2DC4A9000065C420 /* AnalyticsView.swift */; };
+		27475F632DC4A9000065C420 /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F602DC4A9000065C420 /* AnalyticsViewModel.swift */; };
+		27475F652DC4A90E0065C420 /* UserAnalyticsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F642DC4A90E0065C420 /* UserAnalyticsModel.swift */; };
+		27475F672DC4A9170065C420 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F662DC4A9170065C420 /* AnalyticsService.swift */; };
+		27475F6A2DC663470065C420 /* PasswordResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F682DC663470065C420 /* PasswordResetView.swift */; };
+		27475F6B2DC663470065C420 /* PasswordResetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F692DC663470065C420 /* PasswordResetViewModel.swift */; };
 		275100A02DBA237600116001 /* FollowersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2751009E2DBA237600116001 /* FollowersListView.swift */; };
 		275100A12DBA237600116001 /* FollowingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2751009F2DBA237600116001 /* FollowingListView.swift */; };
 		275C71532DACD2C300579962 /* GlobalWorkoutSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */; };
@@ -172,11 +174,9 @@
 		00CDC3EB2D845E8E003B18EB /* InitProfileSetupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitProfileSetupViewModel.swift; sourceTree = "<group>"; };
 		00CDC3EC2D845E8E003B18EB /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		00CDC3ED2D845E8E003B18EB /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
-		00CDC3EE2D845E8E003B18EB /* PasswordResetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordResetViewModel.swift; sourceTree = "<group>"; };
 		00CDC3EF2D845E8E003B18EB /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		00CDC3F12D845E8E003B18EB /* SignupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupViewModel.swift; sourceTree = "<group>"; };
 		00CDC3F22D845E8E003B18EB /* SplashViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewModel.swift; sourceTree = "<group>"; };
-		00CDC3F42D845E8E003B18EB /* WorkoutProcessViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutProcessViewModel.swift; sourceTree = "<group>"; };
 		00CDC3F62D845E8E003B18EB /* CapsuleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleButtonStyle.swift; sourceTree = "<group>"; };
 		00CDC3F72D845E8E003B18EB /* CircleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButtonStyle.swift; sourceTree = "<group>"; };
 		00CDC3F92D845E8E003B18EB /* PrimaryButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButtonStyle.swift; sourceTree = "<group>"; };
@@ -190,13 +190,11 @@
 		00CDC4032D845E8E003B18EB /* PasswordField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordField.swift; sourceTree = "<group>"; };
 		00CDC4052D845E8E003B18EB /* ProgressTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTabBar.swift; sourceTree = "<group>"; };
 		00CDC40B2D845E8E003B18EB /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		00CDC4122D845E8E003B18EB /* WorkoutProcessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutProcessView.swift; sourceTree = "<group>"; };
 		00CDC4142D845E8E003B18EB /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		00CDC4162D845E8E003B18EB /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		00CDC4172D845E8E003B18EB /* InitProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitProfileSetupView.swift; sourceTree = "<group>"; };
 		00CDC4182D845E8E003B18EB /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		00CDC4192D845E8E003B18EB /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		00CDC41A2D845E8E003B18EB /* PasswordResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordResetView.swift; sourceTree = "<group>"; };
 		00CDC41B2D845E8E003B18EB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		00CDC41D2D845E8E003B18EB /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
 		00CDC41E2D845E8E003B18EB /* SnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnsView.swift; sourceTree = "<group>"; };
@@ -229,6 +227,12 @@
 		273750F62DB14902003D031D /* WeightHistoryGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightHistoryGraphView.swift; sourceTree = "<group>"; };
 		273751352DB1512B003D031D /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		273751372DB1513F003D031D /* ProfileEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewModel.swift; sourceTree = "<group>"; };
+		27475F5F2DC4A9000065C420 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		27475F602DC4A9000065C420 /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
+		27475F642DC4A90E0065C420 /* UserAnalyticsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAnalyticsModel.swift; sourceTree = "<group>"; };
+		27475F662DC4A9170065C420 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		27475F682DC663470065C420 /* PasswordResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordResetView.swift; sourceTree = "<group>"; };
+		27475F692DC663470065C420 /* PasswordResetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordResetViewModel.swift; sourceTree = "<group>"; };
 		2751009E2DBA237600116001 /* FollowersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowersListView.swift; sourceTree = "<group>"; };
 		2751009F2DBA237600116001 /* FollowingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingListView.swift; sourceTree = "<group>"; };
 		275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalWorkoutSessionView.swift; sourceTree = "<group>"; };
@@ -354,6 +358,7 @@
 		00CDC3DA2D845E8E003B18EB /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				27475F642DC4A90E0065C420 /* UserAnalyticsModel.swift */,
 				27277A5E2DABCD4300166807 /* RecommendedUser.swift */,
 				00CDC3D72D845E8E003B18EB /* ExcersiceModel.swift */,
 				00CDC3D82D845E8E003B18EB /* UserModel.swift */,
@@ -388,6 +393,7 @@
 		00CDC3E62D845E8E003B18EB /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				27475F662DC4A9170065C420 /* AnalyticsService.swift */,
 				271A769C2DAEA89100C294D5 /* HeatmapService.swift */,
 				276F872C2DB1D98E00E8435E /* ResultService.swift */,
 				272779F02DA8C30700166807 /* StoryService.swift */,
@@ -404,8 +410,6 @@
 		00CDC3F52D845E8E003B18EB /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				00CDC3EE2D845E8E003B18EB /* PasswordResetViewModel.swift */,
-				00CDC3F42D845E8E003B18EB /* WorkoutProcessViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -480,19 +484,9 @@
 			path = ViewParts;
 			sourceTree = "<group>";
 		};
-		00CDC4132D845E8E003B18EB /* Workout */ = {
-			isa = PBXGroup;
-			children = (
-				00CDC4122D845E8E003B18EB /* WorkoutProcessView.swift */,
-			);
-			path = Workout;
-			sourceTree = "<group>";
-		};
 		00CDC4212D845E8E003B18EB /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				00CDC4132D845E8E003B18EB /* Workout */,
-				00CDC41A2D845E8E003B18EB /* PasswordResetView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -529,6 +523,7 @@
 				00CDC46C2D846083003B18EB /* Sns */,
 				00CDC4742D8464B5003B18EB /* Profile */,
 				272779E72DA8BAD700166807 /* Story */,
+				27475F612DC4A9000065C420 /* Analytics */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -612,6 +607,8 @@
 		00CDC4722D846278003B18EB /* Signup */ = {
 			isa = PBXGroup;
 			children = (
+				27475F682DC663470065C420 /* PasswordResetView.swift */,
+				27475F692DC663470065C420 /* PasswordResetViewModel.swift */,
 				00CDC41D2D845E8E003B18EB /* SignupView.swift */,
 				00CDC3F12D845E8E003B18EB /* SignupViewModel.swift */,
 			);
@@ -688,6 +685,15 @@
 				273750F62DB14902003D031D /* WeightHistoryGraphView.swift */,
 			);
 			path = Graphs;
+			sourceTree = "<group>";
+		};
+		27475F612DC4A9000065C420 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				27475F5F2DC4A9000065C420 /* AnalyticsView.swift */,
+				27475F602DC4A9000065C420 /* AnalyticsViewModel.swift */,
+			);
+			path = Analytics;
 			sourceTree = "<group>";
 		};
 		27E5E5192CCEC9E9003E3E70 = {
@@ -873,6 +879,8 @@
 				00CDC4292D845E8E003B18EB /* Router.swift in Sources */,
 				00CDC42A2D845E8E003B18EB /* View+Extensions.swift in Sources */,
 				00CDC42B2D845E8E003B18EB /* UserManager.swift in Sources */,
+				27475F6A2DC663470065C420 /* PasswordResetView.swift in Sources */,
+				27475F6B2DC663470065C420 /* PasswordResetViewModel.swift in Sources */,
 				275C71612DAD432300579962 /* GlobalWorkoutSessionView.swift in Sources */,
 				277467872D8FF510004C25C3 /* UserCell.swift in Sources */,
 				277467892D8FF6CA004C25C3 /* UserSearchField.swift in Sources */,
@@ -886,6 +894,7 @@
 				00CDC42F2D845E8E003B18EB /* FollowRepository.swift in Sources */,
 				276F87312DB1DA7100E8435E /* CompletedWorkoutDetailView.swift in Sources */,
 				00CDC4302D845E8E003B18EB /* SnsRepository.swift in Sources */,
+				27475F672DC4A9170065C420 /* AnalyticsService.swift in Sources */,
 				00CDC4312D845E8E003B18EB /* AuthService.swift in Sources */,
 				27D6A86D2D9D9ABE004D3F2B /* MiniWorkoutView.swift in Sources */,
 				273750F52DB14447003D031D /* UpdateWeightView.swift in Sources */,
@@ -920,16 +929,15 @@
 				00CDC43D2D845E8E003B18EB /* MainViewModel.swift in Sources */,
 				0074075E2D9BC71000808964 /* Date+Extensions.swift in Sources */,
 				00CDC4812D85C408003B18EB /* CreateWorkoutViewModel.swift in Sources */,
-				00CDC43E2D845E8E003B18EB /* PasswordResetViewModel.swift in Sources */,
 				00CDC43F2D845E8E003B18EB /* ProfileViewModel.swift in Sources */,
 				00CDC4412D845E8E003B18EB /* SignupViewModel.swift in Sources */,
 				00CDC4422D845E8E003B18EB /* SplashViewModel.swift in Sources */,
-				00CDC4442D845E8E003B18EB /* WorkoutProcessViewModel.swift in Sources */,
 				275100A02DBA237600116001 /* FollowersListView.swift in Sources */,
 				275100A12DBA237600116001 /* FollowingListView.swift in Sources */,
 				272779ED2DA8BD6E00166807 /* StoryModel.swift in Sources */,
 				00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */,
 				277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */,
+				27475F652DC4A90E0065C420 /* UserAnalyticsModel.swift in Sources */,
 				00CDC4462D845E8E003B18EB /* CircleButtonStyle.swift in Sources */,
 				00CDC4922D87F0CD003B18EB /* WorkoutExerciseCell.swift in Sources */,
 				27277A1B2DABAA3500166807 /* WorkoutListCell.swift in Sources */,
@@ -949,7 +957,6 @@
 				00CDC4502D845E8E003B18EB /* PasswordField.swift in Sources */,
 				00CDC4512D845E8E003B18EB /* ProgressTabBar.swift in Sources */,
 				00CDC4542D845E8E003B18EB /* ProfileView.swift in Sources */,
-				00CDC45A2D845E8E003B18EB /* WorkoutProcessView.swift in Sources */,
 				00CDC45B2D845E8E003B18EB /* CalendarView.swift in Sources */,
 				860018D02D9B72BA00C9F2C6 /* SnsViewModel.swift in Sources */,
 				00CDC45D2D845E8E003B18EB /* HomeView.swift in Sources */,
@@ -957,10 +964,11 @@
 				00CDC45F2D845E8E003B18EB /* LoginView.swift in Sources */,
 				00CDC4842D85DBD1003B18EB /* ExerciseSearchView.swift in Sources */,
 				00CDC4602D845E8E003B18EB /* MainView.swift in Sources */,
-				00CDC4612D845E8E003B18EB /* PasswordResetView.swift in Sources */,
 				00CDC4622D845E8E003B18EB /* RootView.swift in Sources */,
 				271A76992DAEA87C00C294D5 /* HeatmapCalendarView.swift in Sources */,
 				277739FE2DA605420006397D /* WorkoutResultModel.swift in Sources */,
+				27475F622DC4A9000065C420 /* AnalyticsView.swift in Sources */,
+				27475F632DC4A9000065C420 /* AnalyticsViewModel.swift in Sources */,
 				009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */,
 				0074075C2D9BC64C00808964 /* CalendarViewModel.swift in Sources */,
 				272779F12DA8C30700166807 /* StoryService.swift in Sources */,
