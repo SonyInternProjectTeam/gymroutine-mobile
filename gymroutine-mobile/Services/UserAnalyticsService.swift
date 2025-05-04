@@ -3,9 +3,9 @@ import FirebaseFirestore
 import FirebaseFunctions
 import FirebaseAuth
 
-class AnalyticsService {
+class UserAnalyticsService {
     // 싱글톤 인스턴스
-    static let shared = AnalyticsService()
+    static let shared = UserAnalyticsService()
     
     private let db = Firestore.firestore()
     // 리전 명시 (예: "asia-northeast1") - 실제 프로젝트 리전에 맞게 수정

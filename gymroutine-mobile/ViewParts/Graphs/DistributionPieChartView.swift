@@ -17,7 +17,7 @@ struct DistributionPieChartView: View {
                     .frame(maxWidth: .infinity, minHeight: 150, alignment: .center)
             } else {
                 Chart {
-                    ForEach(AnalyticsService.shared.getDistributionChartData(from: distribution), id: \.0) { item in
+                    ForEach(UserAnalyticsService.shared.getDistributionChartData(from: distribution), id: \.0) { item in
                         SectorMark(
                             angle: .value("割合", item.1),
                             innerRadius: .ratio(0.5),

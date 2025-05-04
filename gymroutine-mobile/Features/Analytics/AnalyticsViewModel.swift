@@ -9,7 +9,7 @@ class AnalyticsViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
     
-    private let analyticsService = AnalyticsService.shared
+    private let userAnalyticsService = UserAnalyticsService.shared
     private let db = Firestore.firestore()
     private let userManager = UserManager.shared
     
@@ -41,7 +41,7 @@ class AnalyticsViewModel: ObservableObject {
         isLoading = true
         error = nil
         
-        analyticsService.getUserAnalytics(userId: userId) { [weak self] (analytics, error) in
+        userAnalyticsService.getUserAnalytics(userId: userId) { [weak self] (analytics, error) in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 
@@ -84,7 +84,7 @@ class AnalyticsViewModel: ObservableObject {
         error = nil
         
         // サービスメソッドの呼び出し
-        analyticsService.updateUserAnalytics(userId: userId) { [weak self] (success, error) in
+        userAnalyticsService.updateUserAnalytics(userId: userId) { [weak self] (success, error) in
             Task { @MainActor in
                 self?.isLoading = false
                 

@@ -24,7 +24,7 @@ struct FollowingComparisonChartView: View {
             }
             .padding(.vertical, 8)
             
-            Text(AnalyticsService.shared.getFollowingComparisonString(from: comparison))
+            Text(UserAnalyticsService.shared.getFollowingComparisonString(from: comparison))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .center)
