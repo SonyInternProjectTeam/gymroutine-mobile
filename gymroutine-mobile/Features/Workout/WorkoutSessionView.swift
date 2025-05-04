@@ -582,83 +582,74 @@ struct WorkoutSessionView: View {
 
     // MARK: - [Section4]: restTimerOverlay
     private var restTimerOverlay: some View {
-        VStack {
-            Spacer()
-            
-            HStack {
-                Spacer()
-                
-                VStack(spacing: 15) {
-                    Text("휴식 중...")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    ZStack {
-                        Circle()
-                            .stroke(lineWidth: 8)
-                            .opacity(0.3)
-                            .foregroundColor(.gray)
-                        
-                        Circle()
-                            .trim(from: 0.0, to: CGFloat(viewModel.remainingRestSeconds) / CGFloat(viewModel.restSeconds))
-                            .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
-                            .foregroundColor(.blue)
-                            .rotationEffect(Angle(degrees: 270.0))
-                            .animation(.linear, value: viewModel.remainingRestSeconds)
-                        
-                        Text("\(viewModel.remainingRestSeconds)")
-                            .font(.largeTitle)
-                            .bold()
-                            .contentTransition(.numericText())
-                    }
-                    .frame(width: 100, height: 100)
-                    
-                    HStack(spacing: 20) {
-                        Button {
-                            viewModel.updateRestTime(seconds: viewModel.restSeconds + 15)
-                        } label: {
-                            Text("+15s")
-                                .font(.caption)
-                                .padding(8)
-                                .background(Color.blue.opacity(0.2))
-                                .clipShape(Circle())
-                        }
-                        
-                        Button {
-                            viewModel.stopRestTimer()
-                            viewModel.moveToNextSet()
-                        } label: {
-                            Text("Skip")
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                                .background(.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(15)
-                        }
-                        .buttonStyle(.plain)
-                        
-                        Button {
-                            viewModel.updateRestTime(seconds: max(15, viewModel.restSeconds - 15))
-                        } label: {
-                            Text("-15s")
-                                .font(.caption)
-                                .padding(8)
-                                .background(Color.blue.opacity(0.2))
-                                .clipShape(Circle())
-                        }
-                        .disabled(viewModel.restSeconds <= 15)
-                    }
-                }
-                .padding(30)
-                .background(.ultraThickMaterial)
-                .cornerRadius(20)
-                .shadow(radius: 10)
-                
-                Spacer()
+        VStack(spacing: 16) {
+            Text("休憩中...")
+                .font(.title2)
+                .fontWeight(.bold)
+
+            ZStack {
+                Circle()
+                    .stroke(lineWidth: 8)
+                    .opacity(0.3)
+                    .foregroundColor(.gray)
+
+                Circle()
+                    .trim(from: 0.0, to: CGFloat(viewModel.remainingRestSeconds) / CGFloat(viewModel.restSeconds))
+                    .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
+                    .foregroundColor(.blue)
+                    .rotationEffect(Angle(degrees: 270.0))
+                    .animation(.linear, value: viewModel.remainingRestSeconds)
+
+                Text("\(viewModel.remainingRestSeconds)")
+                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 36, weight: .bold)))
+                    .contentTransition(.numericText())
             }
-            
-            Spacer()
+            .frame(width: 100, height: 100)
+
+            HStack(spacing: 20) {
+                Button {
+                    viewModel.updateRestTime(seconds: max(15, viewModel.restSeconds - 15))
+                } label: {
+                    Text("-15s")
+                        .font(.caption)
+                        .padding(12)
+                        .background(Color.blue.opacity(0.2))
+                        .clipShape(Circle())
+                }
+                .disabled(viewModel.restSeconds <= 15)
+
+                Button {
+                    viewModel.stopRestTimer()
+                    viewModel.moveToNextSet()
+                } label: {
+                    Text("スキップ")
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(16)
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    viewModel.updateRestTime(seconds: viewModel.restSeconds + 15)
+                } label: {
+                    Text("+15s")
+                        .font(.caption)
+                        .padding(12)
+                        .background(Color.blue.opacity(0.2))
+                        .clipShape(Circle())
+                }
+            }
+            .padding(.top, 8)
         }
+        .padding(.vertical, 24)
+        .padding(.horizontal, 32)
+        .background(.ultraThickMaterial)
+        .cornerRadius(20)
+        .shadow(radius: 10)
+        .hAlign(.center)
+        .vAlign(.center)
         .background(Color.black.opacity(0.4))
         .edgesIgnoringSafeArea(.all)
         .onTapGesture {
