@@ -222,13 +222,10 @@ struct WorkoutSessionView: View {
 
                     // 운동 이름
                     VStack(spacing: 16) {
-                        exerciseTitleBox(exerciseName: exercise.name)
+                        exerciseTitleBox(exercise: exercise)
 
                         // 운동 이미지와 진행률
                         exerciseProgressCircle(exercise: exercise)
-
-                        // 휴식 시간 설정
-                        //                            restTimeSettingView(exercise: exercise)
 
                         exerciseSetsSection(for: exercise)
                     }
@@ -297,19 +294,21 @@ struct WorkoutSessionView: View {
         }
     }
 
-    private func exerciseTitleBox(exerciseName: String) -> some View {
+    private func exerciseTitleBox(exercise: WorkoutExercise) -> some View {
         HStack(spacing: 16) {
             Rectangle()
                 .cornerRadius(4)
                 .frame(width: 8, height: 32)
                 .foregroundStyle(Color(.systemGray5))
 
-            Text(exerciseName)
+            Text(exercise.name)
                 .font(.title2.bold())
 
             Spacer()
+
+            restTimeSettingView(exercise: exercise)
         }
-        .padding(.horizontal, 32)
+        .padding(.horizontal, 24)
     }
 
     // 詳細画面のエクササイズ画像と進行円形インジケーター
@@ -373,39 +372,21 @@ struct WorkoutSessionView: View {
 
     // 휴식 시간 설정 뷰
     private func restTimeSettingView(exercise: WorkoutExercise) -> some View {
-        VStack(spacing: 10) {
-            HStack {
-                Text("休憩時間")
-                    .font(.headline)
-                Spacer()
-                // 실시간 남은 시간 대신 설정된 시간 표시
-                Text("\(exercise.restTime ?? 90)秒")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
             Button(action: {
                 selectedExerciseIndex = viewModel.currentExerciseIndex // 현재 인덱스 설정
                 showRestTimeSettingsSheet = true
             }) {
-                HStack {
+                HStack(spacing: 8) {
                     Image(systemName: "timer")
                         .font(.subheadline)
-                    Text("設定変更")
+                    Text("休憩\(exercise.restTime ?? 90)秒")
                         .font(.subheadline)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
+                .padding(8)
                 .background(Color.blue.opacity(0.1))
                 .foregroundColor(.blue)
                 .cornerRadius(12)
             }
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
-        .background(Color(UIColor.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .padding(.horizontal)
     }
 
     private func exerciseSetsSection(for exercise: WorkoutExercise) -> some View {
