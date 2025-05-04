@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
 
 // Add notification name for workout deletion
 extension Notification.Name {
@@ -15,19 +14,8 @@ extension Notification.Name {
 
 struct WorkoutDetailView: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var colorScheme
     @StateObject var viewModel: WorkoutDetailViewModel
     @State private var workoutDeleted = false // State to track deletion
-    private let analyticsService = AnalyticsService.shared
-    
-    var onBack: (() -> Void)?
-    var onDelete: (() -> Void)?
-    
-    init(workoutId: String, onBack: (() -> Void)? = nil, onDelete: (() -> Void)? = nil) {
-        _viewModel = StateObject(wrappedValue: WorkoutDetailViewModel(workoutId: workoutId))
-        self.onBack = onBack
-        self.onDelete = onDelete
-    }
     
     var body: some View {
         // NavigationStack(또는 NavigationView) 내부에서 뷰를 표시
@@ -57,16 +45,7 @@ struct WorkoutDetailView: View {
             // 왼쪽: 커스텀 Back 버튼 + 타이틀
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
-                    Button(action: { 
-                        dismiss() 
-                        
-                        // Log navigate back
-                        analyticsService.logUserAction(
-                            action: "navigate_back",
-                            itemId: viewModel.workout.id ?? "",
-                            contentType: "workout_detail"
-                        )
-                    }) {
+                    Button(action: { dismiss() }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.blue)
                     }
@@ -80,14 +59,6 @@ struct WorkoutDetailView: View {
                     // Use button to trigger sheet presentation instead of NavigationLink
                     Button("編集") {
                         viewModel.showEditView = true
-                        
-                        // Log edit button tap
-                        analyticsService.logUserAction(
-                            action: "edit_workout_button_tap",
-                            itemId: viewModel.workout.id ?? "",
-                            itemName: viewModel.workout.name,
-                            contentType: "workout_detail"
-                        )
                     }
                 }
             }
@@ -113,18 +84,6 @@ struct WorkoutDetailView: View {
         .onAppear {
             // 뷰가 나타날 때마다 최신 데이터를 불러옴
             viewModel.refreshWorkoutData()
-            
-            // Log screen view
-            analyticsService.logScreenView(screenName: "WorkoutDetail", parameters: ["workout_id": viewModel.workout.id ?? ""])
-            
-            // Log workout detail viewed
-            analyticsService.logEvent("workout_detail_viewed", parameters: [
-                "workout_id": viewModel.workout.id ?? "",
-                "workout_name": viewModel.workout.name,
-                "is_routine": viewModel.workout.isRoutine,
-                "is_current_user": viewModel.isCurrentUser,
-                "exercise_count": viewModel.exercises.count
-            ])
         }
         // 앱이 활성화될 때마다 데이터 갱신
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -145,13 +104,6 @@ struct WorkoutDetailView: View {
                     object: nil,
                     userInfo: ["workoutId": viewModel.workout.id ?? ""]
                 )
-                
-                // Log workout deletion
-                analyticsService.logEvent("workout_deleted", parameters: [
-                    "workout_id": viewModel.workout.id ?? "",
-                    "workout_name": viewModel.workout.name
-                ])
-                
                 dismiss() // Dismiss DetailView when workout is deleted
             }
         }
@@ -205,41 +157,17 @@ struct WorkoutDetailView: View {
                     
                     WorkoutExerciseCell(workoutExercise: workoutExercise, onRestTimeClicked: {
                         viewModel.showRestTimeSettings(for: index)
-                        
-                        // Log rest time settings tap
-                        analyticsService.logUserAction(
-                            action: "rest_time_settings_tap",
-                            itemId: workoutExercise.id,
-                            itemName: workoutExercise.name,
-                            contentType: "workout_detail"
-                        )
                     })
                     
                         .onTapGesture {
                             if viewModel.isCurrentUser {
                                 viewModel.onClickedExerciseSets(index: index)
-                                
-                                // Log exercise sets edit tap
-                                analyticsService.logUserAction(
-                                    action: "exercise_sets_edit_tap",
-                                    itemId: workoutExercise.id,
-                                    itemName: workoutExercise.name,
-                                    contentType: "workout_detail"
-                                )
                             }
                         }
                         .overlay(alignment: .topTrailing) {
                             if viewModel.isCurrentUser {
                                 Button(action: {
                                     viewModel.removeExercise(workoutExercise)
-                                    
-                                    // Log exercise removal
-                                    analyticsService.logUserAction(
-                                        action: "remove_exercise",
-                                        itemId: workoutExercise.id,
-                                        itemName: workoutExercise.name,
-                                        contentType: "workout_detail"
-                                    )
                                 }, label: {
                                     Image(systemName: "xmark")
                                         .font(.headline)
@@ -291,13 +219,6 @@ struct WorkoutDetailView: View {
                 if viewModel.isCurrentUser {
                     Button {
                         viewModel.addExercise()
-                        
-                        // Log add exercise button tap
-                        analyticsService.logUserAction(
-                            action: "add_exercise_button_tap",
-                            itemId: viewModel.workout.id ?? "",
-                            contentType: "workout_detail"
-                        )
                     } label: {
                         Label("追加する", systemImage: "plus")
                     }
@@ -306,14 +227,6 @@ struct WorkoutDetailView: View {
                     Button {
                         print("📱 始める 버튼이 클릭되었습니다.")
                         viewModel.startWorkout()
-                        
-                        // Log start workout button tap
-                        analyticsService.logUserAction(
-                            action: "start_workout_button_tap",
-                            itemId: viewModel.workout.id ?? "",
-                            itemName: viewModel.workout.name,
-                            contentType: "workout_detail"
-                        )
                     } label: {
                         Label("始める", systemImage: "play")
                     }
