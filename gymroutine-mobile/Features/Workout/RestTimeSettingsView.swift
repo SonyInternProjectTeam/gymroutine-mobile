@@ -23,21 +23,36 @@ struct RestTimeSettingsView: View {
     }
     
     var body: some View {
-        VStack(spacing: 20) {
-            Text("休憩時間設定")
-                .font(.headline)
-                .padding(.top)
-            
-            Text(LocalizedStringKey(workoutExercise.name))
-                .font(.title3)
-                .fontWeight(.bold)
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: "timer")
+                Text("休憩設定")
+            }
+            .font(.headline)
+            .padding(.top, 24)
+            .padding(.bottom, 16)
+
+            Divider()
+
+            VStack(spacing: 8) {
+                Text(LocalizedStringKey(workoutExercise.name))
+                    .foregroundStyle(.secondary)
+                    .font(.title3)
+                    .fontWeight(.bold)
+
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
+                    Text("\(selectedTime)")
+                        .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 48, weight: .bold)))
+                    Text("秒")
+                        .font(.title3)
+                        .bold()
+                }
+                .foregroundColor(.blue)
+            }
+            .vAlign(.center)
             
             VStack(spacing: 16) {
-                Text("\(selectedTime)秒")
-                    .font(.system(size: 36, weight: .bold))
-                    .foregroundColor(.blue)
-                
-                HStack {
+                HStack(spacing: 8) {
                     Button(action: {
                         if selectedTime > 15 {
                             selectedTime -= 15
@@ -64,21 +79,21 @@ struct RestTimeSettingsView: View {
                             .foregroundColor(.blue)
                     }
                 }
-            }
-            .padding()
-            
-            HStack(spacing: 15) {
-                ForEach(restTimeOptions, id: \.self) { time in
-                    Button(action: {
-                        selectedTime = time
-                    }) {
-                        Text("\(time)")
-                            .font(.footnote)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(selectedTime == time ? Color.blue : Color.blue.opacity(0.1))
-                            .foregroundColor(selectedTime == time ? .white : .blue)
-                            .cornerRadius(20)
+                .padding(.horizontal, 24)
+
+                HStack(spacing: 16) {
+                    ForEach(restTimeOptions, id: \.self) { time in
+                        Button(action: {
+                            selectedTime = time
+                        }) {
+                            Text("\(time)")
+                                .font(.footnote)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(selectedTime == time ? Color.blue : Color.blue.opacity(0.1))
+                                .foregroundColor(selectedTime == time ? .white : .blue)
+                                .cornerRadius(20)
+                        }
                     }
                 }
             }
@@ -97,15 +112,21 @@ struct RestTimeSettingsView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle())
             }
-            .padding(.top)
+            .padding(.top, 32)
+            .padding(.horizontal, 16)
         }
-        .padding()
     }
 }
 
 #Preview {
-    RestTimeSettingsView(
-        workoutExercise: .constant(WorkoutExercise.mock()),
-        onSave: { }
-    )
-} 
+    Text("a")
+        .sheet(isPresented: .constant(true)) {
+            RestTimeSettingsView(
+                workoutExercise: .constant(WorkoutExercise.mock()),
+                onSave: { }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+    
+}
