@@ -42,54 +42,56 @@ struct StoryView: View {
     
     @ViewBuilder
     private func contentBox() -> some View {
-        if viewModel.isLoading {
-            VStack(spacing: 16) {
-                ProgressView()
-                
-                Text("Loading...")
+        Group {
+            if viewModel.isLoading {
+                VStack(spacing: 16) {
+                    ProgressView()
+                    
+                    Text("Loading...")
+                        .foregroundStyle(.secondary)
+                        .font(.subheadline)
+                }
+            } else if let errorMessage = viewModel.errorMessage {
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 45))
+                        .foregroundColor(.yellow)
+                    
+                    Text(errorMessage)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
+            } else if let workoutResult = viewModel.workoutResult {
+                ScrollView(showsIndicators: false) {
+                    WorkoutResultDetailView(result: workoutResult)
+                }
+                .padding()
+            } else {
+                Text("ワークアウトデータが見つかりません。")
                     .foregroundStyle(.secondary)
-                    .font(.subheadline)
+                    .font(.body)
             }
-        } else if let errorMessage = viewModel.errorMessage {
-            VStack(spacing: 16) {
-                Image(systemName: "exclamationmark.triangle")
-                    .font(.system(size: 45))
-                    .foregroundColor(.yellow)
-                
-                Text(errorMessage)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-            }
-        } else if let workoutResult = viewModel.workoutResult {
-            ScrollView(showsIndicators: false) {
-                WorkoutResultDetailView(result: workoutResult)
-            }
-            .padding()
-            .frame(maxHeight: .infinity)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onEnded { value in
-                        let dragDistance = abs(value.translation.width) + abs(value.translation.height)
-                        if dragDistance < 16 { // ほぼ動いてない＝タップ判定
-                            let tapLocation = value.startLocation
-                            let screenWidth = UIScreen.main.bounds.width
-                            let tapRatio = tapLocation.x / screenWidth
+        }
+        .frame(maxHeight: .infinity)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onEnded { value in
+                    let dragDistance = abs(value.translation.width) + abs(value.translation.height)
+                    if dragDistance < 16 { // ほぼ動いてない＝タップ判定
+                        let tapLocation = value.startLocation
+                        let screenWidth = UIScreen.main.bounds.width
+                        let tapRatio = tapLocation.x / screenWidth
 
-                            if tapRatio < 0.2 {
-                                viewModel.previousStory()
-                            } else if tapRatio > 0.8 {
-                                viewModel.advanceStory()
-                            }
+                        if tapRatio < 0.2 {
+                            viewModel.previousStory()
+                        } else if tapRatio > 0.8 {
+                            viewModel.advanceStory()
                         }
                     }
-            )
-        } else {
-            Text("ワークアウトデータが見つかりません。")
-                .foregroundStyle(.secondary)
-                .font(.body)
-        }
+                }
+        )
     }
     
     // Progress Indicators
@@ -164,7 +166,7 @@ struct WorkoutResultDetailView: View {
             // 헤더: 워크아웃 제목 및 요약
             workoutTimeBox
             
-            customDivider
+            CustomDivider()
             
             // 운동 목록
             VStack(alignment: .leading, spacing: 16) {
@@ -184,7 +186,7 @@ struct WorkoutResultDetailView: View {
             // 노트 (있는 경우)
             if let notes = result.notes, !notes.isEmpty {
                 
-                customDivider
+                CustomDivider()
                 
                 VStack(alignment: .leading, spacing: 8) {
                     Label("ノート", systemImage: "note.text")
@@ -197,16 +199,6 @@ struct WorkoutResultDetailView: View {
                 }
             }
         }
-    }
-    
-    private var customDivider: some View {
-        Rectangle()
-            .fill(LinearGradient(
-                gradient: Gradient(colors: [.clear, .primary.opacity(0.3), .clear]),
-                startPoint: .leading,
-                endPoint: .trailing
-            ))
-            .frame(height: 2)
     }
     
     private var workoutTimeBox: some View {

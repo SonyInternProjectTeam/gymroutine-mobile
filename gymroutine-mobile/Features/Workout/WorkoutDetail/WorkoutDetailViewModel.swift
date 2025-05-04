@@ -132,7 +132,7 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     }
     
     /// 로컬 exercises 배열을 Firestore에 저장
-    private func saveExercisesToFirestore() {
+    func saveExercisesToFirestore() {
         guard let workoutId = workout.id else {
             print("Error: Cannot update workout without ID")
             return
