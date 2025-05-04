@@ -378,11 +378,11 @@ struct WorkoutSessionView: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "timer")
-                        .font(.subheadline)
                     Text("休憩\(exercise.restTime ?? 90)秒")
-                        .font(.subheadline)
                 }
-                .padding(8)
+                .font(.subheadline)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 8)
                 .background(Color.blue.opacity(0.1))
                 .foregroundColor(.blue)
                 .cornerRadius(12)
