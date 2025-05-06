@@ -87,7 +87,6 @@ async function getBodyPartFromExercise(exerciseName) {
     'プッシュアップ': 'push-up',
     'ラットプルダウン': 'lat pulldown',
     'ケーブルロウ': 'seated cable row'
-    // 필요에 따라 더 추가
   };
   
   // 일본어 이름을 영어로 변환 시도
@@ -125,7 +124,7 @@ async function getBodyPartFromExercise(exerciseName) {
   }
   
   // 직접 매핑 시도 (데이터베이스에 없는 운동을 위한 백업)
-  // TODO : dbにない運動をマッピングする
+  // TODO : db에 없는 운동을 매핑하는
   const directMapping = {
     'bench press': 'chest',
     'squat': 'lower body',
@@ -181,7 +180,7 @@ async function updateUserAnalytics(userId) {
     
     // 各分析データの生成
     const distribution = await calculateExerciseDistribution(workoutResults);
-    const adherence = calculateAdherence(userId, workoutResults, analysisStartDate);
+    const adherence = await calculateAdherence(userId, workoutResults, analysisStartDate);
     const favoriteExercises = findFavoriteExercises(workoutResults);
     const followingComparison = await calculateFollowingComparison(userId);
     const oneRepMax = calculateOneRepMax(workoutResults);
@@ -313,9 +312,9 @@ async function calculateExerciseDistribution(workoutResults) {
  * @param {string} userId - ユーザーID
  * @param {Array} workoutResults - 運動結果配列
  * @param {Date} startDate - 分析開始日
- * @returns {Object} 週間・月間遵守率
+ * @returns {Promise<Object>} 週間・月間遵守率
  */
-function calculateAdherence(userId, workoutResults, startDate) {
+async function calculateAdherence(userId, workoutResults, startDate) {
   try {
     const now = new Date();
     
@@ -324,7 +323,14 @@ function calculateAdherence(userId, workoutResults, startDate) {
     weekStart.setDate(now.getDate() - CONSTANTS.TIME.WEEKLY_DAYS);
     
     const monthStart = new Date();
-    monthStart.setDate(now.getDate() - CONSTANTS.TIME.MONTHLY_DAYS);
+    monthStart.setMonth(now.getMonth()); // 現在の月の初日
+    monthStart.setDate(1);
+    
+    // 当月の最終日を計算
+    const monthEnd = new Date(monthStart);
+    monthEnd.setMonth(monthEnd.getMonth() + 1);
+    monthEnd.setDate(0);
+    const daysInMonth = monthEnd.getDate(); // 当月の日数
     
     // 実際の運動日をセットに格納（重複排除）
     const workoutDates = new Set();
@@ -351,23 +357,174 @@ function calculateAdherence(userId, workoutResults, startDate) {
       }
     });
     
-    // 週間・月間の目標運動日数を計算（例: 週5日、月20日と仮定）
-    // 実際のアプリでは目標設定に基づいて調整
-    const weeklyTarget = 5; // 週5日を目標とする
-    const monthlyTarget = 20; // 月20日を目標とする
-    
-    // 遵守率を計算
-    const weeklyAdherence = Math.min(100, Math.round((weeklyWorkoutDates.size / weeklyTarget) * 100));
-    const monthlyAdherence = Math.min(100, Math.round((monthlyWorkoutDates.size / monthlyTarget) * 100));
-    
-    return {
-      thisWeek: weeklyAdherence,
-      thisMonth: monthlyAdherence
-    };
+    try {
+      // 当週と当月の予定されたワークアウト数を取得
+      const [weeklyPlannedCount, monthlyPlannedCount] = await Promise.all([
+        getPlannedWorkoutsForWeek(userId, weekStart),
+        getPlannedWorkoutsCount(userId, monthStart)
+      ]);
+      
+      // 予定されたワークアウトがない場合、デフォルト値を使用
+      const weeklyTarget = weeklyPlannedCount > 0 ? weeklyPlannedCount : 7; // デフォルト値は7（全曜日）
+      const monthlyTarget = monthlyPlannedCount > 0 ? monthlyPlannedCount : daysInMonth; // デフォルト値は当月の日数
+      
+      // 遵守率を計算
+      const weeklyAdherence = Math.min(100, Math.round((weeklyWorkoutDates.size / weeklyTarget) * 100));
+      const monthlyAdherence = Math.min(100, Math.round((monthlyWorkoutDates.size / monthlyTarget) * 100));
+      
+      return {
+        thisWeek: weeklyAdherence,
+        thisMonth: monthlyAdherence
+      };
+    } catch (error) {
+      logger.error(`Error getting planned workouts: ${error.message}`);
+      
+      // エラーが発生した場合、デフォルト値を使用
+      const weeklyTarget = 7; // デフォルト値は7（全曜日）
+      const monthlyTarget = daysInMonth; // デフォルト値は当月の日数
+      const weeklyAdherence = Math.min(100, Math.round((weeklyWorkoutDates.size / weeklyTarget) * 100));
+      const monthlyAdherence = Math.min(100, Math.round((monthlyWorkoutDates.size / monthlyTarget) * 100));
+      
+      return {
+        thisWeek: weeklyAdherence,
+        thisMonth: monthlyAdherence
+      };
+    }
   } catch (error) {
     logger.error(`Error calculating adherence: ${error.message}`);
     return { thisWeek: 0, thisMonth: 0 };
   }
+}
+
+/**
+ * 特定の週に予定されたワークアウト数を取得
+ * @param {string} userId - ユーザーID
+ * @param {Date} weekStart - 週の開始日
+ * @returns {Promise<number>} 予定されたワークアウト数
+ */
+async function getPlannedWorkoutsForWeek(userId, weekStart) {
+  try {
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6); // 週の終了日（7日間）
+    
+    // ユーザーのルーティンワークアウトを取得
+    const workoutsRef = db.collection('Workouts');
+    const workoutsSnapshot = await workoutsRef
+      .where('userId', '==', userId)
+      .where('isRoutine', '==', true)
+      .get();
+    
+    if (workoutsSnapshot.empty) {
+      logger.info(`No routine workouts found for user ${userId}`);
+      return 0;
+    }
+    
+    // 当週の日にち配列を生成（すべての日の曜日情報を含む）
+    const daysInWeek = [];
+    let currentDay = new Date(weekStart);
+    
+    while (currentDay <= weekEnd) {
+      daysInWeek.push({
+        date: new Date(currentDay),
+        dayOfWeek: getDayOfWeek(currentDay)
+      });
+      currentDay.setDate(currentDay.getDate() + 1);
+    }
+    
+    // 各ルーティンワークアウトの予定日数をカウント
+    let plannedCount = 0;
+    
+    workoutsSnapshot.forEach(doc => {
+      const workout = doc.data();
+      
+      // ルーティンに曜日指定があるか確認
+      if (workout.scheduledDays && Array.isArray(workout.scheduledDays) && workout.scheduledDays.length > 0) {
+        // 当週の各日に対して、その曜日がルーティンの予定日に含まれるかチェック
+        daysInWeek.forEach(day => {
+          if (workout.scheduledDays.includes(day.dayOfWeek)) {
+            plannedCount++;
+          }
+        });
+      }
+    });
+    
+    logger.info(`Found ${plannedCount} planned workout days for user ${userId} in current week`);
+    return plannedCount;
+  } catch (error) {
+    logger.error(`Error getting planned workouts for week: ${error.message}`);
+    return 0;
+  }
+}
+
+/**
+ * 特定の月に予定されたワークアウト数を取得
+ * @param {string} userId - ユーザーID
+ * @param {Date} monthStart - 月の開始日
+ * @returns {Promise<number>} 予定されたワークアウト数
+ */
+async function getPlannedWorkoutsCount(userId, monthStart) {
+  try {
+    const monthEnd = new Date(monthStart);
+    monthEnd.setMonth(monthEnd.getMonth() + 1);
+    monthEnd.setDate(0); // 月末日を取得
+    
+    // ユーザーのルーティンワークアウトを取得
+    const workoutsRef = db.collection('Workouts');
+    const workoutsSnapshot = await workoutsRef
+      .where('userId', '==', userId)
+      .where('isRoutine', '==', true)
+      .get();
+    
+    if (workoutsSnapshot.empty) {
+      logger.info(`No routine workouts found for user ${userId}`);
+      return 0;
+    }
+    
+    // 当月の日にち配列を生成（すべての日の曜日情報を含む）
+    const daysInMonth = [];
+    let currentDay = new Date(monthStart);
+    
+    while (currentDay <= monthEnd) {
+      daysInMonth.push({
+        date: new Date(currentDay),
+        dayOfWeek: getDayOfWeek(currentDay)
+      });
+      currentDay.setDate(currentDay.getDate() + 1);
+    }
+    
+    // 各ルーティンワークアウトの予定日数をカウント
+    let plannedCount = 0;
+    
+    workoutsSnapshot.forEach(doc => {
+      const workout = doc.data();
+      
+      // ルーティンに曜日指定があるか確認
+      if (workout.scheduledDays && Array.isArray(workout.scheduledDays) && workout.scheduledDays.length > 0) {
+        // 当月の各日に対して、その曜日がルーティンの予定日に含まれるかチェック
+        daysInMonth.forEach(day => {
+          if (workout.scheduledDays.includes(day.dayOfWeek)) {
+            plannedCount++;
+          }
+        });
+      }
+    });
+    
+    logger.info(`Found ${plannedCount} planned workout days for user ${userId} in current month`);
+    return plannedCount;
+  } catch (error) {
+    logger.error(`Error getting planned workouts count: ${error.message}`);
+    return 0;
+  }
+}
+
+/**
+ * 日付から曜日を取得（英語形式）
+ * @param {Date} date - 日付
+ * @returns {string} 曜日（英語）
+ */
+function getDayOfWeek(date) {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return days[date.getDay()];
 }
 
 /**
