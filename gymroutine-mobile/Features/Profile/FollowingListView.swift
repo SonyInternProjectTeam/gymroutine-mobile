@@ -13,7 +13,6 @@ struct FollowingListView: View {
     @State private var following: [User] = []
     @State private var errorMessage: String? = nil
     private let followService = FollowService()
-    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         List {
@@ -61,9 +60,6 @@ struct FollowingListView: View {
                 errorMessage = error.localizedDescription
             }
             UIApplication.hideLoading()
-            
-            // Log screen view
-            analyticsService.logScreenView(screenName: "FollowingList")
         }
     }
 }

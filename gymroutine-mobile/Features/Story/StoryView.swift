@@ -8,7 +8,6 @@ struct StoryView: View {
     @State private var progressValue: CGFloat = 0
     @State private var timer: Timer? = nil
     @State private var storyDuration: Double = 5.0 // 5 seconds per story
-    private let analyticsService = AnalyticsService.shared
     
     // UI관련 상태 변수
     @State private var showCloseButton = true
@@ -184,8 +183,6 @@ struct StoryView: View {
         .edgesIgnoringSafeArea(.all)
         .onAppear {
             startTimer()
-            // Log screen view
-            analyticsService.logScreenView(screenName: "Story")
         }
         .onDisappear {
             stopTimer()

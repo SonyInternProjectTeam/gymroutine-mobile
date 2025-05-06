@@ -11,7 +11,6 @@ import SwiftUI
 struct WelcomeView: View {
     
     let router: Router
-    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         NavigationStack {
@@ -50,10 +49,6 @@ struct WelcomeView: View {
             }
             .vAlign(.center)
             .padding(.horizontal, 48)
-            .onAppear {
-                // Log screen view
-                analyticsService.logScreenView(screenName: "Welcome")
-            }
         }
     }
 }

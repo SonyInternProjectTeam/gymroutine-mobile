@@ -5,7 +5,6 @@ struct CompletedWorkoutDetailView: View {
     let resultId: String
     @StateObject private var viewModel = CompletedWorkoutDetailViewModel()
     @Environment(\.dismiss) private var dismiss
-    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         ScrollView {
@@ -18,9 +17,6 @@ struct CompletedWorkoutDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             viewModel.loadWorkoutResult(resultId: resultId)
-            
-            // Log screen view
-            analyticsService.logScreenView(screenName: "CompletedWorkoutDetail")
         }
     }
     

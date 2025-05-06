@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SignupView: View {
     @ObservedObject var viewModel: SignupViewModel
-    private let analyticsService = AnalyticsService.shared
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -33,10 +32,6 @@ struct SignupView: View {
         .padding([.top, .horizontal], 24)
         .navigationTitle("新規登録")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            // Log screen view
-            analyticsService.logScreenView(screenName: "Signup")
-        }
     }
 
     private var InputForm: some View {
