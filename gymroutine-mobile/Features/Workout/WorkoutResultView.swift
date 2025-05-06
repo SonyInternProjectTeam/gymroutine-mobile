@@ -361,13 +361,13 @@ struct WorkoutResultView_Previews: PreviewProvider {
             ExerciseSet(reps: 6, weight: 70)
         ]
         // WorkoutExercise 생성 시 Exercise 정보 직접 전달 불필요 (name, part만 사용)
-        let sampleWorkoutExercise1 = WorkoutExercise(name: "벤치 프레스", part: ExercisePart.chest.rawValue, sets: sampleSets1)
+        let sampleWorkoutExercise1 = WorkoutExercise(name: "벤치 프레스", part: ExercisePart.chest.rawValue, key: "Bench Press", sets: sampleSets1)
 
         let sampleSets2 = [
             ExerciseSet(reps: 12, weight: 100),
             ExerciseSet(reps: 10, weight: 110)
         ]
-        let sampleWorkoutExercise2 = WorkoutExercise(name: "스쿼트", part: ExercisePart.legs.rawValue, sets: sampleSets2)
+        let sampleWorkoutExercise2 = WorkoutExercise(name: "스쿼트", part: ExercisePart.lowerbody.rawValue, key:"Squat", sets: sampleSets2)
 
         // Workout 모델 사용
         let sampleWorkout = Workout(

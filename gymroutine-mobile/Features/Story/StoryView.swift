@@ -237,8 +237,8 @@ struct StoryView_Previews: PreviewProvider {
         // Create mock workout result data
         let mockSet1 = SetResultModel(Reps: 10, Weight: 50.0)
         let mockSet2 = SetResultModel(Reps: 8, Weight: 55.0)
-        let mockExercise1 = ExerciseResultModel(exerciseName: "ベンチプレス", setsCompleted: 2, sets: [mockSet1, mockSet2])
-        let mockExercise2 = ExerciseResultModel(exerciseName: "ショルダープレス", setsCompleted: 3, sets: [mockSet1, mockSet1, mockSet1])
+        let mockExercise1 = ExerciseResultModel(exerciseName: "ベンチプレス", key: "Bench Press", setsCompleted: 2, sets: [mockSet1, mockSet2])
+        let mockExercise2 = ExerciseResultModel(exerciseName: "ショルダープレス", key: "Shoulder Press", setsCompleted: 3, sets: [mockSet1, mockSet1, mockSet1])
         let mockWorkoutResult = WorkoutResultModel(
             id: "mockResult1",
             duration: 2700,

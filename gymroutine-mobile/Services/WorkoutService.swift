@@ -46,7 +46,8 @@ class WorkoutService {
                 var exerciseDict: [String: Any] = [
                     "id": exercise.id,
                     "name": exercise.name,
-                    "part": exercise.part
+                    "part": exercise.part,
+                    "key": exercise.key
                 ]
                 
                 // Add restTime if available
@@ -82,6 +83,7 @@ class WorkoutService {
             "id": exercise.id,         // 고유 ID 저장
             "name": exercise.name,
             "part": exercise.part,
+            "key": exercise.key,
             "sets": []  // 초기 세트 배열 (빈 배열)
         ]
         

@@ -566,6 +566,7 @@ final class WorkoutSessionViewModel: ObservableObject {
                     return WorkoutExercise(
                         name: "",
                         part: "",
+                        key: "",
                         sets: [],
                         restTime: 90
                     )

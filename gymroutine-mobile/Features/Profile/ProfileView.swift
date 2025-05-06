@@ -166,7 +166,7 @@ struct ProfileView: View {
                             NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
                                 WorkoutCell(
                                     workoutName: workout.name,
-                                    exerciseImageName: workout.exercises.first?.name,
+                                    exerciseImageName: workout.exercises.first?.key,
                                     count: workout.exercises.count
                                 )
                             }

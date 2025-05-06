@@ -43,6 +43,7 @@ class WorkoutExercisesManager: ObservableObject {
         let newWorkoutExercise = WorkoutExercise(
             name: exercise.name,
             part: exercise.part,
+            key: exercise.key,
             sets: [ExerciseSet(reps: 0, weight: 0)])
         exercises.append(newWorkoutExercise)
         UIApplication.showBanner(type: .success, message: "\(exercise.name)を追加しました。")

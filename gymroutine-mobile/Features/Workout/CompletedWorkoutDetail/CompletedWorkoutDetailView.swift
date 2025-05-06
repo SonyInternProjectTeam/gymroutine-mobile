@@ -201,6 +201,7 @@ struct CompletedWorkoutDetailView: View {
                     exerciseIndex: index + 1,
                     exercise: ExerciseResultModel(
                         exerciseName: exercise.exerciseName,
+                        key: exercise.key,
                         setsCompleted: exercise.setsCompleted ?? 0,
                         sets: exercise.sets?.map { set in
                             SetResultModel(

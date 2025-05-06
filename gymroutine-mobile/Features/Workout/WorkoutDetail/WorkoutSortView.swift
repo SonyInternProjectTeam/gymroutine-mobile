@@ -23,7 +23,7 @@ struct WorkoutSortView: View {
                         .background(.main)
                         .clipShape(Circle())
                     
-                    ExerciseImageCell(imageName: exercise.name)
+                    ExerciseImageCell(imageName: exercise.key)
                         .frame(width: 56, height: 56)
                     
                     VStack(alignment: .leading) {
