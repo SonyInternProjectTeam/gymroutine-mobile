@@ -155,7 +155,10 @@ struct ProfileView: View {
             switch viewModel.selectedTab {
             case .analysis:
                 // WeightHistoryViewModel이 자체적으로 UserManager에서 데이터를 관찰합니다
-                WeightHistoryGraphView(weightHistory: viewModel.user?.weightHistory)
+                // WeightHistoryGraphView(weightHistory: viewModel.user?.weightHistory)
+                NavigationView {
+                    AnalyticsView()
+                }
             case .posts:
                 if viewModel.workouts.isEmpty {
                     Text("まだワークアウトがありません")
