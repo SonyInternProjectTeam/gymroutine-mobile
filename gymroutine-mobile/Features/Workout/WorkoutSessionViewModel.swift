@@ -225,7 +225,27 @@ final class WorkoutSessionViewModel: ObservableObject {
         // 세션 중 변경사항을 Firestore에 저장
         saveExercisesToFirestore()
     }
-    
+
+    func addSetToExercise(at index: Int) {
+        guard exercisesManager.exercises.indices.contains(index) else { return }
+
+        var exercise = exercisesManager.exercises[index]
+
+        // 最後のセット情報をコピー、またはデフォルト値
+        let lastSet = exercise.sets.last
+        let newSet = ExerciseSet(
+            reps: lastSet?.reps ?? 10,
+            weight: lastSet?.weight ?? 50.0
+        )
+
+        exercise.sets.append(newSet)
+        exercisesManager.updateExerciseSet(for: exercise)
+
+        print("✅ セット追加: \(exercise.name)")
+
+        saveExercisesToFirestore()
+    }
+
     // 세트 삭제 (복원)
     func removeSet(exerciseIndex: Int, setIndex: Int) {
         guard exerciseIndex < exercisesManager.exercises.count,
@@ -546,6 +566,7 @@ final class WorkoutSessionViewModel: ObservableObject {
                     return WorkoutExercise(
                         name: "",
                         part: "",
+                        key: "",
                         sets: [],
                         restTime: 90
                     )

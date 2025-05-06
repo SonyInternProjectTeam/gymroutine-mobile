@@ -38,36 +38,47 @@ struct ProfileEditView: View {
     
     var body: some View {
         Form {
-            Section(header: Text("名前")) {
-                TextField("ユーザー名を入力", text: $name)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-            }
-            
-            Section(header: Text("公開範囲")) {
-                Picker("公開範囲", selection: $visibility) {
-                    ForEach(visibilityOptions.keys.sorted(), id: \.self) { key in
-                        Text(visibilityOptions[key]!).tag(key)
-                    }
+            Section(header: Text("ユーザー設定").fontWeight(.semibold)) {
+                VStack(alignment: .leading) {
+                    Label("ユーザー名", systemImage: "pencil")
+                        .font(.headline)
+                    
+                    
+                    TextField("ユーザー名を入力", text: $name)
+                        .fontWeight(.semibold)
+                        .padding(12)
+                        .background(Color(UIColor.systemGray6))
+                        .cornerRadius(8)
                 }
-                .pickerStyle(SegmentedPickerStyle())
-            }
-            
-            Section {
-                Button(action: {
-                    if name != user.name || visibility != user.visibility {
-                        alertType = .confirmUpdate
-                    } else {
-                        alertType = .noChanges
+                
+                VStack(alignment: .leading) {
+                    Label("公開設定", systemImage: "person.3")
+                        .font(.headline)
+                    
+                    Picker("公開範囲", selection: $visibility) {
+                        ForEach(visibilityOptions.keys.sorted(), id: \.self) { key in
+                            Text(visibilityOptions[key]!).tag(key)
+                        }
                     }
-                }) {
+                    .pickerStyle(SegmentedPickerStyle())
+                }
+                
+                Button {
+                    alertType = .confirmUpdate
+                } label: {
                     Text("変更を保存")
-                        .frame(maxWidth: .infinity)
+                        .font(.headline)
                 }
-                .buttonStyle(PrimaryButtonStyle())
+                .disabled(name == user.name && visibility == user.visibility)
+                .buttonStyle(CapsuleButtonStyle(color: .main))
+                .padding(.horizontal)
+                .padding(.top, 24)
+                .padding(.bottom)
+                .listRowSeparator(.hidden)
             }
             
             // Account management section
-            Section(header: Text("アカウント管理")) {
+            Section(header: Text("アカウント管理").fontWeight(.semibold)) {
                 Button(action: {
                     alertType = .confirmLogout
                 }) {
@@ -91,11 +102,9 @@ struct ProfileEditView: View {
         }
         .navigationTitle("ユーザー設定")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            // Refresh user data when view appears
-            viewModel.refreshUserData()
-        }
-        .onChange(of: viewModel.showMessage) { newValue in
+        .scrollDismissesKeyboard(.immediately)
+        .onAppear(perform: viewModel.refreshUserData)
+        .onChange(of: viewModel.showMessage) { _, newValue in
             if newValue {
                 // Show success or failure message
                 if viewModel.updateSuccess {

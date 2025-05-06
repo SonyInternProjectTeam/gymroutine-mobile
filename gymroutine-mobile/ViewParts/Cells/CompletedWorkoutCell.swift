@@ -8,7 +8,7 @@ struct CompletedWorkoutCell: View {
     var body: some View {
         NavigationLink(destination: CompletedWorkoutDetailView(resultId: result.id ?? "")) {
             HStack(spacing: 8) {
-                ExerciseImageCell(imageName: result.exercises?.first?.exerciseName)
+                ExerciseImageCell(imageName: result.exercises?.first?.key)
                     .frame(width: 48, height: 48)
                 
                 VStack(alignment: .leading, spacing: 8) {

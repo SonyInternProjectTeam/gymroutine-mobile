@@ -14,6 +14,14 @@ class StoryViewModel: ObservableObject {
     @Published var workoutResult: WorkoutResultModel? = nil // To hold the fetched workout result
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
+    
+    //ViewModelからViewを閉じる
+    var viewDismissalModePublisher = PassthroughSubject<Bool, Never>()
+    private var shouldDismissView = false {
+        didSet {
+            viewDismissalModePublisher.send(shouldDismissView)
+        }
+    }
 
     private var cancellables = Set<AnyCancellable>()
     private let workoutService = WorkoutService() // Assuming WorkoutService fetches results
@@ -76,19 +84,19 @@ class StoryViewModel: ObservableObject {
 
     func advanceStory() {
         if currentStoryIndex < stories.count - 1 {
+            print("DEBUG: 次のストーリーを表示します。")
             currentStoryIndex += 1
         } else {
-            // Optionally close the story view or loop back
-            // closeStoryView() // Needs implementation
+            shouldDismissView = true
         }
     }
 
     func previousStory() {
         if currentStoryIndex > 0 {
+            print("DEBUG: 前のストーリーを表示します。")
             currentStoryIndex -= 1
+        } else {
+            shouldDismissView = true
         }
     }
-
-    // TODO: Implement logic for story timer/progress bar
-    // TODO: Add function to mark a story as viewed if necessary
 } 

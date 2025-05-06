@@ -27,7 +27,7 @@ struct WorkoutListCell: View {
                         .frame(width: 56, height: 56)
                         .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
                     
-                    ExerciseImageCell(imageName: exercise.name)
+                    ExerciseImageCell(imageName: exercise.key)
                         .frame(width: 46, height: 46)
                 }
                 
@@ -76,6 +76,7 @@ struct WorkoutListCell_Previews: PreviewProvider {
                 exercise: WorkoutExercise(
                     name: "Shoulder Press",
                     part: "shoulder",
+                    key: "Shoulder Press",
                     sets: [ExerciseSet(reps: 12, weight: 20)]
                 ),
                 showDragHandle: true
@@ -86,6 +87,7 @@ struct WorkoutListCell_Previews: PreviewProvider {
                 exercise: WorkoutExercise(
                     name: "Bench Press",
                     part: "chest",
+                    key: "Bench Press",
                     sets: [ExerciseSet(reps: 10, weight: 60)]
                 ),
                 showDragHandle: false

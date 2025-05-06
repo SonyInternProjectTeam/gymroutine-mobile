@@ -169,7 +169,7 @@ struct ProfileView: View {
                             NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
                                 WorkoutCell(
                                     workoutName: workout.name,
-                                    exerciseImageName: workout.exercises.first?.name,
+                                    exerciseImageName: workout.exercises.first?.key,
                                     count: workout.exercises.count
                                 )
                             }
@@ -187,19 +187,7 @@ extension ProfileView {
     // MARK: - プロフィールアイコン部分
     private func profileIcon(profileUrl: String) -> some View {
         ZStack(alignment: .bottomTrailing) {
-            AsyncImage(url: URL(string: profileUrl)) { image in
-                image.resizable()
-            } placeholder: {
-                Circle()
-                    .fill(Color(UIColor.systemGray2))
-            }
-            .scaledToFill()
-            .clipShape(Circle())
-            .overlay {
-                Circle()
-                    .strokeBorder(.white, lineWidth: 4)
-            }
-            .frame(width: 112, height: 112)
+            ProfileIcon(profileUrl: profileUrl, size: .large)
 
             // 自分のプロフィールの場合のみ、プロフィール写真変更ボタンを表示
             if viewModel.isCurrentUser {
@@ -223,7 +211,7 @@ extension ProfileView {
     private func followStatsView(user: User) -> some View {
         HStack(spacing: 10) {
             NavigationLink {
-                FollowersListView(userID: user.uid, router: router)
+                FollowListView(userID: user.uid, listType: .followers, router: router)
             } label: {
                 VStack(spacing: 4) {
                     Text("フォロワー")
@@ -237,7 +225,7 @@ extension ProfileView {
             .hAlign(.center)
 
             NavigationLink {
-                FollowingListView(userID: user.uid, router: router)
+                FollowListView(userID: user.uid, listType: .following, router: router)
             } label: {
                 VStack(spacing: 4) {
                     Text("フォロー中")
