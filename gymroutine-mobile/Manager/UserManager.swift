@@ -58,11 +58,6 @@ final class UserManager: ObservableObject { // Make final
             // isLoading will be set to false within setupUserListener
         } else {
             print("DEBUG: User is not authenticated.")
-            // 로그아웃 알림 전송
-            if self.currentUser != nil {
-                NotificationCenter.default.post(name: NSNotification.Name("UserLoggedOut"), object: nil)
-            }
-            
             // Update isLoggedIn along with isUserAuthenticated
             if self.isLoggedIn { self.isLoggedIn = false } 
             self.currentUser = nil // Clear user data
@@ -114,9 +109,6 @@ final class UserManager: ObservableObject { // Make final
                     if self.currentUser != user { // Requires User to be Equatable
                          self.currentUser = user
                          print("DEBUG: User data UPDATED via listener: Name=\(user.name ?? "N/A"), Total=\(user.totalWorkoutDays ?? -1), Consec=\(user.consecutiveWorkoutDays ?? -1)")
-                         
-                         // 로그인 알림 전송
-                         NotificationCenter.default.post(name: NSNotification.Name("UserLoggedIn"), object: user)
                     } else {
                          print("DEBUG: User data received via listener, but NO changes detected.")
                     }

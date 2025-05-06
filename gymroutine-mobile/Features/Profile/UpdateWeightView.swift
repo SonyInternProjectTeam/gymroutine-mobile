@@ -3,7 +3,6 @@ import SwiftUI
 struct UpdateWeightView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject private var userManager = UserManager.shared
-    private let analyticsService = AnalyticsService.shared
     
     @State private var weightInput: String = ""
     @State private var isLoading: Bool = false
@@ -77,9 +76,6 @@ struct UpdateWeightView: View {
                  if let weight = userManager.currentUser?.currentWeight {
                      weightInput = String(format: "%.1f", weight)
                  }
-                 
-                 // Log screen view
-                 analyticsService.logScreenView(screenName: "UpdateWeight")
             }
         }
     }

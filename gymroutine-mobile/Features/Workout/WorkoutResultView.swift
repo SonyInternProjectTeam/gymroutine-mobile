@@ -7,7 +7,6 @@ struct WorkoutResultView: View {
     let workoutSession: WorkoutSessionModel // TODO: Pass the actual completed session data
     // 노트 입력을 위한 상태 변수
     @State private var notes: String
-    private let analyticsService = AnalyticsService.shared
 
     // 초기화 시 workoutSession의 노트를 @State 변수에 할당
     init(workoutSession: WorkoutSessionModel) {
@@ -49,29 +48,8 @@ struct WorkoutResultView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("닫기") {
                         workoutManager.dismissResultView()
-                        
-                        // Log dismiss result view
-                        analyticsService.logUserAction(
-                            action: "dismiss_workout_result",
-                            itemId: workoutSession.workout.id,
-                            contentType: "workout_result"
-                        )
                     }
                 }
-            }
-            .onAppear {
-                // Log screen view
-                analyticsService.logScreenView(screenName: "WorkoutResult")
-                
-                // Log workout result viewed
-                analyticsService.logEvent("workout_result_viewed", parameters: [
-                    "workout_id": workoutSession.workout.id,
-                    "workout_name": workoutSession.workout.name,
-                    "elapsed_time": workoutSession.elapsedTime,
-                    "total_rest_time": workoutSession.totalRestTime,
-                    "active_time": workoutSession.elapsedTime - workoutSession.totalRestTime,
-                    "exercise_count": workoutSession.workout.exercises.count
-                ])
             }
         }
     }
@@ -174,14 +152,6 @@ struct WorkoutResultView: View {
                  // 공유 버튼
                  Button {
                      shareWorkoutResult()
-                     
-                     // Log share workout result
-                     analyticsService.logUserAction(
-                         action: "share_workout_result",
-                         itemId: workoutSession.workout.id,
-                         itemName: workoutSession.workout.name,
-                         contentType: "workout_result"
-                     )
                  } label: {
                      Label("共有", systemImage: "square.and.arrow.up")
                  }
@@ -190,14 +160,6 @@ struct WorkoutResultView: View {
                  // 보존 버튼
                  Button {
                      saveWorkoutResultWithNotes()
-                     
-                     // Log save workout result
-                     analyticsService.logUserAction(
-                         action: "save_workout_result",
-                         itemId: workoutSession.workout.id,
-                         itemName: workoutSession.workout.name,
-                         contentType: "workout_result"
-                     )
                  } label: {
                      Label("保存", systemImage: "tray.and.arrow.down") // 아이콘 변경 제안
                  }

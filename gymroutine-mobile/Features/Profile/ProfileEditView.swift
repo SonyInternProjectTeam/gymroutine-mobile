@@ -12,7 +12,6 @@ struct ProfileEditView: View {
     @StateObject var viewModel: ProfileEditViewModel
     @State private var name: String
     @State private var visibility: Int
-    private let analyticsService = AnalyticsService.shared
     
     //アラートに関する変数
     @State private var showAlert = false
@@ -95,9 +94,6 @@ struct ProfileEditView: View {
         .onAppear {
             // Refresh user data when view appears
             viewModel.refreshUserData()
-            
-            // Log screen view
-            analyticsService.logScreenView(screenName: "ProfileEdit")
         }
         .onChange(of: viewModel.showMessage) { newValue in
             if newValue {

@@ -11,7 +11,6 @@ struct SnsView: View {
     @StateObject private var viewModel = SnsViewModel()
     @FocusState private var isFocused: Bool
     @State private var searchMode: Bool = false
-    private let analyticsService = AnalyticsService.shared
 
     var body: some View {
         VStack(spacing: 16) {
@@ -36,9 +35,6 @@ struct SnsView: View {
         .onAppear {
             // 画面表示時におすすめユーザーを生成して取得
             viewModel.initializeRecommendations()
-            
-            // Log screen view
-            analyticsService.logScreenView(screenName: "Sns")
         }
     }
 
