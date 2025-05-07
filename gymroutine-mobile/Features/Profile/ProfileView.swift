@@ -290,3 +290,4 @@ extension ProfileView {
         ProfileView(viewModel: ProfileViewModel(user: User(uid: "previewUser1", email: "preview@example.com", name: "Preview Useraaaaa")), router: Router())
     }
 }
+

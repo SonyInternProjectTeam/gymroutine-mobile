@@ -4,15 +4,15 @@ import Firebase
 class StoryService {
     static let shared = StoryService()
     private let repository = StoryRepository.shared
-    private let followService = FollowService() // Create a new instance
+    private let followService = FollowService() // 新しいインスタンスを作成
     private var cancellables = Set<AnyCancellable>()
-    private var storyListenerId: String? // 스토리 리스너 ID 저장
+    private var storyListenerId: String? // ストーリーリスナーIDを保存
 
     @Published var friendsStories: [Story] = []
-    @Published var userStories: [Story] = [] // For user's own stories
+    @Published var userStories: [Story] = [] // ユーザー自身のストーリー用
     
     deinit {
-        // 객체가 해제될 때 모든 리스너 정리
+        // オブジェクトが解放される時にすべてのリスナーをクリア
         if let listenerId = storyListenerId {
             repository.removeListener(listenerId: listenerId)
         }
@@ -42,15 +42,15 @@ class StoryService {
         }
     }
     
-    // 실시간 스토리 업데이트를 위한 메소드
+    // 実時間ストーリー更新のためのメソッド
     func startRealtimeUpdates(userId: String) {
         Task {
-            // 기존 리스너가 있으면 제거
+            // 既存のリスナーがあれば削除
             if let listenerId = storyListenerId {
                 repository.removeListener(listenerId: listenerId)
             }
             
-            // 팔로잉 유저 가져오기
+            // フォローしているユーザーを取得
             let result = await followService.getFollowing(for: userId)
             
             switch result {
@@ -67,9 +67,9 @@ class StoryService {
         }
     }
     
-    // 스토리 리스너 설정
+    // ストーリーリスナー設定
     private func setupStoryListener(for userIds: [String], currentUserId: String?) {
-        // 현재 사용자 ID 포함
+        // 現在のユーザーIDを含める
         var idsToFetch = userIds
         if let safeCurrentUserId = currentUserId, !idsToFetch.contains(safeCurrentUserId) {
             idsToFetch.append(safeCurrentUserId)
@@ -85,7 +85,7 @@ class StoryService {
         
         print("Setting up realtime listener for stories from user IDs: \(idsToFetch)")
         
-        // 새 리스너 설정
+        // 新しいリスナーを設定
         storyListenerId = repository.listenForFriendsStories(
             userIds: idsToFetch,
             onUpdate: { [weak self] stories in
@@ -101,7 +101,7 @@ class StoryService {
         )
     }
     
-    // 리스너 정지
+    // リスナー停止
     func stopRealtimeUpdates() {
         if let listenerId = storyListenerId {
             repository.removeListener(listenerId: listenerId)
@@ -151,4 +151,33 @@ class StoryService {
 
     // TODO: Add function to fetch user's own stories
     // TODO: Add function to potentially mark stories as viewed
+
+    print("📣 [SnsService] getRecommendedUsers 呼び出し完了 - userId: \(userId)")
+    let result = await repository.fetchRecommendedUsers(for: userId)
+    
+    switch result {
+    case .success(let users):
+        print("📣 [SnsService] getRecommendedUsers 成功 - \(users.count)人のおすすめユーザー")
+    case .failure(let error):
+        print("📣 [SnsService] getRecommendedUsers 失敗 - \(error.localizedDescription)")
+    }
+    
+    return result
+}
+
+/// 推薦リストを強制的に更新する（デバッグや特定のアクションに応じて使用）
+/// - Parameter userId: 現在ログイン中のユーザーID
+/// - Returns: 更新成功かどうかをResultで返す
+func refreshRecommendations(for userId: String) async -> Result<Bool, Error> {
+    print("📣 [SnsService] refreshRecommendations 呼び出し完了 - userId: \(userId)")
+    let result = await repository.forceUpdateRecommendations(for: userId)
+    
+    switch result {
+    case .success(let success):
+        print("📣 [SnsService] refreshRecommendations 成功 - \(success)")
+    case .failure(let error):
+        print("📣 [SnsService] refreshRecommendations 失敗 - \(error.localizedDescription)")
+    }
+    
+    return result
 } 
