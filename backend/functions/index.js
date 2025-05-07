@@ -60,6 +60,7 @@ exports.expireStories = onSchedule({
   region: region // 리전 설정
 }, cronHandler.expireStories);
 
+//TODO : change schedule to 0
 exports.dailyRecommendationUpdate = onSchedule({
   schedule: "0 15 * * *", // 매일 00:00 JST (UTC 15:00)
   timeZone: "Asia/Tokyo",
