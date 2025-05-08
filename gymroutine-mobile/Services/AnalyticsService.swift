@@ -134,6 +134,7 @@ class AnalyticsService {
     }
     
     /// 사용자 팔로우 이벤트 로깅
+    /*
     func logUserFollowed(followedUserId: String, fromScreen: String) {
         Analytics.logEvent("user_followed", parameters: [
             "followed_user_id": followedUserId,
@@ -157,9 +158,11 @@ class AnalyticsService {
             "share_method": shareMethod
         ])
     }
+    */
     
     // MARK: - 분석 관련 이벤트
     
+    /*
     /// 분석 데이터 조회 이벤트 로깅
     func logAnalyticsViewed(analyticsType: String, timePeriod: String) {
         Analytics.logEvent("analytics_viewed", parameters: [
@@ -184,9 +187,11 @@ class AnalyticsService {
             "achieved_value": achievedValue
         ])
     }
+    */
     
     // MARK: - 운동 관련 추가 이벤트
     
+    /*
     /// 운동 일정 추가 이벤트 로깅
     func logWorkoutScheduled(workoutId: String, workoutName: String, scheduledDay: String) {
         Analytics.logEvent("workout_scheduled", parameters: [
@@ -263,6 +268,7 @@ class AnalyticsService {
             "action": action // "opened", "dismissed", "snoozed" 등
         ])
     }
+    */
 
     // MARK: - 사용자 속성 관리
     
@@ -276,6 +282,7 @@ class AnalyticsService {
         Analytics.setUserProperty(value, forName: name)
     }
     
+    /*
     /// 사용자 운동 레벨 설정
     func setUserFitnessLevel(level: String) {
         Analytics.setUserProperty(level, forName: "fitness_level")
@@ -290,4 +297,5 @@ class AnalyticsService {
     func setUserWorkoutFrequency(timesPerWeek: Int) {
         Analytics.setUserProperty("\(timesPerWeek)", forName: "workout_frequency_per_week")
     }
+    */
 }
