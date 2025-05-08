@@ -25,6 +25,31 @@ class StoryViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
     private let workoutService = WorkoutService() // Assuming WorkoutService fetches results
+    
+    // 合計セット数
+    var totalSets: Int {
+        guard let workoutResult = workoutResult else { return 0 }
+        
+        var total = 0
+        for exercise in workoutResult.exercises {
+            total += exercise.sets.count
+        }
+        return total
+    }
+    
+    // 総重量
+    var totalVolume: Int {
+        guard let workoutResult = workoutResult else { return 0 }
+        
+        var total = 0
+        for exercise in workoutResult.exercises {
+            for set in exercise.sets {
+                let weight = set.Weight ?? 0.0
+                total += Int(Double(set.Reps) * weight)
+            }
+        }
+        return total
+    }
 
     init(user: User, stories: [Story]) {
         self.user = user
@@ -98,5 +123,11 @@ class StoryViewModel: ObservableObject {
         } else {
             shouldDismissView = true
         }
+    }
+
+    func formattedTime(from seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        return "\(minutes)分 \(remainingSeconds)秒"
     }
 } 

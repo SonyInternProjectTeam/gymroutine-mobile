@@ -65,7 +65,7 @@ struct StoryView: View {
                 }
             } else if let workoutResult = viewModel.workoutResult {
                 ScrollView(showsIndicators: false) {
-                    WorkoutResultDetailView(result: workoutResult)
+                    WorkoutResultDetailView(result: workoutResult, viewModel: viewModel)
                 }
                 .padding()
             } else {
@@ -160,10 +160,13 @@ struct StoryView: View {
 // 워크아웃 결과 상세 뷰 (기존 뷰에서 디자인 개선)
 struct WorkoutResultDetailView: View {
     let result: WorkoutResultModel
+    @ObservedObject var viewModel: StoryViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // 헤더: 워크아웃 제목 및 요약
+            totalSummaryBox
+            
             workoutTimeBox
             
             CustomDivider()
@@ -201,11 +204,83 @@ struct WorkoutResultDetailView: View {
         }
     }
     
+    private var totalSummaryBox: some View {
+        HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 16) {
+                Label("総重量", systemImage: "figure.strengthtraining.traditional")
+                    .font(.headline)
+                
+                HStack(alignment: .lastTextBaseline) {
+                    Text("\(viewModel.totalVolume)")
+                        .font(.largeTitle).bold()
+                        .foregroundStyle(.main)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.1)
+                    Text("kg")
+                        .fontWeight(.semibold)
+                }
+                .hAlign(.center)
+            }
+            .padding()
+            .background()
+            .clipShape(.rect(cornerRadius: 8))
+            .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
+            
+            VStack(alignment: .leading, spacing: 16) {
+                Label("合計セット数", systemImage: "list.number.rtl")
+                    .font(.headline)
+                
+                HStack(alignment: .lastTextBaseline) {
+                    Text("\(viewModel.totalSets)")
+                        .font(.largeTitle).bold()
+                        .foregroundStyle(.main)
+                    Text("回")
+                        .fontWeight(.semibold)
+                }
+                .hAlign(.center)
+            }
+            .padding()
+            .background()
+            .clipShape(.rect(cornerRadius: 8))
+            .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
+        }
+    }
+    
     private var workoutTimeBox: some View {
         HStack(spacing: 16) {
-            timeCell(title: "運動時間", value: result.duration)
+            VStack(alignment: .leading, spacing: 16) {
+                Label("運動時間", systemImage: "figure.run")
+                    .font(.headline)
+                
+                Group {
+                    Text(viewModel.formattedTime(from: result.duration))
+                }
+                .font(.title2).bold()
+                .foregroundStyle(.main)
+                .hAlign(.center)
+            }
+            .padding()
+            .background()
+            .clipShape(.rect(cornerRadius: 8))
+            .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
             
-            timeCell(title: "休憩時間", value: result.restTime ?? 0)
+            VStack(alignment: .leading, spacing: 16) {
+                Label("休憩時間", systemImage: "cup.and.saucer")
+                    .font(.headline)
+                
+                Group {
+                    if let restTime = result.restTime {
+                        Text(viewModel.formattedTime(from: restTime))
+                    } else { Text("--") }
+                }
+                .font(.title2).bold()
+                .foregroundStyle(.main)
+                .hAlign(.center)
+            }
+            .padding()
+            .background()
+            .clipShape(.rect(cornerRadius: 8))
+            .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
         }
     }
     
@@ -217,7 +292,7 @@ struct WorkoutResultDetailView: View {
                 .font(.caption)
                 .hAlign(.leading)
             
-            Text(value.formattedDuration)
+            Text(viewModel.formattedTime(from: value))
                 .font(.title2.bold())
                 .hAlign(.center)
         }
