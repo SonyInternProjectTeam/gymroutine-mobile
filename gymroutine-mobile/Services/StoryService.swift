@@ -7,7 +7,7 @@ class StoryService {
     private let followService = FollowService() // 新しいインスタンスを作成
     private var cancellables = Set<AnyCancellable>()
     private var storyListenerId: String? // ストーリーリスナーIDを保存
-
+    
     @Published var friendsStories: [Story] = []
     @Published var userStories: [Story] = [] // ユーザー自身のストーリー用
     
@@ -17,7 +17,7 @@ class StoryService {
             repository.removeListener(listenerId: listenerId)
         }
     }
-
+    
     func fetchFriendsStories(userId: String) {
         Task {
             // 1. Get following User objects from FollowService using async/await
@@ -122,9 +122,9 @@ class StoryService {
         guard !idsToFetch.isEmpty else {
             print("No user IDs to fetch stories for.")
             // Clear stories if the list is empty (e.g., user has no friends and no self stories)
-             DispatchQueue.main.async { // Ensure update on main thread
-                 self.friendsStories = [] 
-             }
+            DispatchQueue.main.async { // Ensure update on main thread
+                self.friendsStories = [] 
+            }
             return
         }
         
@@ -148,36 +148,7 @@ class StoryService {
             }
             .store(in: &cancellables)
     }
-
+    
     // TODO: Add function to fetch user's own stories
     // TODO: Add function to potentially mark stories as viewed
-
-    print("📣 [SnsService] getRecommendedUsers 呼び出し完了 - userId: \(userId)")
-    let result = await repository.fetchRecommendedUsers(for: userId)
-    
-    switch result {
-    case .success(let users):
-        print("📣 [SnsService] getRecommendedUsers 成功 - \(users.count)人のおすすめユーザー")
-    case .failure(let error):
-        print("📣 [SnsService] getRecommendedUsers 失敗 - \(error.localizedDescription)")
-    }
-    
-    return result
 }
-
-/// 推薦リストを強制的に更新する（デバッグや特定のアクションに応じて使用）
-/// - Parameter userId: 現在ログイン中のユーザーID
-/// - Returns: 更新成功かどうかをResultで返す
-func refreshRecommendations(for userId: String) async -> Result<Bool, Error> {
-    print("📣 [SnsService] refreshRecommendations 呼び出し完了 - userId: \(userId)")
-    let result = await repository.forceUpdateRecommendations(for: userId)
-    
-    switch result {
-    case .success(let success):
-        print("📣 [SnsService] refreshRecommendations 成功 - \(success)")
-    case .failure(let error):
-        print("📣 [SnsService] refreshRecommendations 失敗 - \(error.localizedDescription)")
-    }
-    
-    return result
-} 
