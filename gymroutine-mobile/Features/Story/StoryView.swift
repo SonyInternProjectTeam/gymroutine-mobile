@@ -5,6 +5,7 @@ import FirebaseFirestore // Import Firestore to use Timestamp
 struct StoryView: View {
     @ObservedObject var viewModel: StoryViewModel
     @Environment(\.dismiss) var dismiss // To close the view
+    private let analyticsService = AnalyticsService.shared
     
     // UI관련 상태 변수
     @State private var showCloseButton = true
@@ -35,6 +36,20 @@ struct StoryView: View {
             .onReceive(viewModel.viewDismissalModePublisher) { shouldDismiss in
                 if shouldDismiss {
                     dismiss()
+                }
+            }
+            .onAppear {
+                // Log screen view
+                analyticsService.logScreenView(screenName: "Story")
+                
+                // Log story viewed
+                if viewModel.stories.indices.contains(viewModel.currentStoryIndex) {
+                    let story = viewModel.stories[viewModel.currentStoryIndex]
+                    analyticsService.logStoryViewed(
+                        storyId: story.id ?? "unknown",
+                        authorId: story.userId,
+                        viewDuration: 0 // Start with 0, will be updated when story changes or view disappears
+                    )
                 }
             }
         }

@@ -84,6 +84,10 @@ struct WorkoutResultView: View {
             bottomButtons
         }
         .edgesIgnoringSafeArea(.top)
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "WorkoutResult")
+        }
     }
 
     // MARK: - Subviews

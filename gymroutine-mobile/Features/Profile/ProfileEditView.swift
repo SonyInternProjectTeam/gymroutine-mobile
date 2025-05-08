@@ -104,7 +104,12 @@ struct ProfileEditView: View {
         .navigationTitle("ユーザー設定")
         .navigationBarTitleDisplayMode(.inline)
         .scrollDismissesKeyboard(.immediately)
-        .onAppear(perform: viewModel.refreshUserData)
+        .onAppear {
+            viewModel.refreshUserData()
+            
+            // Log screen view
+            analyticsService.logScreenView(screenName: "ProfileEdit")
+        }
         .onChange(of: viewModel.showMessage) { _, newValue in
             if newValue {
                 // Show success or failure message
