@@ -178,6 +178,7 @@ class AppWorkoutManager: ObservableObject {
             }.count
             
             return ExerciseResultModel(exerciseName: workoutExercise.name,
+                                       key: workoutExercise.key,
                                        setsCompleted: completedSetsCount,
                                        sets: setsResult)
         }

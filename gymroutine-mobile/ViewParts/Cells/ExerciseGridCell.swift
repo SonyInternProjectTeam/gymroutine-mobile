@@ -16,11 +16,13 @@ struct ExerciseGridCell: View {
 
     var body: some View {
         VStack(alignment: .center, spacing: 4) {
-            Image(.workout)
-                .resizable()
-                .scaledToFit()
-                .padding()
-                .background(.secondary.opacity(0.2))
+            if let image = UIImage(named: exercise.key) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .padding()
+                    .background(.secondary.opacity(0.2))
+            }
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -45,6 +47,9 @@ struct ExerciseGridCell: View {
                 Text(LocalizedStringKey(exercise.name))
                     .font(.callout)
                     .fontWeight(.regular)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .multilineTextAlignment(.leading)
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 16)

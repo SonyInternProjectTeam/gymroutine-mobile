@@ -53,22 +53,41 @@ struct ExerciseDetailView: View {
 
 extension ExerciseDetailView {
     private var headerBox: some View {
-        Image(.welcomeLogo)
-            .resizable()
-            .scaledToFit()
-            .frame(height: 400)
+        if let image = UIImage(named: exercise.key) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 400)
+                        .background(.white)
+        } else {
+                    Image(.welcomeLogo)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 400)
+                        .background(.white)
+        }
     }
+
     
     private var exercisePartBox: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("部位")
                 .font(.headline)
             
-            Text(LocalizedStringKey(exercise.part))
-                .padding(.vertical, 8)
-                .padding(.horizontal)
-                .background()
-                .clipShape(Capsule())
+            HStack{
+                Text(LocalizedStringKey(exercise.part))
+                    .padding(.vertical, 8)
+                    .padding(.horizontal)
+                    .background()
+                    .clipShape(Capsule())
+                
+                Text(LocalizedStringKey(exercise.detailedPart))
+                    .padding(.vertical, 8)
+                    .padding(.horizontal)
+                    .background()
+                    .clipShape(Capsule())
+            }
+            
         }
         .hAlign(.leading)
     }

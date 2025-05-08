@@ -15,14 +15,14 @@ final class ProfileViewModel: ObservableObject {
     @Published var followersCount: Int = 0
     @Published var followingCount: Int = 0
     @Published var selectedPhotoItem: PhotosPickerItem?
-    @Published var isFollowing: Bool = false  // 현재 로그인 중인 사용자가 이 프로필을 팔로우 중인지
+    @Published var isFollowing: Bool = false  // 現在ログイン中のユーザーがこのプロフィールをフォロー中かどうか
     @Published var selectedTab: ProfileTab = .analysis
-    @Published var workouts: [Workout] = []   // 추가: 워크아웃 목록
+    @Published var workouts: [Workout] = []   // 追加: ワークアウトリスト
     
     private let userManager = UserManager.shared
     private let userService = UserService()
     private let followService = FollowService()
-    private let workoutRepository = WorkoutRepository()  // Repository 인스턴스
+    private let workoutRepository = WorkoutRepository()  // Repository インスタンス
     
     enum ProfileTab: String, CaseIterable {
         case analysis = "分析"
@@ -49,7 +49,7 @@ final class ProfileViewModel: ObservableObject {
             if !isCurrentUser {
                 updateFollowingStatus()
             }
-            // 워크아웃 데이터 불러오기
+            // ワークアウトデータの読み込み
             Task {
                 await fetchWorkouts()
             }
@@ -163,22 +163,22 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    /// Repository를 통해 워크아웃 데이터를 불러옵니다.
+    /// Repositoryを通じてワークアウトデータを読み込みます。
     func fetchWorkouts() async {
         guard let userID = user?.uid else {
-            print("ERROR: fetchWorkouts - 사용자 ID가 없습니다")
+            print("ERROR: fetchWorkouts - ユーザーIDがありません")
             return 
         }
         
-        print("DEBUG: 사용자 ID: \(userID)의 워크아웃 데이터를 불러옵니다")
+        print("DEBUG: ユーザーID: \(userID)のワークアウトデータを読み込みます")
         do {
             let fetchedWorkouts = try await workoutRepository.fetchWorkouts(for: userID)
-            print("DEBUG: 워크아웃 \(fetchedWorkouts.count)개 로드 완료")
+            print("DEBUG: ワークアウト \(fetchedWorkouts.count)個をロード完了")
             DispatchQueue.main.async {
                 self.workouts = fetchedWorkouts
             }
         } catch {
-            print("ERROR: 워크아웃 로드 실패: \(error)")
+            print("ERROR: ワークアウトのロードに失敗: \(error)")
         }
     }
 }

@@ -240,7 +240,7 @@ final class UserService {
                 // Prepare the final update data
                 let updateData: [String: Any] = [
                     "currentWeight": newWeight,
-                    "weightHistory": currentHistory // Write the modified array back (소문자로 수정)
+                    "weightHistory": currentHistory // 小文字に修正
                 ]
 
                 // Update the document within the transaction
@@ -253,7 +253,7 @@ final class UserService {
             print("[UserService] Successfully updated weight and history for user \(userId) to \(newWeight) kg")
             
             // Print success message with more details
-            print("[UserService] 체중 업데이트 완료: \(newWeight)kg, 날짜: \(todayDateString)")
+            print("[UserService] 体重更新完了: \(newWeight)kg, 日付: \(todayDateString)")
 
             // Optional: Update local UserManager's currentUser if needed immediately
             // Requires careful merging or re-fetching as the entire history array might change
