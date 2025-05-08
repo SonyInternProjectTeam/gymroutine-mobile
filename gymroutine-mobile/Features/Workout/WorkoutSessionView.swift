@@ -23,6 +23,9 @@ struct WorkoutSessionView: View {
     @State private var selectedExerciseIndex = 0
     @State private var showEndWorkoutAlert = false // 종료 알림을 위해 필요
     @State private var showEditSetSheet = false
+    
+    // Analytics Service
+    private let analyticsService = AnalyticsService.shared
 
     // 진행 원 애니메이션을 위한 키프레임 애니메이션
     @State private var animateProgress = false
