@@ -11,6 +11,7 @@ import PhotosUI
 struct ProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
     @Namespace var namespace
+    private let analyticsService = AnalyticsService.shared
     
     // フォロワーとフォロー中の一覧画面に遷移するための状態変数
     @State private var showFollowers: Bool = false
@@ -62,6 +63,9 @@ struct ProfileView: View {
                         await viewModel.fetchWorkouts()
                     }
                 }
+                
+                // Log screen view
+                analyticsService.logScreenView(screenName: "Profile")
             }
             .onDisappear {
                 // Remove the observer when the view disappears

@@ -13,6 +13,7 @@ struct CalendarView: View {
     
     @StateObject private var viewModel = CalendarViewModel()
     @State private var routineFlg = false
+    private let analyticsService = AnalyticsService.shared
     
     private let weekdays = ["日", "月", "火", "水", "木", "金", "土"]
     
@@ -27,6 +28,10 @@ struct CalendarView: View {
         .background(Color.gray.opacity(0.1))
         .sheet(isPresented: $routineFlg) {
             Text("ルーティーン追加画面を\nここに作成")
+        }
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "Calendar")
         }
     }
 }

@@ -7,6 +7,7 @@ struct WorkoutEditView: View {
     @State private var workoutName: String
     @State private var workoutNotes: String
     @State private var selectedDays: [String] = []
+    private let analyticsService = AnalyticsService.shared
     
     private let weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     private let weekdaysLocalized = ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"]
@@ -93,6 +94,10 @@ struct WorkoutEditView: View {
             Button("キャンセル", role: .cancel) { }
         } message: {
             Text("「\(workoutName)」を完全に削除しますか？この操作は取り消せません。")
+        }
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "WorkoutEdit")
         }
     }
     

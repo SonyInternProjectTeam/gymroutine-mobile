@@ -16,6 +16,7 @@ struct WorkoutDetailView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: WorkoutDetailViewModel
     @State private var workoutDeleted = false // State to track deletion
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         // NavigationStack(또는 NavigationView) 내부에서 뷰를 표시
@@ -80,6 +81,9 @@ struct WorkoutDetailView: View {
         .onAppear {
             // 뷰가 나타날 때마다 최신 데이터를 불러옴
             viewModel.refreshWorkoutData()
+            
+            // Log screen view
+            analyticsService.logScreenView(screenName: "WorkoutDetail")
         }
         // 앱이 활성화될 때마다 데이터 갱신
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
