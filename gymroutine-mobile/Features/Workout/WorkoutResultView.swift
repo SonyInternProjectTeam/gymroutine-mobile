@@ -7,6 +7,7 @@ struct WorkoutResultView: View {
     let workoutSession: WorkoutSessionModel // TODO: Pass the actual completed session data
     // 노트 입력을 위한 상태 변수
     @State private var notes: String
+    private let analyticsService = AnalyticsService.shared
 
     private let totalSets: Int  //合計セット
     private let totalVolume: Double //総重量
@@ -83,6 +84,10 @@ struct WorkoutResultView: View {
             bottomButtons
         }
         .edgesIgnoringSafeArea(.top)
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "WorkoutResult")
+        }
     }
 
     // MARK: - Subviews
@@ -301,6 +306,14 @@ struct WorkoutResultView: View {
                  // 보존 버튼
                  Button {
                      saveWorkoutResultWithNotes()
+                     
+                     // Log save workout result
+                     analyticsService.logUserAction(
+                         action: "save_workout_result",
+                         itemId: workoutSession.workout.id,
+                         itemName: workoutSession.workout.name,
+                         contentType: "workout_result"
+                     )
                  } label: {
                      Label("保存する", systemImage: "tray.and.arrow.down")
                  }

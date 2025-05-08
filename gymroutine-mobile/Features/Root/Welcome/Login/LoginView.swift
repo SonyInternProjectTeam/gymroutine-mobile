@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
     @ObservedObject var viewModel: LoginViewModel
+    private let analyticsService = AnalyticsService.shared
 
     @State private var isShowingPasswordReset = false
 
@@ -42,6 +43,10 @@ struct LoginView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isShowingPasswordReset) {
             PasswordResetView()
+        }
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "Login")
         }
     }
 

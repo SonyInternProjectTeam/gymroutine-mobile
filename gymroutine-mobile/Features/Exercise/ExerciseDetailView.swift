@@ -13,6 +13,7 @@ struct ExerciseDetailView: View {
     let exercise: Exercise
     let isReadOnly: Bool
     let onAddButtonTapped: (() -> Void)?
+    private let analyticsService = AnalyticsService.shared
     
     
     init(exercise: Exercise, isReadOnly: Bool, onAddButtonTapped: (() -> Void)? = nil) {
@@ -43,6 +44,10 @@ struct ExerciseDetailView: View {
         .contentMargins(.bottom, 80)
         .navigationTitle(LocalizedStringKey(exercise.name))
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "ExerciseDetail")
+        }
     }
 }
 

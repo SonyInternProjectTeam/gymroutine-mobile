@@ -4,21 +4,21 @@ import FirebaseFunctions
 import FirebaseAuth
 
 class UserAnalyticsService {
-    // 싱글톤 인스턴스
+    // シングルトンインスタンス
     static let shared = UserAnalyticsService()
     
     private let db = Firestore.firestore()
-    // 리전 명시 (예: "asia-northeast1") - 실제 프로젝트 리전에 맞게 수정
+    // リージョン指定（例: "asia-northeast1"）- 実際のプロジェクトリージョンに合わせて修正
     private let functions = Functions.functions(region: "asia-northeast1")
     
     private init() {}
     
-    // MARK: - 데이터 조회 메서드
+    // MARK: - データ照会メソッド
     
-    /// 사용자의 운동 분석 데이터를 가져오는 메서드
+    /// ユーザーの運動分析データを取得するメソッド
     /// - Parameters:
-    ///   - userId: 사용자 ID
-    ///   - completion: 완료 핸들러 (분석 데이터와 에러)
+    ///   - userId: ユーザーID
+    ///   - completion: 完了ハンドラー（分析データとエラー）
     func getUserAnalytics(userId: String, completion: @escaping (UserAnalytics?, Error?) -> Void) {
         let docRef = db.collection("UserAnalytics").document(userId)
         
@@ -31,7 +31,7 @@ class UserAnalyticsService {
             
             guard let document = document, document.exists else {
                 print("No analytics data exists for user: \(userId)")
-                completion(nil, nil) // 오류 없이 분석 데이터가 없는 경우
+                completion(nil, nil) // エラーなしで分析データがない場合
                 return
             }
             
@@ -45,38 +45,38 @@ class UserAnalyticsService {
         }
     }
     
-    // MARK: - 데이터 업데이트 메서드
+    // MARK: - データ更新メソッド
     
-    /// 사용자의 운동 분석 데이터를 수동으로 업데이트 요청하는 메서드
+    /// ユーザーの運動分析データを手動で更新要請するメソッド
     /// - Parameters:
-    ///   - userId: 사용자 ID
-    ///   - completion: 완료 핸들러 (성공 여부와 에러)
+    ///   - userId: ユーザーID
+    ///   - completion: 完了ハンドラー（成功可否とエラー）
     func updateUserAnalytics(userId: String, completion: @escaping (Bool, Error?) -> Void) {
         print("Analytics update requested for user ID: \(userId)")
         
-        // 현재 인증된 사용자 확인
+        // 現在認証されたユーザーを確認
         guard let currentUser = Auth.auth().currentUser else {
             let error = NSError(domain: "AnalyticsService", code: 401, 
-                                userInfo: [NSLocalizedDescriptionKey: "인증된 사용자가 없습니다."])
+                                userInfo: [NSLocalizedDescriptionKey: "認証されたユーザーがいません。"])
             completion(false, error)
             return
         }
         
-        // 백엔드 함수 호출을 위한 데이터 준비
+        // バックエンド関数呼び出しのためのデータ準備
         let data: [String: Any] = ["userId": userId]
         
-        // 함수 이름과 리전 확인
+        // 関数名とリージョン確認
         let functionName = "updateUserAnalytics"
         let regionName = "asia-northeast1"
         print("Calling function \(functionName) in region \(regionName)")
         
-        // 디버깅을 위해 함수 호출 전 데이터 출력
+        // デバッグのための関数呼び出し前データ出力
         print("Sending data to function: \(data)")
         
-        // Firebase 인증 토큰 설정
+        // Firebase認証トークン設定
         let functions = Functions.functions(region: regionName)
         
-        // Firebase Functions 호출
+        // Firebase Functions呼び出し
         functions.httpsCallable(functionName).call(data) { [weak self] result, error in
             if let error = error {
                 print("Function call error: \(error)")
@@ -90,7 +90,7 @@ class UserAnalyticsService {
             if let resultData = result?.data as? [String: Any] {
                 print("Function response: \(resultData)")
                 
-                // success 값이 있으면 사용, 없거나 Bool이 아니면 false 반환
+                // successキーがある場合は使用、ない場合やBool値でない場合はfalseを返す
                 if let success = resultData["success"] as? Bool {
                     completion(success, nil)
                 } else {
@@ -100,25 +100,25 @@ class UserAnalyticsService {
             } else {
                 print("Unexpected response format. Raw result: \(String(describing: result?.data))")
                 completion(false, NSError(domain: "AnalyticsService", code: 500, 
-                                        userInfo: [NSLocalizedDescriptionKey: "서버 응답 형식이 잘못되었습니다."]))
+                                        userInfo: [NSLocalizedDescriptionKey: "サーバーレスポンスの形式が正しくありません。"]))
             }
         }
     }
     
-    // MARK: - 데이터 변환 유틸리티 메서드
+    // MARK: - データ変換ユーティリティメソッド
     
-    /// 운동 부위 분포 데이터를 차트 데이터 포맷으로 변환하는 메서드
-    /// - Parameter distribution: 부위별 분포 딕셔너리
-    /// - Returns: 차트용 데이터 배열
+    /// 運動部位分布データをチャートデータフォーマットに変換するメソッド
+    /// - Parameter distribution: 部位別分布辞書
+    /// - Returns: チャート用データ配列
     func getDistributionChartData(from distribution: ExerciseDistribution) -> [(String, Double)] {
         return distribution.map { ($0.key, $0.value) }
-            .sorted { $0.1 > $1.1 } // 분포 비율이 높은 순서로 정렬
+            .sorted { $0.1 > $1.1 } // 分布率が高い順に並び替え
     }
     
-    /// 선호 운동에서 무게가 가장 높은 Top N 운동 정보를 반환하는 메서드
-    /// - Parameter favoriteExercises: 선호 운동 목록
-    /// - Parameter count: 반환할 운동 수
-    /// - Returns: 무게 기준으로 정렬된 운동 목록
+    /// お気に入り運動で重量が最も高いトップN運動情報を返すメソッド
+    /// - Parameter favoriteExercises: お気に入り運動リスト
+    /// - Parameter count: 返す運動数
+    /// - Returns: 重量基準でソートされた運動リスト
     func getTopExercisesByWeight(from favoriteExercises: [FavoriteExercise], count: Int = 3) -> [FavoriteExercise] {
         return favoriteExercises
             .sorted { $0.avgWeight > $1.avgWeight }
@@ -126,9 +126,9 @@ class UserAnalyticsService {
             .map { $0 }
     }
     
-    /// 팔로잉 사용자 대비 운동 빈도 비교 문자열을 반환하는 메서드
-    /// - Parameter comparison: 팔로잉 비교 데이터
-    /// - Returns: 비교 결과 문자열
+    /// フォロー中ユーザー対比運動頻度比較文字列を返すメソッド
+    /// - Parameter comparison: フォロー比較データ
+    /// - Returns: 比較結果文字列
     func getFollowingComparisonString(from comparison: FollowingComparison) -> String {
         let diff = comparison.user - comparison.followingAvg
         

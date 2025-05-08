@@ -15,6 +15,7 @@ struct ExerciseSearchView: View {
     @ObservedObject var exercisesManager: WorkoutExercisesManager
     @StateObject private var viewModel = ExerciseSearchViewModel()
     @FocusState private var isFocused: Bool
+    private let analyticsService = AnalyticsService.shared
     private let exerciseColumns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible())
@@ -81,6 +82,10 @@ struct ExerciseSearchView: View {
                 selectExercisePartView
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
+            }
+            .onAppear {
+                // Log screen view
+                analyticsService.logScreenView(screenName: "ExerciseSearch")
             }
         }
     }

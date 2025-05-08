@@ -12,6 +12,7 @@ struct EditSetView: View {
     
     @State private var weight: Double
     @State private var reps: Int
+    private let analyticsService = AnalyticsService.shared
     
     var onSave: (Double, Int) -> Void
     
@@ -116,6 +117,10 @@ struct EditSetView: View {
             .padding(.top)
         }
         .padding()
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "EditSet")
+        }
     }
 }
 

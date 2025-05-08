@@ -12,6 +12,7 @@ struct ProfileEditView: View {
     @StateObject var viewModel: ProfileEditViewModel
     @State private var name: String
     @State private var visibility: Int
+    private let analyticsService = AnalyticsService.shared
     
     //アラートに関する変数
     @State private var showAlert = false
@@ -103,7 +104,12 @@ struct ProfileEditView: View {
         .navigationTitle("ユーザー設定")
         .navigationBarTitleDisplayMode(.inline)
         .scrollDismissesKeyboard(.immediately)
-        .onAppear(perform: viewModel.refreshUserData)
+        .onAppear {
+            viewModel.refreshUserData()
+            
+            // Log screen view
+            analyticsService.logScreenView(screenName: "ProfileEdit")
+        }
         .onChange(of: viewModel.showMessage) { _, newValue in
             if newValue {
                 // Show success or failure message

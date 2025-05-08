@@ -13,6 +13,7 @@ struct EditExerciseSetView: View {
     @Environment(\.dismiss) var dismiss
     let order: Int
     @Binding var workoutExercise: WorkoutExercise
+    private let analyticsService = AnalyticsService.shared
     
     // 문자열로 변환된 값을 저장하기 위한 상태 변수
     @State private var repsStrings: [String] = []
@@ -44,6 +45,10 @@ struct EditExerciseSetView: View {
         .padding()
         .padding(.top)
         .background(Color.gray.opacity(0.1))
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "EditExerciseSet")
+        }
     }
 }
 

@@ -7,6 +7,7 @@ struct AnalyticsView: View {
     @State private var showingUpdateAlert = false
     @State private var updateSuccess = false
     @State private var errorMessage = ""
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         ScrollView {
@@ -77,6 +78,9 @@ struct AnalyticsView: View {
         .onAppear {
             viewModel.loadAnalytics()
             viewModel.loadUserData()
+            
+            // Log screen view
+            analyticsService.logScreenView(screenName: "Analytics")
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
