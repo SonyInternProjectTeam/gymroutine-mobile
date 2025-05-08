@@ -133,6 +133,137 @@ class AnalyticsService {
         ])
     }
     
+    /// 사용자 팔로우 이벤트 로깅
+    func logUserFollowed(followedUserId: String, fromScreen: String) {
+        Analytics.logEvent("user_followed", parameters: [
+            "followed_user_id": followedUserId,
+            "from_screen": fromScreen
+        ])
+    }
+    
+    /// 사용자 언팔로우 이벤트 로깅
+    func logUserUnfollowed(unfollowedUserId: String, fromScreen: String) {
+        Analytics.logEvent("user_unfollowed", parameters: [
+            "unfollowed_user_id": unfollowedUserId,
+            "from_screen": fromScreen
+        ])
+    }
+    
+    /// 소셜 콘텐츠 공유 이벤트 로깅
+    func logContentShared(contentType: String, contentId: String, shareMethod: String) {
+        Analytics.logEvent("content_shared", parameters: [
+            "content_type": contentType,
+            "content_id": contentId,
+            "share_method": shareMethod
+        ])
+    }
+    
+    // MARK: - 분석 관련 이벤트
+    
+    /// 분석 데이터 조회 이벤트 로깅
+    func logAnalyticsViewed(analyticsType: String, timePeriod: String) {
+        Analytics.logEvent("analytics_viewed", parameters: [
+            "analytics_type": analyticsType,
+            "time_period": timePeriod
+        ])
+    }
+    
+    /// 목표 설정 이벤트 로깅
+    func logGoalSet(goalType: String, targetValue: Double, timeFrame: String) {
+        Analytics.logEvent("goal_set", parameters: [
+            "goal_type": goalType,
+            "target_value": targetValue,
+            "time_frame": timeFrame
+        ])
+    }
+    
+    /// 목표 달성 이벤트 로깅
+    func logGoalAchieved(goalType: String, achievedValue: Double) {
+        Analytics.logEvent("goal_achieved", parameters: [
+            "goal_type": goalType,
+            "achieved_value": achievedValue
+        ])
+    }
+    
+    // MARK: - 운동 관련 추가 이벤트
+    
+    /// 운동 일정 추가 이벤트 로깅
+    func logWorkoutScheduled(workoutId: String, workoutName: String, scheduledDay: String) {
+        Analytics.logEvent("workout_scheduled", parameters: [
+            "workout_id": workoutId,
+            "workout_name": workoutName,
+            "scheduled_day": scheduledDay
+        ])
+    }
+    
+    /// 개인 최고 기록(PR) 달성 이벤트 로깅
+    func logPersonalRecordAchieved(exerciseName: String, recordType: String, previousValue: Double, newValue: Double) {
+        Analytics.logEvent("personal_record_achieved", parameters: [
+            "exercise_name": exerciseName,
+            "record_type": recordType,
+            "previous_value": previousValue,
+            "new_value": newValue,
+            "improvement_percentage": ((newValue - previousValue) / previousValue) * 100
+        ])
+    }
+    
+    /// 체중 업데이트 이벤트 로깅
+    func logWeightUpdated(previousWeight: Double?, newWeight: Double) {
+        var parameters: [String: Any] = [
+            "new_weight_kg": newWeight
+        ]
+        
+        if let previousWeight = previousWeight {
+            parameters["previous_weight_kg"] = previousWeight
+            parameters["weight_change"] = newWeight - previousWeight
+        }
+        
+        Analytics.logEvent("weight_updated", parameters: parameters)
+    }
+    
+    /// 앱 사용 시간 기록
+    func logAppUsageTime(sessionDuration: TimeInterval, featureUsed: [String]) {
+        Analytics.logEvent("app_usage_time", parameters: [
+            "session_duration_seconds": sessionDuration,
+            "features_used": featureUsed.joined(separator: ",")
+        ])
+    }
+    
+    /// 운동 검색 이벤트 로깅
+    func logExerciseSearch(searchQuery: String, resultsCount: Int) {
+        Analytics.logEvent("exercise_search", parameters: [
+            "search_query": searchQuery,
+            "results_count": resultsCount
+        ])
+    }
+    
+    /// 캘린더 상호작용 이벤트 로깅
+    func logCalendarInteraction(interactionType: String, dateSelected: String) {
+        Analytics.logEvent("calendar_interaction", parameters: [
+            "interaction_type": interactionType,
+            "date_selected": dateSelected
+        ])
+    }
+    
+    /// 운동 루틴 수정 이벤트 로깅
+    func logWorkoutEdited(workoutId: String, workoutName: String, changedFields: [String], exercisesAdded: Int, exercisesRemoved: Int) {
+        Analytics.logEvent("workout_edited", parameters: [
+            "workout_id": workoutId,
+            "workout_name": workoutName,
+            "changed_fields": changedFields.joined(separator: ","),
+            "exercises_added": exercisesAdded,
+            "exercises_removed": exercisesRemoved
+        ])
+    }
+    
+    /// 예정된 운동 알림 상호작용 로깅
+    func logScheduledWorkoutNotificationInteraction(workoutId: String, action: String) {
+        Analytics.logEvent("workout_notification_interaction", parameters: [
+            "workout_id": workoutId,
+            "action": action // "opened", "dismissed", "snoozed" 등
+        ])
+    }
+
     // MARK: - 사용자 속성 관리
     
     /// 사용자 ID 설정
@@ -143,5 +274,20 @@ class AnalyticsService {
     /// 사용자 속성 설정
     func setUserProperty(name: String, value: String?) {
         Analytics.setUserProperty(value, forName: name)
+    }
+    
+    /// 사용자 운동 레벨 설정
+    func setUserFitnessLevel(level: String) {
+        Analytics.setUserProperty(level, forName: "fitness_level")
+    }
+    
+    /// 사용자 선호 운동 종류 설정
+    func setUserPreferredWorkoutTypes(types: [String]) {
+        Analytics.setUserProperty(types.joined(separator: ","), forName: "preferred_workout_types")
+    }
+    
+    /// 사용자 운동 빈도 설정
+    func setUserWorkoutFrequency(timesPerWeek: Int) {
+        Analytics.setUserProperty("\(timesPerWeek)", forName: "workout_frequency_per_week")
     }
 }
