@@ -18,6 +18,15 @@ struct HomeView: View {
     @State private var showingUpdateWeightSheet = false
     @State private var isShowingOnboarding = false
     
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        
+        let appearance: UITabBarAppearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        UITabBar.appearance().standardAppearance = appearance
+    }
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             header
@@ -29,6 +38,7 @@ struct HomeView: View {
             }
             .padding()
         }
+        .padding(.top, 8)
         .background(Color.gray.opacity(0.1))
         .contentMargins(.top, 16)
         .contentMargins(.bottom, 80)
