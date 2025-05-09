@@ -105,28 +105,24 @@ class WorkoutService {
         }
     }
     
-    /// 워크아웃 상세 정보를 불러오는 메서드 (exercises 필드도 디코딩)
-    func fetchWorkoutById(workoutID: String) async throws -> Workout {
-        let documentSnapshot = try await db.collection("Workouts").document(workoutID).getDocument()
+    func fetchWorkoutById(workoutID: String) async -> Result<Workout, Error> {
+        let workoutRef = db.collection("Workouts").document(workoutID)
         
-        guard documentSnapshot.exists else {
-            throw NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])
-        }
-        
-        // Firestore 문서를 Workout 모델로 변환
         do {
-            var workout = try documentSnapshot.data(as: Workout.self)
-            workout.id = documentSnapshot.documentID
-            return workout
+            let snapshot = try await workoutRef.getDocument()
+            do {
+                let workout = try snapshot.data(as: Workout.self)
+                return .success(workout)
+            } catch {
+                return .failure(NSError(domain: "Firestore", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Decode Error"]))
+            }
         } catch {
-            print("🔥 워크아웃 디코딩 에러: \(error.localizedDescription)")
-            throw error
+            return .failure(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"]))
         }
     }
     
     /// 引数のユーザーが登録済みのワークアウトを全て取得
     func fetchUserWorkouts(uid: String) async -> [Workout]? {
-        let db = Firestore.firestore()
         let workoutsRef = db.collection("Workouts").whereField("userId", isEqualTo: uid)
         
         do {

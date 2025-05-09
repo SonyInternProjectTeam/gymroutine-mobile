@@ -12,7 +12,6 @@ import FirebaseFirestore
 struct CalendarView: View {
     
     @StateObject private var viewModel = CalendarViewModel()
-    @State private var routineFlg = false
     
     private let weekdays = ["日", "月", "火", "水", "木", "金", "土"]
     
@@ -25,9 +24,6 @@ struct CalendarView: View {
             contentBox
         }
         .background(Color.gray.opacity(0.1))
-        .sheet(isPresented: $routineFlg) {
-            Text("ルーティーン追加画面を\nここに作成")
-        }
     }
 }
 
@@ -40,15 +36,6 @@ extension CalendarView {
                 .font(.title2.bold())
                 .padding()
                 .hAlign(.center)
-                .overlay(alignment: .trailing) {
-                    Button(action: {
-                        routineFlg.toggle()
-                    }, label: {
-                        Image(systemName: "plus")
-                            .imageScale(.large).bold()
-                            .padding(.trailing)
-                    })
-                }
         }
     }
     

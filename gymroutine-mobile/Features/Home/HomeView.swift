@@ -247,7 +247,7 @@ struct HomeView: View {
             userId: userId,
             name: "Quick Start",
             createdAt: Date(),
-            notes: "Started from quick start button",
+            notes: "「今すぐ始める」から作成されました。",
             isRoutine: false,
             scheduledDays: [],
             exercises: [] // Empty exercise list
