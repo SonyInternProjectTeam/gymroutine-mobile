@@ -157,40 +157,33 @@ async function getRecommendationsForUser(userId) {
  */
 async function getActiveUsers() {
   try {
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - CONSTANTS.TIME.INACTIVE_USER_DAYS);
-    
-    // Resultコレクションから最近の活動ユーザーを確認
-    const activeResultUsers = new Set();
-    const resultSnapshot = await db.collectionGroup('Result')
-      .where('createdAt', '>=', sevenDaysAgo)
+    // 今日からCONSTANTS.TIME.INACTIVE_USER_DAYS日前の日付を計算
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - CONSTANTS.TIME.INACTIVE_USER_DAYS);
+
+    // Resultサブコレクションから指定期間内に作成されたドキュメントを取得
+    const activeUserSet = new Set();
+    const resultSnapshot = await db
+      .collectionGroup('Result')
+      .where('createdAt', '>=', cutoffDate)
       .get();
-    
+
+    // 各ドキュメントからユーザーIDを抽出し、Setに追加
     resultSnapshot.forEach(doc => {
-      const userId = doc.ref.path.split('/')[1]; // Result/{userId}/{month}/{resultId} パスから抽出
-      activeResultUsers.add(userId);
+      // パス例: Result/{userId}/{month}/{resultId}
+      const userId = doc.ref.path.split('/')[1];
+      activeUserSet.add(userId);
     });
-    
-    // Storiesコレクションから最近の活動ユーザーを確認
-    const storiesSnapshot = await db.collection('Stories')
-      .where('createdAt', '>=', sevenDaysAgo)
-      .get();
-    
-    const activeUserIds = [];
-    storiesSnapshot.forEach(doc => {
-      const storyData = doc.data();
-      if (storyData.userId) {
-        activeResultUsers.add(storyData.userId);
-      }
-    });
-    
-    // Setを配列に変換
-    return Array.from(activeResultUsers);
+
+    // Setを配列に変換して返却
+    return Array.from(activeUserSet);
   } catch (error) {
-    logger.error(`Error getting active users: ${error.message}`);
+    // エラーをログに記録して再スロー
+    logger.error(`アクティブユーザー取得中にエラーが発生しました: ${error.message}`);
     throw error;
   }
 }
+
 
 /**
  * 推薦対象候補ユーザーを取得します（現在フォローしていないアクティブユーザー）
@@ -237,8 +230,27 @@ async function getCandidateUsers(userId) {
     logger.info(`Total following users (including self): ${following.length}`);
     
     // 3. アクティブユーザーリストを取得
-    const activeUsersSnapshot = await db.collection('Users').where("Visibility", "in", [1, 2]).get();
-    logger.info(`Found ${activeUsersSnapshot.size} total users in database`);
+    // 수정: 먼저 쿼리 없이 모든 사용자를 가져와서 로깅
+    logger.info(`Attempting to get all users first to check database access`);
+    const allUsersSnapshot = await db.collection('Users').get();
+    logger.info(`Found ${allUsersSnapshot.size} total users in database without filter`);
+    
+    // 수정: Visibility 필드가 있는지 확인하고 타입 로깅
+    let usersWithVisibility = 0;
+    allUsersSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.Visibility !== undefined) {
+        usersWithVisibility++;
+        logger.info(`User ${doc.id} has Visibility of type ${typeof data.Visibility} with value ${data.Visibility}`);
+      }
+    });
+    logger.info(`Found ${usersWithVisibility} users with Visibility field`);
+    
+    // 수정: 숫자와 문자열 타입 모두 고려한 쿼리
+    const activeUsersSnapshot = await db.collection('Users')
+      .where("visibility", "in", [1, 2, "1", "2"])
+      .get();
+    logger.info(`Found ${activeUsersSnapshot.size} users with Visibility in [1,2,"1","2"]`);
     
     // 4. フォローしていないアクティブユーザーをフィルタリング
     const candidates = [];
