@@ -38,7 +38,13 @@ enum ExercisePart: String, CaseIterable {
     case back
     case lowerbody = "lower body"
     case shoulders
+    
+    // 画像表示用に定義
+    var assetName: String {
+            return self.rawValue.replacingOccurrences(of: "/", with: ":")
+        }
 }
+
 
 // 今後detailedPart検索機能実装の際に使用
 //enum ExerciseDetailedPart: String, CaseIterable {
