@@ -60,18 +60,16 @@ exports.expireStories = onSchedule({
   region: region // 리전 설정
 }, cronHandler.expireStories);
 
-//TODO : change schedule to 0
 exports.dailyRecommendationUpdate = onSchedule({
-  schedule: "0 15 * * *", // 매일 00:00 JST (UTC 15:00)
+  schedule: "0 0 * * *",
   timeZone: "Asia/Tokyo",
-  region: region // 리전 설정
+  region: region
 }, recommendationScheduler.dailyRecommendationUpdate);
 
-// Analytics scheduled functions
 exports.dailyAnalyticsUpdate = onSchedule({
-  schedule: '0 18 * * *', // 매일 03:00 JST (UTC 18:00)
-  timeZone: 'Asia/Tokyo',
-  region: region // 리전 설정
+  schedule: "0 3 * * *",
+  timeZone: "Asia/Tokyo",
+  region: region
 }, analyticsScheduler.dailyAnalyticsUpdate);
 
 // Export API endpoints
