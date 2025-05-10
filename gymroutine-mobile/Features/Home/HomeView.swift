@@ -12,6 +12,7 @@ struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
     @ObservedObject private var userManager = UserManager.shared
     @ObservedObject private var workoutManager = AppWorkoutManager.shared
+    private let analyticsService = AnalyticsService.shared
     
     @State private var isShowTodayworkouts = true
     @State private var createWorkoutFlg = false
@@ -66,6 +67,10 @@ struct HomeView: View {
                 .clipped()
                 .shadow(radius: 4)
                 .padding()
+        }
+        .onAppear {
+            // Log screen view event
+            analyticsService.logScreenView(screenName: "Home")
         }
     }
     
@@ -129,6 +134,16 @@ struct HomeView: View {
         HeatmapCalendarView(heatmapData: viewModel.heatmapData, startDate: Date(), numberOfMonths: 1)
             .frame(height: 230)
             .padding(.bottom, 20)
+            .onAppear {
+                // Log calendar viewed event
+                analyticsService.logEvent("calendar_viewed")
+            }
+            .onTapGesture {
+                // Log heatmap interaction when user taps on the calendar
+                analyticsService.logEvent("heatmap_interaction", parameters: [
+                    "interaction_type": "tap"
+                ])
+            }
     }
 
     private var todaysWorkoutsBox: some View {
@@ -136,6 +151,12 @@ struct HomeView: View {
             Button {
                 withAnimation {
                     isShowTodayworkouts.toggle()
+                    
+                    // Log toggle today's workouts
+                    analyticsService.logUserAction(
+                        action: "toggle_todays_workouts",
+                        contentType: "home_view"
+                    )
                 }
             } label: {
                 HStack {
@@ -161,9 +182,18 @@ struct HomeView: View {
                         }) {
                             WorkoutCell(
                                 workoutName: workout.name,
-                                exerciseImageName: workout.exercises.first?.name,
+                                exerciseImageName: workout.exercises.first?.key,
                                 count: workout.exercises.count
                             )
+                            .onTapGesture {
+                                // Log todays workout selection
+                                analyticsService.logUserAction(
+                                    action: "select_todays_workout",
+                                    itemId: workout.id ?? "",
+                                    itemName: workout.name,
+                                    contentType: "home_view"
+                                )
+                            }
                         }
                         .buttonStyle(PlainButtonStyle()) // 기본 네비게이션 스타일 제거
                     }
@@ -225,6 +255,12 @@ struct HomeView: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         showingUpdateWeightSheet = true
+                        
+                        // Log weight update tap
+                        analyticsService.logUserAction(
+                            action: "update_weight_tap",
+                            contentType: "user_profile"
+                        )
                     }
                 }
             } else {
@@ -253,6 +289,14 @@ struct HomeView: View {
             exercises: [] // Empty exercise list
         )
         
+        // Log workout started analytics event
+        analyticsService.logWorkoutStarted(
+            workoutId: quickWorkout.id ?? "",
+            workoutName: quickWorkout.name,
+            isRoutine: quickWorkout.isRoutine,
+            exerciseCount: quickWorkout.exercises.count
+        )
+        
         // Start the workout through AppWorkoutManager
         workoutManager.startWorkout(workout: quickWorkout)
         
@@ -262,6 +306,11 @@ struct HomeView: View {
     private var buttonBox: some View {
         HStack {
             Button {
+                // Log user action for creating routine
+                analyticsService.logUserAction(
+                    action: "create_routine_tapped",
+                    contentType: "home_screen"
+                )
                 createWorkoutFlg.toggle()
             } label: {
                 Label("ワークアウト作成", systemImage: "plus")
@@ -269,6 +318,11 @@ struct HomeView: View {
             .buttonStyle(SecondaryButtonStyle())
             
             Button {
+                // Log user action before starting quick workout
+                analyticsService.logUserAction(
+                    action: "quick_start_tapped",
+                    contentType: "home_screen"
+                )
                 startQuickWorkout()
             } label: {
                 Label("今すぐ始める", systemImage: "play")
@@ -278,7 +332,7 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Subviews (Add FollowingUserIcon if missing)
+// MARK: - Subviews
 
 struct FollowingUserIcon: View {
     let user: User

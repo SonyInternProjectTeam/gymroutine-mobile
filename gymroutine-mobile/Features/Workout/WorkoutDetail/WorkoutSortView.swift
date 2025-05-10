@@ -11,6 +11,7 @@ import SwiftUI
 struct WorkoutSortView: View {
     
     @EnvironmentObject var viewModel: WorkoutDetailViewModel
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         List {
@@ -47,6 +48,10 @@ struct WorkoutSortView: View {
             .listRowBackground(Color.clear)
         }
         .environment(\.editMode, .constant(.active))
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "WorkoutSort")
+        }
     }
 }
 

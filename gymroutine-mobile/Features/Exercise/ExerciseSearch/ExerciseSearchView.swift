@@ -15,6 +15,7 @@ struct ExerciseSearchView: View {
     @ObservedObject var exercisesManager: WorkoutExercisesManager
     @StateObject private var viewModel = ExerciseSearchViewModel()
     @FocusState private var isFocused: Bool
+    private let analyticsService = AnalyticsService.shared
     private let exerciseColumns = [
         GridItem(.flexible(), spacing: 12),
         GridItem(.flexible())
@@ -82,6 +83,10 @@ struct ExerciseSearchView: View {
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
             }
+            .onAppear {
+                // Log screen view
+                analyticsService.logScreenView(screenName: "ExerciseSearch")
+            }
         }
     }
     
@@ -144,7 +149,7 @@ struct ExerciseSearchView: View {
                 Text(LocalizedStringKey(part.rawValue))
                     .font(.headline)
                 
-                if let image = UIImage(named: part.rawValue) {
+                if let image = UIImage(named: part.assetName) {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFit()

@@ -28,6 +28,7 @@ struct FollowListView: View {
     @State private var users: [User] = []
     @State private var errorMessage: String? = nil
     @State private var isLoading: Bool = false
+    private let analyticsService = AnalyticsService.shared
 
     private let followService = FollowService()
 
@@ -49,6 +50,9 @@ struct FollowListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await fetchUsers(showLoading: true)
+            
+            // Log screen view
+            analyticsService.logScreenView(screenName: "FollowList_\(listType == .followers ? "Followers" : "Following")")
         }
         .refreshable {
             await fetchUsers(showLoading: false)
