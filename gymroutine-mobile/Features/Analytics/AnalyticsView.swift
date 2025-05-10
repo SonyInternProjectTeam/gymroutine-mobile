@@ -10,10 +10,20 @@ struct AnalyticsView: View {
     private let analyticsService = AnalyticsService.shared
     
     var body: some View {
-        ScrollView {
             VStack(spacing: 20) {
                 // 上部ヘッダー
-                AnalyticsHeaderView(updatedAt: viewModel.analytics?.updatedAt.dateValue())
+                AnalyticsHeaderView(updatedAt: viewModel.analytics?.updatedAt.dateValue(),
+                    isLoading: viewModel.isLoading,
+                    updateAction: {
+                        Task {
+                            await viewModel.updateAnalytics { success, error in
+                                updateSuccess = success
+                                errorMessage = error?.localizedDescription ?? ""
+                                showingUpdateAlert = true
+                            }
+                        }
+                    }
+                )
                 
                 if viewModel.isLoading {
                     // ローディングインジケーター
@@ -54,8 +64,6 @@ struct AnalyticsView: View {
                         }
                     }
                 }
-            }
-            .padding(.bottom, 30)
         }
         .alert(isPresented: $showingUpdateAlert) {
             Alert(
@@ -73,8 +81,6 @@ struct AnalyticsView: View {
                 }
             )
         }
-        .navigationTitle("運動分析")
-        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             viewModel.loadAnalytics()
             viewModel.loadUserData()
@@ -82,35 +88,27 @@ struct AnalyticsView: View {
             // Log screen view
             analyticsService.logScreenView(screenName: "Analytics")
         }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    Task {
-                        await viewModel.updateAnalytics { success, error in
-                            updateSuccess = success
-                            errorMessage = error?.localizedDescription ?? ""
-                            showingUpdateAlert = true
-                        }
-                    }
-                }) {
-                    Image(systemName: "arrow.clockwise")
-                }
-                .disabled(viewModel.isLoading)
-            }
-        }
     }
 }
 
 // MARK: - 分析ヘッダービュー
 struct AnalyticsHeaderView: View {
     let updatedAt: Date?
+    let isLoading: Bool
+    let updateAction: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("運動分析")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-            
+            HStack{
+                Text("運動分析")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                Spacer()
+                Button(action: updateAction) {
+                Image(systemName: "arrow.clockwise")
+                }
+                .disabled(isLoading)
+            }
             Text("過去90日間の運動データに基づく")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
