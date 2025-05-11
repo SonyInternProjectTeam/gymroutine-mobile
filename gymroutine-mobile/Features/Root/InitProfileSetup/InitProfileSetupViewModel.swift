@@ -58,8 +58,7 @@ final class InitProfileSetupViewModel: ObservableObject {
             createdAt: Date(),
             totalWorkoutDays: 0,
             currentWeight: nil,
-            consecutiveWorkoutDays: 0,
-            weightHistory: []
+            consecutiveWorkoutDays: 0
         )
         
         Task {

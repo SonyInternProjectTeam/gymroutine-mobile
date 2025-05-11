@@ -3,9 +3,16 @@ import Charts
 import FirebaseFirestore // For Timestamp
 
 struct WeightHistoryGraphView: View {
-    let weightHistory: [WeightEntry]?
+    @State private var weightHistory: [WeightEntry] = []
+    @State private var isLoading = true
+    @State private var loadError: Error? = nil
     @State private var selectedEntry: WeightEntry? = nil
     @State private var periodType: PeriodType = .oneMonth
+    let userId: String
+    
+    init(userId: String) {
+        self.userId = userId
+    }
     
     enum PeriodType: String, CaseIterable, Identifiable {
         case oneWeek = "1週間"
@@ -31,10 +38,10 @@ struct WeightHistoryGraphView: View {
 
     // Find the min and max weight for Y-axis scaling
     private var weightDomain: ClosedRange<Double> {
-        guard let history = weightHistory, !history.isEmpty else {
+        guard !weightHistory.isEmpty else {
             return 0...100 // Default range if no data
         }
-        let weights = history.map { $0.weight }
+        let weights = weightHistory.map { $0.weight }
         let minWeight = weights.min() ?? 0
         let maxWeight = weights.max() ?? 100
         // Add some padding to the domain
@@ -43,11 +50,11 @@ struct WeightHistoryGraphView: View {
     
     // Filter history based on selected period
     private var filteredHistory: [WeightEntry] {
-        guard let history = weightHistory, !history.isEmpty else {
+        guard !weightHistory.isEmpty else {
             return []
         }
         
-        let sortedHistory = history.sorted { $0.date.dateValue() < $1.date.dateValue() }
+        let sortedHistory = weightHistory.sorted { $0.date.dateValue() < $1.date.dateValue() }
         
         guard let days = periodType.days else {
             // If "all" is selected, return all entries
@@ -124,8 +131,15 @@ struct WeightHistoryGraphView: View {
                     .foregroundColor(.secondary)
             }
             
-            if let history = weightHistory, !filteredHistory.isEmpty {
-                // 차트 뷰
+            if isLoading {
+                ProgressView()
+                    .frame(height: 200, alignment: .center)
+            } else if let error = loadError {
+                Text("データの読み込みに失敗しました")
+                    .foregroundColor(.red)
+                    .frame(height: 200, alignment: .center)
+            } else if !weightHistory.isEmpty && !filteredHistory.isEmpty {
+                // Chart view
                 chartView
             } else {
                 Text("体重履歴のデータがありません。")
@@ -134,6 +148,26 @@ struct WeightHistoryGraphView: View {
             }
         }
         .padding()
+        .task {
+            await loadWeightHistory()
+        }
+    }
+    
+    private func loadWeightHistory() async {
+        isLoading = true
+        loadError = nil
+        
+        let result = await WeightHistoryService.shared.fetchWeightHistory(userId: userId)
+        
+        isLoading = false
+        
+        switch result {
+        case .success(let entries):
+            self.weightHistory = entries
+        case .failure(let error):
+            self.loadError = error
+            print("Failed to load weight history: \(error.localizedDescription)")
+        }
     }
     
     // Extract chart view for cleaner code
@@ -251,33 +285,14 @@ struct WeightHistoryGraphView: View {
 // Preview Provider
 struct WeightHistoryGraphView_Previews: PreviewProvider {
     static var previews: some View {
-        // Sample data for preview
-        let sampleHistory = [
-            WeightEntry(weight: 72.0, date: Timestamp(date: Calendar.current.date(byAdding: .day, value: -45, to: Date())!)),
-            WeightEntry(weight: 71.4, date: Timestamp(date: Calendar.current.date(byAdding: .day, value: -38, to: Date())!)),
-            WeightEntry(weight: 71.1, date: Timestamp(date: Calendar.current.date(byAdding: .day, value: -31, to: Date())!)),
-            WeightEntry(weight: 71.0, date: Timestamp(date: Calendar.current.date(byAdding: .day, value: -24, to: Date())!)),
-            WeightEntry(weight: 70.8, date: Timestamp(date: Calendar.current.date(byAdding: .day, value: -17, to: Date())!)),
-            WeightEntry(weight: 70.6, date: Timestamp(date: Calendar.current.date(byAdding: .day, value: -10, to: Date())!)),
-            WeightEntry(weight: 70.5, date: Timestamp(date: Date()))
-        ]
-        
-        let emptyHistory: [WeightEntry]? = []
-        let nilHistory: [WeightEntry]? = nil
-
         VStack {
-            WeightHistoryGraphView(weightHistory: sampleHistory)
+            WeightHistoryGraphView(userId: "previewUserId")
                 .padding()
                 .background(Color.white)
                 .cornerRadius(10)
                 .shadow(radius: 2)
                 .padding()
-            
-            WeightHistoryGraphView(weightHistory: emptyHistory)
-                .padding()
-            
-            WeightHistoryGraphView(weightHistory: nilHistory)
-                .padding()
+                .previewLayout(.sizeThatFits)
         }
         .background(Color.gray.opacity(0.1))
     }
