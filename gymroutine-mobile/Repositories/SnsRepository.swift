@@ -12,7 +12,7 @@ import FirebaseFunctions
 /// SNS関連のDB通信を担当するRepositoryクラス
 class SnsRepository {
     private let db = Firestore.firestore()
-    private let functions = Functions.functions()
+    private let functions = Functions.functions(region: "asia-northeast1")
     private let cacheExpiryHours = 24 // 캐시 유효 시간 (시간 단위)
     
     /// 現在のユーザーがフォローしているユーザー一覧を取得する

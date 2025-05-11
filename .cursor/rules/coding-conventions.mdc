@@ -1,0 +1,38 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# GymRoutine Mobile Coding Conventions
+
+## Swift Style Guidelines
+
+1. **Naming**
+   - Use camelCase for variables and functions
+   - Use PascalCase for types and protocols
+   - Use descriptive names that convey purpose
+
+2. **File Organization**
+   - Group related functionality in the same directory
+   - One primary class/struct per file
+   - Extensions in separate files when logical
+
+3. **SwiftUI Patterns**
+   - Use MVVM architecture for views
+   - Keep views small and focused
+   - Extract reusable components to ViewParts directory
+
+4. **Error Handling**
+   - Use Swift's Result type for handling errors
+   - Provide meaningful error messages
+   - Handle errors at appropriate levels
+
+5. **Documentation**
+   - Document public APIs with comments
+   - Include parameter descriptions for non-obvious functions
+   - Add TODO comments for incomplete functionality
+
+6. **Analytics**
+   - Log important user actions
+   - Include relevant context in analytics events
+   - Use consistent event naming conventions
