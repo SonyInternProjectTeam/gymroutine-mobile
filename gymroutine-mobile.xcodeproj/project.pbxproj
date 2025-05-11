@@ -96,7 +96,6 @@
 		273750F82DB14902003D031D /* WeightHistoryGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273750F62DB14902003D031D /* WeightHistoryGraphView.swift */; };
 		273751362DB15132003D031D /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273751352DB1512B003D031D /* ProfileEditView.swift */; };
 		273751382DB15147003D031D /* ProfileEditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273751372DB1513F003D031D /* ProfileEditViewModel.swift */; };
-		275102072DBBA05300116001 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275102062DBBA05300116001 /* AnalyticsService.swift */; };
 		27475F622DC4A9000065C420 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F5F2DC4A9000065C420 /* AnalyticsView.swift */; };
 		27475F632DC4A9000065C420 /* AnalyticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F602DC4A9000065C420 /* AnalyticsViewModel.swift */; };
 		27475F652DC4A90E0065C420 /* UserAnalyticsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F642DC4A90E0065C420 /* UserAnalyticsModel.swift */; };
@@ -107,6 +106,7 @@
 		27475F732DC665010065C420 /* AdherenceCircleChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F6C2DC665010065C420 /* AdherenceCircleChartView.swift */; };
 		27475F742DC665010065C420 /* DistributionPieChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F6D2DC665010065C420 /* DistributionPieChartView.swift */; };
 		27475F752DC665010065C420 /* FavoriteExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27475F6E2DC665010065C420 /* FavoriteExercisesView.swift */; };
+		275102072DBBA05300116001 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275102062DBBA05300116001 /* AnalyticsService.swift */; };
 		275C71532DACD2C300579962 /* GlobalWorkoutSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */; };
 		275C71612DAD432300579962 /* GlobalWorkoutSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275C71602DAD432300579962 /* GlobalWorkoutSessionView.swift */; };
 		276C4C132DC6F6A80012AFCB /* UserAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 276C4C122DC6F6A80012AFCB /* UserAnalyticsService.swift */; };
@@ -246,7 +246,6 @@
 		273750F62DB14902003D031D /* WeightHistoryGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightHistoryGraphView.swift; sourceTree = "<group>"; };
 		273751352DB1512B003D031D /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		273751372DB1513F003D031D /* ProfileEditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditViewModel.swift; sourceTree = "<group>"; };
-		275102062DBBA05300116001 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		27475F5F2DC4A9000065C420 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		27475F602DC4A9000065C420 /* AnalyticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsViewModel.swift; sourceTree = "<group>"; };
 		27475F642DC4A90E0065C420 /* UserAnalyticsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAnalyticsModel.swift; sourceTree = "<group>"; };
@@ -257,6 +256,7 @@
 		27475F6E2DC665010065C420 /* FavoriteExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteExercisesView.swift; sourceTree = "<group>"; };
 		27475F6F2DC665010065C420 /* FollowingComparisonChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowingComparisonChartView.swift; sourceTree = "<group>"; };
 		27475F702DC665010065C420 /* OneRepMaxBarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneRepMaxBarChartView.swift; sourceTree = "<group>"; };
+		275102062DBBA05300116001 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalWorkoutSessionView.swift; sourceTree = "<group>"; };
 		275C71602DAD432300579962 /* GlobalWorkoutSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalWorkoutSessionView.swift; sourceTree = "<group>"; };
 		276C4C122DC6F6A80012AFCB /* UserAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAnalyticsService.swift; sourceTree = "<group>"; };
@@ -1002,7 +1002,6 @@
 				276C4C132DC6F6A80012AFCB /* UserAnalyticsService.swift in Sources */,
 				00CDC4412D845E8E003B18EB /* SignupViewModel.swift in Sources */,
 				00CDC4422D845E8E003B18EB /* SplashViewModel.swift in Sources */,
-				00CDC4442D845E8E003B18EB /* WorkoutProcessViewModel.swift in Sources */,
 				272779ED2DA8BD6E00166807 /* StoryModel.swift in Sources */,
 				00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */,
 				277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */,

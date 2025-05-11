@@ -32,9 +32,7 @@ struct WorkoutEditView: View {
                     notesBox
                     
                     // ルーチン曜日（ルーチンの場合のみ表示）
-                    if viewModel.workout.isRoutine {
-                        routineDaysBox
-                    }
+                    routineDaysBox
                     
                     deleteButtonSection
                 }
@@ -69,7 +67,7 @@ struct WorkoutEditView: View {
                         await viewModel.saveWorkout(
                             name: workoutName, 
                             notes: workoutNotes.isEmpty ? nil : workoutNotes,
-                            scheduledDays: selectedDays.isEmpty ? nil : selectedDays
+                            scheduledDays: selectedDays
                         )
                         dismiss()
                     }
