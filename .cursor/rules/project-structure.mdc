@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# GymRoutine Mobile Project Structure
+
+This is a SwiftUI-based iOS application with a Firebase backend for gym workout tracking and social features.
+
+## Main Directories
+
+- **gymroutine-mobile/**: Main iOS app codebase
+  - [Application/gymroutine_mobileApp.swift](mdc:gymroutine-mobile/Application/gymroutine_mobileApp.swift): App entry point and configuration
+  - [Application/Router.swift](mdc:gymroutine-mobile/Application/Router.swift): Navigation router
+  
+- **Features/**: Contains the main app features organized by domain
+  - Home: Home screen views
+  - Exercise: Exercise management
+  - Workout: Workout tracking
+  - Calendar: Schedule views
+  - Profile: User profile management
+  - Analytics: Usage analytics
+  - Root: Root view components
+
+- **Services/**: Service layer for API calls and external integrations
+
+- **Models/**: Data models and entities
+
+- **Repositories/**: Data access layer
+
+- **Manager/**: Business logic managers
+
+- **ViewParts/**: Reusable UI components
+
+- **Extensions/**: Swift extension utilities
+
+## Backend
+
+- **backend/functions/**: Firebase Cloud Functions
+- **backend/firebase.json**: Firebase configuration
