@@ -37,7 +37,7 @@ struct AnalyticsView: View {
                         DistributionPieChartView(distribution: analytics.distribution)
                         
                         // 体重変化グラフ
-                        WeightHistoryGraphView(weightHistory: viewModel.user?.weightHistory)
+                        WeightHistoryGraphView(userId: UserManager.shared.currentUser?.uid ?? "")
                         
                         // 運動遵守率
                         AdherenceCircleChartView(adherence: analytics.adherence)

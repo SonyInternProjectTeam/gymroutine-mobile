@@ -149,7 +149,7 @@ struct ExerciseSearchView: View {
                 Text(LocalizedStringKey(part.rawValue))
                     .font(.headline)
                 
-                if let image = UIImage(named: part.rawValue) {
+                if let image = UIImage(named: part.assetName) {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFit()

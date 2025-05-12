@@ -65,12 +65,6 @@ class AuthService {
         do {
             let documentRef = db.collection("Users").document(user.uid)
             
-            // Convert weightHistory to an array of dictionaries for Firestore
-            // Use nil-coalescing to handle optional user.weightHistory
-            let weightHistoryData = (user.weightHistory ?? []).map { entry -> [String: Any] in
-                return ["weight": entry.weight, "date": entry.date] // entry.date is already a Timestamp
-            }
-
             var userData: [String: Any] = [
                 "uid": user.uid,
                 "email": user.email,
@@ -79,8 +73,7 @@ class AuthService {
                 "visibility": user.visibility,
                 "isActive": user.isActive,
                 "gender": user.gender,
-                "createdAt": Timestamp(date: user.createdAt),
-                "weightHistory": weightHistoryData // Always include weightHistory (potentially empty array)
+                "createdAt": Timestamp(date: user.createdAt)
             ]
             
             // Add optional fields only if they are not nil
@@ -96,12 +89,9 @@ class AuthService {
             if let consecutiveDays = user.consecutiveWorkoutDays {
                 userData["consecutiveWorkoutDays"] = consecutiveDays
             }
-
+            
             // Set data (merge is true, so existing fields won't be overwritten unnecessarily)
             try await documentRef.setData(userData, merge: true)
-            
-            // Initialize UserManager after saving - @MainActorコンテキストでの呼び出しが必要
-            // await UserManager.shared.initializeUser() // 呼び出す側で処理するように変更
             
             return .success(())
         } catch {
