@@ -1,0 +1,32 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# GymRoutine Mobile Architecture
+
+This application follows a layered architecture pattern with SwiftUI for UI and Firebase for backend services.
+
+## Architecture Layers
+
+1. **UI Layer**: SwiftUI Views in Features directory
+   - Follows MVVM pattern with ViewModels
+   - Root navigation with [Router.swift](mdc:gymroutine-mobile/Application/Router.swift)
+
+2. **Business Logic Layer**: Manager classes
+   - Handles application logic
+   - User authentication and session management
+
+3. **Data Access Layer**: Repositories and Services
+   - Services: Handle API/Firebase communication
+   - Repositories: Provide data access abstraction
+
+4. **Model Layer**: Data models
+   - Entity models for app data
+
+## Firebase Integration
+
+- Authentication via Firebase Auth
+- Data storage in Firestore
+- Cloud Functions for server-side logic
+- Analytics for user behavior tracking
