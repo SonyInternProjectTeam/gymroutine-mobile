@@ -253,10 +253,8 @@ class WorkoutService {
                 updateData["notes"] = FieldValue.delete()
             }
             
-            // ルーチンの曜日がある場合は追加
-//            if let scheduledDays = scheduledDays {
                 updateData["scheduledDays"] = scheduledDays
-//            }
+                updateData["isRoutine"] = scheduledDays.isEmpty ? false : true
             
             try await db.collection("Workouts").document(workoutID).updateData(updateData)
             return .success(())
