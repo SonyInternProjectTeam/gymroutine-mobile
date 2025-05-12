@@ -27,6 +27,9 @@ struct HomeView: View {
                 VStack(spacing: 24) {
                     calendarBox
                     todaysWorkoutsBox
+                        .onAppear {
+                            viewModel.loadTodaysWorkouts()
+                        }
                     userInfoBox
                 }
                 .padding()
@@ -52,6 +55,9 @@ struct HomeView: View {
             }
             .fullScreenCover(isPresented: $createWorkoutFlg) {
                 CreateWorkoutView()
+                    .onDisappear{
+                        viewModel.loadTodaysWorkouts()
+                    }
             }
             .overlay(alignment: .bottom) {
                 buttonBox
