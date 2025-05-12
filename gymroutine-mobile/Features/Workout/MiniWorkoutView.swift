@@ -101,7 +101,7 @@ struct MiniWorkoutView: View {
             }
             
             // Log screen view
-            analyticsService.logScreenView(screenName: "MiniWorkout")
+            // analyticsService.logScreenView(screenName: "MiniWorkout")
         }
         // 画面が更新されるたびにtimerTriggerを更新してビューをリフレッシュ
         .id(timerTrigger)

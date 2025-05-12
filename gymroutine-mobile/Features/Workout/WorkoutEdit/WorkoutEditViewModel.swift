@@ -9,6 +9,7 @@ final class WorkoutEditViewModel: WorkoutExercisesManager {
     @Published var showError = false
     @Published var errorMessage = ""
     @Published var showDeleteConfirmAlert = false // State for delete confirmation alert
+    @Published var showRoutineAlert = false // State for delete confirmation alert
     
     init(workout: Workout) {
         self.workout = workout
@@ -22,13 +23,18 @@ final class WorkoutEditViewModel: WorkoutExercisesManager {
     }
     
     // ワークアウト情報とエクササイズの順序を保存
-    func saveWorkout(name: String, notes: String?, scheduledDays: [String]? = nil) async {
+    func saveWorkout(name: String, notes: String?, scheduledDays: [String] = [], routine:Bool ) async {
         UIApplication.showLoading()
+        var scheduledDays: [String] = scheduledDays
         
         guard let workoutId = workout.id else {
             showError(message: "ワークアウトIDがありません")
             UIApplication.hideLoading()
             return
+        }
+        
+        if !routine {
+            scheduledDays = []
         }
         
         // 1. ワークアウト基本情報の更新
@@ -51,6 +57,7 @@ final class WorkoutEditViewModel: WorkoutExercisesManager {
             case .success:
                 // 成功
                 UIApplication.showBanner(type: .success, message: "ワークアウトを更新しました")
+
                 // ローカルワークアウトモデルの更新
                 self.workout = Workout(
                     id: workout.id,
@@ -58,8 +65,8 @@ final class WorkoutEditViewModel: WorkoutExercisesManager {
                     name: name,
                     createdAt: workout.createdAt,
                     notes: notes,
-                    isRoutine: workout.isRoutine,
-                    scheduledDays: scheduledDays ?? workout.scheduledDays,
+                    isRoutine: !scheduledDays.isEmpty,
+                    scheduledDays: scheduledDays,
                     exercises: exercises
                 )
             case .failure(let error):
