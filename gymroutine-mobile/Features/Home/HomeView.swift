@@ -19,50 +19,58 @@ struct HomeView: View {
     @State private var showingUpdateWeightSheet = false
     @State private var isShowingOnboarding = false
     
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        
+        let appearance: UITabBarAppearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        UITabBar.appearance().standardAppearance = appearance
+    }
+    
     var body: some View {
-        ZStack {
-            ScrollView(showsIndicators: false) {
-                header
-                
-                VStack(spacing: 24) {
-                    calendarBox
-                    todaysWorkoutsBox
-                    userInfoBox
-                }
+        ScrollView(showsIndicators: false) {
+            header
+            
+            VStack(spacing: 24) {
+                calendarBox
+                todaysWorkoutsBox
+                userInfoBox
+            }
+            .padding()
+        }
+        .padding(.top, 8)
+        .background(Color.gray.opacity(0.1))
+        .contentMargins(.top, 16)
+        .contentMargins(.bottom, 80)
+        .refreshable {
+            // 스크롤 당겨서 새로고침 시 스토리 데이터 업데이트
+            viewModel.refreshStories()
+            // 기타 필요한 데이터 업데이트
+            viewModel.loadFollowingUsers()
+            viewModel.loadTodaysWorkouts()
+            // 히트맵 데이터도 업데이트
+            viewModel.loadHeatmapData()
+        }
+        .sheet(isPresented: $showingUpdateWeightSheet) {
+            UpdateWeightView()
+                .environmentObject(userManager)
+        }
+        .sheet(item: $viewModel.selectedUserForStory) { user in
+            StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
+        }
+        .fullScreenCover(isPresented: $createWorkoutFlg) {
+            CreateWorkoutView()
+        }
+        .overlay(alignment: .bottom) {
+            buttonBox
+                .clipped()
+                .shadow(radius: 4)
                 .padding()
-            }
-            .background(Color.gray.opacity(0.1))
-            .contentMargins(.top, 16)
-            .contentMargins(.bottom, 80)
-            .refreshable {
-                // 스크롤 당겨서 새로고침 시 스토리 데이터 업데이트
-                viewModel.refreshStories()
-                // 기타 필요한 데이터 업데이트
-                viewModel.loadFollowingUsers()
-                viewModel.loadTodaysWorkouts()
-                // 히트맵 데이터도 업데이트
-                viewModel.loadHeatmapData()
-            }
-            .sheet(isPresented: $showingUpdateWeightSheet) {
-                UpdateWeightView()
-                    .environmentObject(userManager)
-            }
-            .sheet(item: $viewModel.selectedUserForStory) { user in
-                StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
-            }
-            .fullScreenCover(isPresented: $createWorkoutFlg) {
-                CreateWorkoutView()
-            }
-            .overlay(alignment: .bottom) {
-                buttonBox
-                    .clipped()
-                    .shadow(radius: 4)
-                    .padding()
-            }
-            .onAppear {
-                // Log screen view event
-                analyticsService.logScreenView(screenName: "Home")
-            }
+        }
+        .onAppear {
+            // Log screen view event
+            analyticsService.logScreenView(screenName: "Home")
         }
     }
     
@@ -275,7 +283,7 @@ struct HomeView: View {
             userId: userId,
             name: "Quick Start",
             createdAt: Date(),
-            notes: "Started from quick start button",
+            notes: "「今すぐ始める」から作成されました。",
             isRoutine: false,
             scheduledDays: [],
             exercises: [] // Empty exercise list

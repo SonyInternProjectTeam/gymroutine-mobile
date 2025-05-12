@@ -45,15 +45,6 @@ extension CalendarView {
                 .font(.title2.bold())
                 .padding()
                 .hAlign(.center)
-                .overlay(alignment: .trailing) {
-                    Button(action: {
-                        routineFlg.toggle()
-                    }, label: {
-                        Image(systemName: "plus")
-                            .imageScale(.large).bold()
-                            .padding(.trailing)
-                    })
-                }
         }
     }
     

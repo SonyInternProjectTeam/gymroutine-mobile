@@ -42,33 +42,21 @@ final class CompletedWorkoutDetailViewModel: ObservableObject {
             
             // 워크아웃 결과를 가져온 후, 해당 워크아웃 ID가 있다면 워크아웃 이름도 가져옴
             if let result = result, let workoutId = result.workoutId {
-                do {
-                    let workout = try await workoutService.fetchWorkoutById(workoutID: workoutId)
-                    
-                    DispatchQueue.main.async {
-                        self.workoutName = workout.name
-                        self.workoutResult = result
-                        self.isLoading = false
-                    }
-                } catch {
-                    print("[ERROR] ワークアウト情報の取得に失敗: \(error.localizedDescription)")
-                    
-                    DispatchQueue.main.async {
-                        self.workoutResult = result
-                        self.isLoading = false
-                        
-                        // ワークアウト名がない場合はエクササイズ名を使用
-                        if let firstExercise = result.exercises?.first {
-                            self.workoutName = firstExercise.exerciseName + "のワークアウト"
-                        } else {
-                            self.workoutName = "Quick Start"
-                        }
+                let response = await workoutService.fetchWorkoutById(workoutID: workoutId)
+                switch response {
+                case .success(let workout):
+                    self.workoutName = workout.name
+                case .failure(let error):
+                    print("[ERROR] \(error.localizedDescription)")
+                    // ワークアウト名がない場合はエクササイズ名を使用
+                    if let firstExercise = result.exercises?.first {
+                        self.workoutName = firstExercise.exerciseName + "のワークアウト"
+                    } else {
+                        self.workoutName = "Quick Start"
                     }
                 }
             } else {
                 DispatchQueue.main.async {
-                    self.workoutResult = result
-                    self.isLoading = false
                     
                     if result == nil {
                         self.errorMessage = "ワークアウト結果の読み込みに失敗しました"
@@ -80,6 +68,8 @@ final class CompletedWorkoutDetailViewModel: ObservableObject {
                     }
                 }
             }
+            self.workoutResult = result
+            self.isLoading = false
         }
     }
     

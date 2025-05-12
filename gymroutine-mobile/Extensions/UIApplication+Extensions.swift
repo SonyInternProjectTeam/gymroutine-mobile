@@ -45,7 +45,7 @@ extension UIApplication {
         vc.view.backgroundColor = .clear
         newWindow.rootViewController = vc
         newWindow.windowLevel = UIWindow.Level.alert + 1
-        UIApplication.loadingWindow = newWindow
+        UIApplication.bannerWindow = newWindow
         newWindow.makeKeyAndVisible()
     }
 }
