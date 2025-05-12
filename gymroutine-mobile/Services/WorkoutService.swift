@@ -234,7 +234,7 @@ class WorkoutService {
     // MARK: - Workout Update
 
     /// ワークアウトの基本情報（名前、メモなど）を更新するメソッド
-    func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String]? = nil) async -> Result<Void, Error> {
+    func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String] = []) async -> Result<Void, Error> {
         do {
             // 更新するフィールドのみを含める
             var updateData: [String: Any] = [
@@ -249,10 +249,8 @@ class WorkoutService {
                 updateData["notes"] = FieldValue.delete()
             }
             
-            // ルーチンの曜日がある場合は追加
-            if let scheduledDays = scheduledDays {
                 updateData["scheduledDays"] = scheduledDays
-            }
+                updateData["isRoutine"] = scheduledDays.isEmpty ? false : true
             
             try await db.collection("Workouts").document(workoutID).updateData(updateData)
             return .success(())
