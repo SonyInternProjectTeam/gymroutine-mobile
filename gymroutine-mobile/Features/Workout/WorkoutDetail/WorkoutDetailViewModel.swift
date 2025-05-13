@@ -59,8 +59,7 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
                 self.exercises = refreshedWorkout.exercises
             case .failure(let error):
                 print("[ERROR] \(error.localizedDescription)")
-                //　今後修正 - workoutDetailView画面でのエラーを確認
-//                UIApplication.showBanner(type: .error, message: "データの更新に失敗しました")
+                UIApplication.showBanner(type: .error, message: "データの更新に失敗しました")
             }
             UIApplication.hideLoading()
         }
