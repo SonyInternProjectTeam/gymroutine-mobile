@@ -30,7 +30,7 @@ struct MiniWorkoutView: View {
                 // 現在のエクササイズイメージ
                 if let sessionViewModel = workoutManager.workoutSessionViewModel,
                    let currentExercise = sessionViewModel.currentExercise {
-                    ExerciseImageCell(imageName: currentExercise.name)
+                    ExerciseImageCell(imageName: currentExercise.key)
                         .frame(width: 45, height: 45)
                 }
                 
