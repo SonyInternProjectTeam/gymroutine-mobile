@@ -110,6 +110,7 @@ class WorkoutService {
 
         do {
             let snapshot = try await workoutRef.getDocument()
+            print(snapshot)
             do {
                 let workout = try snapshot.data(as: Workout.self)
                 return .success(workout)
