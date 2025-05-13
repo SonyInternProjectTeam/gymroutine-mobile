@@ -9,32 +9,52 @@ class AnalyticsViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
     
+    // 알림 관련 상태 변수
+    @Published var showingUpdateAlert = false
+    @Published var updateSuccess = false
+    @Published var errorMessage = ""
+    
     private let userAnalyticsService = UserAnalyticsService.shared
     private let db = Firestore.firestore()
     private let userManager = UserManager.shared
+    private let userId: String
     
     // MARK: - データロードメソッド
     
-    init() {
-        // UserManagerから最新ユーザー情報を取得
-        loadUserData()
+    init(userId: String) {
+        self.userId = userId
     }
     
-    /// 現在のユーザー情報をUserManagerから読み込むメソッド
-    func loadUserData() {
-        self.user = userManager.currentUser
-        if let user = self.user {
-            print("UserManagerからユーザー情報のロード完了: \(user.name)")
-        } else {
-            print("UserManagerからユーザー情報が見つかりません")
+    /// 現在のユーザー情報をFirestoreから読み込むメソッド
+    func loadUserData() async {
+        if userId.isEmpty {
+            self.error = NSError(domain: "AnalyticsViewModel", code: 1, 
+                                userInfo: [NSLocalizedDescriptionKey: "ユーザーIDが指定されていません。"])
+            return
+        }
+        
+        do {
+            let snapshot = try await db.collection("Users").document(userId).getDocument()
+            if snapshot.exists, let data = snapshot.data() {
+                let user = try Firestore.Decoder().decode(User.self, from: data)
+                self.user = user
+                print("Firestoreからユーザー情報のロード完了: \(user.name)")
+            } else {
+                print("Firestoreからユーザー情報が見つかりません")
+                self.user = nil
+            }
+        } catch {
+            print("ユーザー情報の読み込みエラー: \(error.localizedDescription)")
+            self.user = nil
+            self.error = error
         }
     }
     
-    /// 現在のユーザーの運動分析データを読み込むメソッド
+    /// 指定されたユーザーの運動分析データを読み込むメソッド
     func loadAnalytics() {
-        guard let userId = Auth.auth().currentUser?.uid else {
+        if userId.isEmpty {
             self.error = NSError(domain: "AnalyticsViewModel", code: 1, 
-                                 userInfo: [NSLocalizedDescriptionKey: "ユーザーがログインしていません。"])
+                                userInfo: [NSLocalizedDescriptionKey: "ユーザーIDが指定されていません。"])
             return
         }
         
@@ -55,30 +75,37 @@ class AnalyticsViewModel: ObservableObject {
         }
     }
     
+    /// View에서 호출할 분석 요청 메소드
+    func requestAnalyticsUpdate() async {
+        await updateAnalytics { [weak self] success, error in
+            guard let self = self else { return }
+            
+            self.updateSuccess = success
+            self.errorMessage = error?.localizedDescription ?? ""
+            self.showingUpdateAlert = true
+        }
+    }
+    
     /// 現在のユーザーの運動分析データを更新するメソッド
     /// - Parameter completion: 完了ハンドラ (成功状況とエラー)
     func updateAnalytics(completion: @escaping (Bool, Error?) -> Void) async {
-        guard let user = Auth.auth().currentUser else {
+        if userId.isEmpty {
             let error = NSError(domain: "AnalyticsViewModel", code: 1,
-                                userInfo: [NSLocalizedDescriptionKey: "ユーザーがログインしていません。"])
+                               userInfo: [NSLocalizedDescriptionKey: "ユーザーIDが指定されていません。"])
+            completion(false, error)
+            return
+        }
+        
+        // 現在のユーザーとリクエスト対象ユーザーが異なる場合は権限エラー
+        guard let currentUser = Auth.auth().currentUser, currentUser.uid == userId else {
+            let error = NSError(domain: "AnalyticsViewModel", code: 403,
+                               userInfo: [NSLocalizedDescriptionKey: "他のユーザーの分析データは更新できません。"])
             completion(false, error)
             return
         }
         
         // デバッグ用のログ出力
-        print("ViewModel - 運動分析の更新リクエスト: ユーザーID \(user.uid)")
-        print("ViewModel - ログイン情報: \(user.email ?? "メールなし"), プロバイダー: \(user.providerID)")
-        
-        // ユーザーIDを確実に確認
-        let userId = user.uid
-        print("ViewModel - 確認されたユーザーID: \(userId)")
-        
-        // 現在ログインしているユーザー情報の確認
-        if let token = try? await user.getIDToken() {
-            print("ViewModel - ユーザートークン確認済み (最初の10文字): \(String(token.prefix(10)))...")
-        } else {
-            print("ViewModel - ユーザートークンを取得できません")
-        }
+        print("ViewModel - 運動分析の更新リクエスト: ユーザーID \(userId)")
         
         isLoading = true
         error = nil
@@ -101,7 +128,9 @@ class AnalyticsViewModel: ObservableObject {
                         // 成功時に少し遅延してからデータを再読み込み
                         try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
                         self?.loadAnalytics()
-                        self?.loadUserData()
+                        Task {
+                            await self?.loadUserData()
+                        }
                     }
                     completion(success, nil)
                 }

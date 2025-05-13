@@ -7,6 +7,7 @@ struct WorkoutEditView: View {
     @State private var workoutName: String
     @State private var workoutNotes: String
     @State private var selectedDays: [String] = []
+    @State private var routineToggle: Bool = false
     private let analyticsService = AnalyticsService.shared
     
     private let weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -21,6 +22,7 @@ struct WorkoutEditView: View {
         self._workoutNotes = State(initialValue: workout.notes ?? "")
         self._selectedDays = State(initialValue: workout.scheduledDays)
         self._workoutDeleted = workoutDeleted
+        self._routineToggle = State(initialValue: workout.isRoutine)
     }
     
     var body: some View {
@@ -30,12 +32,11 @@ struct WorkoutEditView: View {
                     nameBox
                     
                     notesBox
-                    
+                    Toggle("ルーティン化", isOn: $routineToggle)
                     // ルーチン曜日（ルーチンの場合のみ表示）
-                    if viewModel.workout.isRoutine {
+                    if routineToggle {
                         routineDaysBox
                     }
-                    
                     deleteButtonSection
                 }
                 .padding()
@@ -65,11 +66,16 @@ struct WorkoutEditView: View {
             // 右：保存ボタン
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("保存") {
+                    if selectedDays == [] && routineToggle {
+                        viewModel.showRoutineAlert = true
+                        return
+                    }
                     Task {
                         await viewModel.saveWorkout(
                             name: workoutName, 
                             notes: workoutNotes.isEmpty ? nil : workoutNotes,
-                            scheduledDays: selectedDays.isEmpty ? nil : selectedDays
+                            scheduledDays: selectedDays,
+                            routine: routineToggle
                         )
                         dismiss()
                     }
@@ -94,6 +100,11 @@ struct WorkoutEditView: View {
             Button("キャンセル", role: .cancel) { }
         } message: {
             Text("「\(workoutName)」を完全に削除しますか？この操作は取り消せません。")
+        }
+        .alert("エラー", isPresented: $viewModel.showRoutineAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("ワークアウトを行う曜日を選択して下さい")
         }
         .onAppear {
             // Log screen view

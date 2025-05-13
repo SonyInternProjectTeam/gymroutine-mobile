@@ -19,6 +19,15 @@ struct HomeView: View {
     @State private var showingUpdateWeightSheet = false
     @State private var isShowingOnboarding = false
     
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        
+        let appearance: UITabBarAppearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        UITabBar.appearance().standardAppearance = appearance
+    }
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             header
@@ -26,9 +35,9 @@ struct HomeView: View {
             VStack(spacing: 24) {
                 calendarBox
                 todaysWorkoutsBox
-                   .onAppear {
-                      viewModel.loadTodaysWorkouts()
-                   }
+                    .onAppear {
+                        viewModel.loadTodaysWorkouts()
+                    }
                 userInfoBox
             }
             .padding()
@@ -68,8 +77,8 @@ struct HomeView: View {
         .onAppear {
             // Log screen view event
             analyticsService.logScreenView(screenName: "Home")
-            }
         }
+    }
     
     private var header: some View {
         VStack(spacing: 16) {
@@ -280,7 +289,7 @@ struct HomeView: View {
             userId: userId,
             name: "Quick Start",
             createdAt: Date(),
-            notes: "Started from quick start button",
+            notes: "「今すぐ始める」から作成されました。",
             isRoutine: false,
             scheduledDays: [],
             exercises: [] // Empty exercise list

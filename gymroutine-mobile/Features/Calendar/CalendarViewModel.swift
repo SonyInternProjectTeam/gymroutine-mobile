@@ -55,35 +55,34 @@ final class CalendarViewModel: ObservableObject {
     
     // ワークアウト名を取得（存在しない場合は適切な代替名を返す）
     func getWorkoutName(for result: WorkoutResult) -> String {
-        // すでにキャッシュされている場合はそれを返す
-        if let workoutId = result.workoutId, let name = workoutNames[workoutId] {
-            return name
-        }
-        
-        // キャッシュされていない場合、ワークアウトIDがあればワークアウト名を非同期で取得
         if let workoutId = result.workoutId {
+            // キャッシュ済みなら返す
+            if let name = workoutNames[workoutId] {
+                return name
+            }
+
+            // 非同期取得
             Task {
-                do {
-                    let workout = try await workoutService.fetchWorkoutById(workoutID: workoutId)
-                    DispatchQueue.main.async {
-                        self.workoutNames[workoutId] = workout.name
-                        self.objectWillChange.send() // UIを更新
-                    }
-                } catch {
-                    print("[ERROR] ワークアウト名の取得に失敗: \(error.localizedDescription)")
+                let response = await workoutService.fetchWorkoutById(workoutID: workoutId)
+                switch response {
+                case .success(let workout):
+                    self.workoutNames[workoutId] = workout.name
+                    self.objectWillChange.send()
+                case .failure(let error):
+                    print("[ERROR] \(error.localizedDescription)")
+                    let fallbackName = result.exercises?.first?.exerciseName.appending("のワークアウト") ?? "Quick Start"
+                    self.workoutNames[workoutId] = fallbackName
+                    self.objectWillChange.send()
                 }
             }
-            
-            // ロード中は一時的な名前を表示
             return "ワークアウトを読み込み中..."
         }
-        
-        // ワークアウトIDがない場合、エクササイズ名から生成
+
+        // workoutId がない場合
         if let firstExercise = result.exercises?.first {
             return firstExercise.exerciseName + "のワークアウト"
         }
-        
-        // それ以外は「不明」を返す
+
         return "Quick Start"
     }
     

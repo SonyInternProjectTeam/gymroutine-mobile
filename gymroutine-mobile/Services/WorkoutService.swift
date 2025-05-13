@@ -105,28 +105,25 @@ class WorkoutService {
         }
     }
     
-    /// ワークアウト詳細情報を読み込むメソッド (exercisesフィールドもデコード)
-    func fetchWorkoutById(workoutID: String) async throws -> Workout {
-        let documentSnapshot = try await db.collection("Workouts").document(workoutID).getDocument()
-        
-        guard documentSnapshot.exists else {
-            throw NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])
-        }
-        
-        // Firestoreドキュメントをワークアウトモデルに変換
+    func fetchWorkoutById(workoutID: String) async -> Result<Workout, Error> {
+        let workoutRef = db.collection("Workouts").document(workoutID)
+
         do {
-            var workout = try documentSnapshot.data(as: Workout.self)
-            workout.id = documentSnapshot.documentID
-            return workout
+            let snapshot = try await workoutRef.getDocument()
+            print(snapshot)
+            do {
+                let workout = try snapshot.data(as: Workout.self)
+                return .success(workout)
+            } catch {
+                return .failure(NSError(domain: "Firestore", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Decode Error"]))
+            }
         } catch {
-            print("🔥 ワークアウトデコードエラー: \(error.localizedDescription)")
-            throw error
+            return .failure(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"]))
         }
     }
     
     /// 引数のユーザーが登録済みのワークアウトを全て取得
     func fetchUserWorkouts(uid: String) async -> [Workout]? {
-        let db = Firestore.firestore()
         let workoutsRef = db.collection("Workouts").whereField("userId", isEqualTo: uid)
         
         do {
@@ -238,7 +235,7 @@ class WorkoutService {
     // MARK: - Workout Update
 
     /// ワークアウトの基本情報（名前、メモなど）を更新するメソッド
-    func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String]? = nil) async -> Result<Void, Error> {
+    func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String] = []) async -> Result<Void, Error> {
         do {
             // 更新するフィールドのみを含める
             var updateData: [String: Any] = [
@@ -253,10 +250,8 @@ class WorkoutService {
                 updateData["notes"] = FieldValue.delete()
             }
             
-            // ルーチンの曜日がある場合は追加
-            if let scheduledDays = scheduledDays {
                 updateData["scheduledDays"] = scheduledDays
-            }
+                updateData["isRoutine"] = scheduledDays.isEmpty ? false : true
             
             try await db.collection("Workouts").document(workoutID).updateData(updateData)
             return .success(())
