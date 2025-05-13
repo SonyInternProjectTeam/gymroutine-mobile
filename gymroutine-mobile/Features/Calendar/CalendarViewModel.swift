@@ -257,4 +257,8 @@ final class CalendarViewModel: ObservableObject {
         
         self.workoutsByWeekday = categorizedWorkouts
     }
+    
+    func reloadData() {
+        
+    }
 }

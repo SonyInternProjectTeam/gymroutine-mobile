@@ -22,6 +22,9 @@ struct CalendarView: View {
             headerBox()
             
             calendarBox
+                .onAppear {
+                    viewModel.fetchUserRoutine()
+                }
             
             contentBox
         }
