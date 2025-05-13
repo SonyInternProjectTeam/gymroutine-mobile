@@ -139,6 +139,7 @@
 		79A0A11F2DBDDCC600DF56F6 /* UserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A0A11E2DBDDCC600DF56F6 /* UserCell.swift */; };
 		79A0A1212DBDE72D00DF56F6 /* ProfileIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A0A1202DBDE72D00DF56F6 /* ProfileIcon.swift */; };
 		79A0A13C2DBE1BCD00DF56F6 /* FollowListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A0A13B2DBE1BCD00DF56F6 /* FollowListView.swift */; };
+		79A0AA782DD0BE7400DF56F6 /* WorkoutSessionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A0AA772DD0BE7400DF56F6 /* WorkoutSessionModel.swift */; };
 		79EE75982D9D0932004A5B27 /* ExerciseImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EE75972D9D0932004A5B27 /* ExerciseImageCell.swift */; };
 		860018D02D9B72BA00C9F2C6 /* SnsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860018CF2D9B72BA00C9F2C6 /* SnsViewModel.swift */; };
 /* End PBXBuildFile section */
@@ -283,6 +284,7 @@
 		79A0A11E2DBDDCC600DF56F6 /* UserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
 		79A0A1202DBDE72D00DF56F6 /* ProfileIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileIcon.swift; sourceTree = "<group>"; };
 		79A0A13B2DBE1BCD00DF56F6 /* FollowListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowListView.swift; sourceTree = "<group>"; };
+		79A0AA772DD0BE7400DF56F6 /* WorkoutSessionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionModel.swift; sourceTree = "<group>"; };
 		79EE75972D9D0932004A5B27 /* ExerciseImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseImageCell.swift; sourceTree = "<group>"; };
 		860018CF2D9B72BA00C9F2C6 /* SnsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnsViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -405,6 +407,7 @@
 				277739FD2DA605420006397D /* WorkoutResultModel.swift */,
 				272779EC2DA8BD6E00166807 /* StoryModel.swift */,
 				00CDC3D92D845E8E003B18EB /* WorkoutModel.swift */,
+				79A0AA772DD0BE7400DF56F6 /* WorkoutSessionModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1008,6 +1011,7 @@
 				00CDC4422D845E8E003B18EB /* SplashViewModel.swift in Sources */,
 				272779ED2DA8BD6E00166807 /* StoryModel.swift in Sources */,
 				00CDC4452D845E8E003B18EB /* CapsuleButtonStyle.swift in Sources */,
+				79A0AA782DD0BE7400DF56F6 /* WorkoutSessionModel.swift in Sources */,
 				277465F52D8E9BC9004C25C3 /* WorkoutRepository.swift in Sources */,
 				27475F652DC4A90E0065C420 /* UserAnalyticsModel.swift in Sources */,
 				00CDC4462D845E8E003B18EB /* CircleButtonStyle.swift in Sources */,
