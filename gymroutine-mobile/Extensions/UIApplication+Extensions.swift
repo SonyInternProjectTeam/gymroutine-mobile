@@ -7,10 +7,23 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
 
 extension UIApplication {
+    
+    // アプリアイコンを取得
+    var icon: UIImage? {
+        guard let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? NSDictionary,
+            let primaryIconsDictionary = iconsDictionary["CFBundlePrimaryIcon"] as? NSDictionary,
+            let iconFiles = primaryIconsDictionary["CFBundleIconFiles"] as? NSArray,
+            // First will be smallest for the device class, last will be the largest for device class
+            let lastIcon = iconFiles.lastObject as? String,
+            let icon = UIImage(named: lastIcon) else {
+                return nil
+        }
+
+        return icon
+    }
     
     static var loadingWindow: UIWindow?
     static var bannerWindow: UIWindow?

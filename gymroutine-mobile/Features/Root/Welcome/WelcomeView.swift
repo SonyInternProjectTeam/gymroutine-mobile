@@ -22,7 +22,8 @@ struct WelcomeView: View {
                         .scaledToFit()
                         .hAlign(.center)
 
-                    Text("ジムルーティーンへようこそ！")
+                    Text("GymLinkerへようこそ！")
+                        .font(.title2.bold())
                         .foregroundStyle(.secondary)
                 }
 
