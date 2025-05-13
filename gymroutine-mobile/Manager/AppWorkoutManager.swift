@@ -60,8 +60,19 @@ class AppWorkoutManager: ObservableObject {
     @objc private func saveWorkoutSession() {
         guard let viewModel = workoutSessionViewModel else { return }
 
+        let updatedWorkout = Workout(
+            id: viewModel.workout.id ?? "",
+            userId: viewModel.workout.userId,
+            name: viewModel.workout.name,
+            createdAt: viewModel.workout.createdAt,
+            notes: viewModel.workout.notes,
+            isRoutine: viewModel.workout.isRoutine,
+            scheduledDays: viewModel.workout.scheduledDays,
+            exercises: viewModel.exercisesManager.exercises
+        )
+
         let session = WorkoutSessionModel(
-            workout: viewModel.workout,
+            workout: updatedWorkout,
             startTime: viewModel.startTime,
             elapsedTime: Date().timeIntervalSince(viewModel.startTime),
             completedSets: viewModel.completedSets,
