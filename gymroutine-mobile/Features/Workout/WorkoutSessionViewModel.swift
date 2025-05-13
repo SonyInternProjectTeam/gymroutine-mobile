@@ -44,12 +44,15 @@ final class WorkoutSessionViewModel: ObservableObject {
     private let workoutService = WorkoutService()
     
     // MARK: - Initialization
-    init(workout: Workout) {
+    init(workout: Workout, startTime: Date = Date()) {
         print("📱 WorkoutSessionViewModel 초기화됨")
         print("📱 전달받은 워크아웃: \(workout.name), 운동 개수: \(workout.exercises.count)")
         
         self.workout = workout
-        self.startTime = Date()
+        self.startTime = startTime
+
+        updateTimer()
+
         startTimer()
         setupAudioPlayer()
 

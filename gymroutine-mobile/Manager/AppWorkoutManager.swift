@@ -2,16 +2,6 @@ import SwiftUI
 import FirebaseAuth // 사용자 ID 가져오기 위해 추가
 import FirebaseFirestore // Timestamp 사용 위해 추가
 
-// 워크아웃 세션 모델 (결과 저장 및 표시에 사용)
-struct WorkoutSessionModel {
-    let workout: Workout // 원본 워크아웃 데이터
-    let startTime: Date
-    var elapsedTime: TimeInterval
-    var completedSets: Set<String> = [] // 완료된 세트 정보 ("exerciseIndex-setIndex")
-    var totalRestTime: TimeInterval = 0 // total rest time in seconds
-    // TODO: add actual exercise data (weight, reps, etc.) if needed
-}
-
 @MainActor
 class AppWorkoutManager: ObservableObject {
     static let shared = AppWorkoutManager()
@@ -25,6 +15,9 @@ class AppWorkoutManager: ObservableObject {
     // MARK: - Result View State
     @Published var showResultView = false // 결과 화면 표시 여부
     @Published var completedWorkoutSession: WorkoutSessionModel? = nil // 완료된 세션 데이터
+
+    // MARK: - Session Persistence
+    private let sessionPersistenceKey = "activeWorkoutSession"
 
     // MARK: - Compatibility Properties (삭제 예정 또는 유지)
     var isWorkoutInProgress: Bool { isWorkoutSessionActive }
@@ -52,8 +45,70 @@ class AppWorkoutManager: ObservableObject {
     
     private init() {
         print("📱 AppWorkoutManager 초기화됨")
+        restoreWorkoutSession()
+        // バックグラウンド移行時の通知を監視
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(saveWorkoutSession),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil
+        )
     }
-    
+
+    // MARK: - Session
+    // セッション状態をUserDefaultsに保存
+    @objc private func saveWorkoutSession() {
+        guard let viewModel = workoutSessionViewModel else { return }
+
+        let session = WorkoutSessionModel(
+            workout: viewModel.workout,
+            startTime: viewModel.startTime,
+            elapsedTime: Date().timeIntervalSince(viewModel.startTime),
+            completedSets: viewModel.completedSets,
+            totalRestTime: viewModel.getTotalRestTime()
+        )
+
+        do {
+            let sessionData = session.encodeForUserDefaults()
+            let jsonData = try JSONSerialization.data(withJSONObject: sessionData)
+            let base64String = jsonData.base64EncodedString()
+            UserDefaults.standard.set(base64String, forKey: sessionPersistenceKey)
+            print("🔥 AppWorkoutManager: セッション状態を保存完了")
+        } catch {
+            print("🔥 AppWorkoutManager: セッション状態の保存に失敗: \(error)")
+        }
+    }
+
+    // 保存されたセッションを復元
+    private func restoreWorkoutSession() {
+        guard let base64String = UserDefaults.standard.string(forKey: sessionPersistenceKey),
+              let jsonData = Data(base64Encoded: base64String),
+              let sessionData = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+              let session = try? WorkoutSessionModel.decodeFromUserDefaults(sessionData) else {
+            return
+        }
+
+        print("🔥 AppWorkoutManager: セッション状態を復元")
+
+        // セッションを復元
+        self.isWorkoutSessionActive = true
+        self.currentWorkout = session.workout
+
+        let viewModel = WorkoutSessionViewModel(workout: session.workout, startTime: session.startTime)
+        viewModel.completedSets = session.completedSets
+        self.workoutSessionViewModel = viewModel
+    }
+
+    // セッションをクリア
+    func clearWorkoutSession() {
+        print("🔥 AppWorkoutManager: セッション状態をクリア")
+        UserDefaults.standard.removeObject(forKey: sessionPersistenceKey)
+        self.isWorkoutSessionActive = false
+        self.isWorkoutSessionMaximized = false
+        self.currentWorkout = nil
+        self.workoutSessionViewModel = nil
+    }
+
     // MARK: - Workout Lifecycle
     // 워크아웃 시작
     func startWorkout(workout: Workout) {
@@ -117,10 +172,7 @@ class AppWorkoutManager: ObservableObject {
 
         // 기존 세션 상태 정리
         print("   🧹 Clearing active session states (isWorkoutSessionActive = false, isWorkoutSessionMaximized = false)")
-        self.isWorkoutSessionActive = false
-        self.isWorkoutSessionMaximized = false
-        self.workoutSessionViewModel = nil
-        self.currentWorkout = nil
+        clearWorkoutSession()
         
         // 사용자 isActive 상태를 false로 업데이트
         Task {
@@ -135,10 +187,7 @@ class AppWorkoutManager: ObservableObject {
     func endWorkout() {
         print("⏹️ AppWorkoutManager: 워크아웃 세션 강제 종료")
         // 모든 상태 초기화
-        isWorkoutSessionActive = false
-        isWorkoutSessionMaximized = false
-        workoutSessionViewModel = nil
-        currentWorkout = nil
+        clearWorkoutSession()
         showResultView = false
         completedWorkoutSession = nil
         
