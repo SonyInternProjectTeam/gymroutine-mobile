@@ -52,6 +52,7 @@ final class UserManager: ObservableObject { // Make final
             // Setup listener only if not already listening for this user
             if currentUser?.uid != firebaseUser.uid || userListener == nil {
                 await self.setupUserListener(userId: firebaseUser.uid)
+                await self.waitForUserData()
             }
             // Update isLoggedIn along with isUserAuthenticated
             if !self.isLoggedIn { self.isLoggedIn = true } 
@@ -142,6 +143,28 @@ final class UserManager: ObservableObject { // Make final
              // If already listening, data should arrive automatically. 
              // Optionally force a re-fetch if immediate data is critical (though listener should handle it)
              // self.isLoading = false // We might already have data
+        }
+    }
+    
+    func waitForUserData() async {
+        await withCheckedContinuation { continuation in
+            var observer: NSObjectProtocol? = nil 
+
+            observer = NotificationCenter.default.addObserver(
+                forName: NSNotification.Name("UserLoggedIn"),
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let user = notification.object as? User {
+                    print("User data received: \(user.name ?? "Unknown")")
+                }
+                // 続きを再開
+                continuation.resume()
+                // メモリリーク防止のため解除
+                if let observer = observer {
+                    NotificationCenter.default.removeObserver(observer)
+                }
+            }
         }
     }
     
