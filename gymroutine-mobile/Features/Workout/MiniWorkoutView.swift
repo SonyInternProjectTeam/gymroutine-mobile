@@ -30,7 +30,7 @@ struct MiniWorkoutView: View {
                 // 現在のエクササイズイメージ
                 if let sessionViewModel = workoutManager.workoutSessionViewModel,
                    let currentExercise = sessionViewModel.currentExercise {
-                    ExerciseImageCell(imageName: currentExercise.name)
+                    ExerciseImageCell(imageName: currentExercise.key)
                         .frame(width: 45, height: 45)
                 }
                 
@@ -101,7 +101,7 @@ struct MiniWorkoutView: View {
             }
             
             // Log screen view
-            analyticsService.logScreenView(screenName: "MiniWorkout")
+            // analyticsService.logScreenView(screenName: "MiniWorkout")
         }
         // 画面が更新されるたびにtimerTriggerを更新してビューをリフレッシュ
         .id(timerTrigger)

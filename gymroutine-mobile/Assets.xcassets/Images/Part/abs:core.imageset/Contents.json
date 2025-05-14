@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Dips.png",
+      "filename" : "abs:core.png",
       "idiom" : "universal",
       "scale" : "1x"
     },

@@ -22,6 +22,9 @@ struct CalendarView: View {
             headerBox()
             
             calendarBox
+                .onAppear {
+                    viewModel.fetchUserRoutine()
+                }
             
             contentBox
         }
@@ -45,15 +48,6 @@ extension CalendarView {
                 .font(.title2.bold())
                 .padding()
                 .hAlign(.center)
-                .overlay(alignment: .trailing) {
-                    Button(action: {
-                        routineFlg.toggle()
-                    }, label: {
-                        Image(systemName: "plus")
-                            .imageScale(.large).bold()
-                            .padding(.trailing)
-                    })
-                }
         }
     }
     
@@ -225,7 +219,7 @@ extension CalendarView {
         NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
             WorkoutCell(
                 workoutName: workout.name,
-                exerciseImageName: workout.exercises.first?.name,
+                exerciseImageName: workout.exercises.first?.key,
                 count: workout.exercises.count
             )
         }

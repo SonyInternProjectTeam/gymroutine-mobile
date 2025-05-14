@@ -52,15 +52,13 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
         
         Task {
             UIApplication.showLoading()
-            do {
-                let refreshedWorkout = try await service.fetchWorkoutById(workoutID: workoutId)
-                await MainActor.run {
-                    self.workout = refreshedWorkout
-                    self.exercises = refreshedWorkout.exercises
-                    print("✅ 워크아웃 데이터 새로고침 완료")
-                }
-            } catch {
-                print("🔥 워크아웃 새로고침 실패: \(error.localizedDescription)")
+            let response = await service.fetchWorkoutById(workoutID: workoutId)
+            switch response {
+            case .success(let refreshedWorkout):
+                self.workout = refreshedWorkout
+                self.exercises = refreshedWorkout.exercises
+            case .failure(let error):
+                print("[ERROR] \(error.localizedDescription)")
                 UIApplication.showBanner(type: .error, message: "データの更新に失敗しました")
             }
             UIApplication.hideLoading()
@@ -267,19 +265,15 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
         }
         
         UIApplication.showLoading()
-        do {
-            let refreshedWorkout = try await service.fetchWorkoutById(workoutID: workoutId)
-            await MainActor.run {
-                self.workout = refreshedWorkout
-                self.exercises = refreshedWorkout.exercises
-                print("✅ 워크아웃 데이터 동기적 새로고침 완료")
-            }
-            UIApplication.hideLoading()
-        } catch {
-            UIApplication.hideLoading()
-            print("🔥 워크아웃 동기적 새로고침 실패: \(error.localizedDescription)")
+        let response = await service.fetchWorkoutById(workoutID: workoutId)
+        switch response {
+        case .success(let refreshedWorkout):
+            self.workout = refreshedWorkout
+            self.exercises = refreshedWorkout.exercises
+        case .failure(let error):
             UIApplication.showBanner(type: .error, message: "データの更新に失敗しました")
             throw error
         }
+        UIApplication.hideLoading()
     }
 }

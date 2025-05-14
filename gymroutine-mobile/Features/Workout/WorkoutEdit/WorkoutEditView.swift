@@ -3,10 +3,12 @@ import SwiftUI
 struct WorkoutEditView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var workoutDeleted: Bool
+    @EnvironmentObject var detailViewModel: WorkoutDetailViewModel
     @StateObject var viewModel: WorkoutEditViewModel
     @State private var workoutName: String
     @State private var workoutNotes: String
     @State private var selectedDays: [String] = []
+    @State private var routineToggle: Bool = false
     private let analyticsService = AnalyticsService.shared
     
     private let weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -21,83 +23,96 @@ struct WorkoutEditView: View {
         self._workoutNotes = State(initialValue: workout.notes ?? "")
         self._selectedDays = State(initialValue: workout.scheduledDays)
         self._workoutDeleted = workoutDeleted
+        self._routineToggle = State(initialValue: workout.isRoutine)
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 24) {
-                    nameBox
-                    
-                    notesBox
-                    
-                    // ルーチン曜日（ルーチンの場合のみ表示）
-                    if viewModel.workout.isRoutine {
-                        routineDaysBox
+        NavigationStack {
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 24) {
+                        nameBox
+                        
+                        notesBox
+                        Toggle("ルーティン化", isOn: $routineToggle)
+                        // ルーチン曜日（ルーチンの場合のみ表示）
+                        if routineToggle {
+                            routineDaysBox
+                        }
+                        deleteButtonSection
                     }
-                    
-                    deleteButtonSection
+                    .padding()
                 }
-                .padding()
+                .scrollDismissesKeyboard(.immediately)
+                .background(Color.gray.opacity(0.1))
+                .contentMargins(.top, 16)
+                .contentMargins(.bottom, 80)
+                .ignoresSafeArea(.keyboard, edges: .bottom)
             }
-            .scrollDismissesKeyboard(.immediately)
-            .background(Color.gray.opacity(0.1))
-            .contentMargins(.top, 16)
-            .contentMargins(.bottom, 80)
-            .ignoresSafeArea(.keyboard, edges: .bottom)
-        }
-        // ナビゲーションバー設定
-        .navigationBarBackButtonHidden(true)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            // 左：キャンセルボタン
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("キャンセル") {
-                    dismiss()
+            // ナビゲーションバー設定
+            .navigationBarBackButtonHidden(true)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                // 左：キャンセルボタン
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("キャンセル") {
+                        dismiss()
+                    }
+                }
+                // 中央：タイトル
+                ToolbarItem(placement: .principal) {
+                    Text("ワークアウト編集")
+                        .font(.headline)
+                }
+                
+                // 右：保存ボタン
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("保存") {
+                        if selectedDays == [] && routineToggle {
+                            viewModel.showRoutineAlert = true
+                            return
+                        }
+                        Task {
+                            await viewModel.saveWorkout(
+                                name: workoutName, 
+                                notes: workoutNotes.isEmpty ? nil : workoutNotes,
+                                scheduledDays: selectedDays,
+                                routine: routineToggle
+                            )
+                            detailViewModel.refreshWorkoutData()
+                            dismiss()
+                        }
+                    }
+                    .disabled(workoutName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
-            // 中央：タイトル
-            ToolbarItem(placement: .principal) {
-                Text("ワークアウト編集")
-                    .font(.headline)
+            .alert("エラー", isPresented: $viewModel.showError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(viewModel.errorMessage)
             }
-            
-            // 右：保存ボタン
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("保存") {
+            .alert("ワークアウト削除確認", isPresented: $viewModel.showDeleteConfirmAlert) {
+                Button("削除", role: .destructive) {
                     Task {
-                        await viewModel.saveWorkout(
-                            name: workoutName, 
-                            notes: workoutNotes.isEmpty ? nil : workoutNotes,
-                            scheduledDays: selectedDays.isEmpty ? nil : selectedDays
-                        )
-                        dismiss()
+                        if await viewModel.deleteWorkout() {
+                            workoutDeleted = true
+                            dismiss()
+                        }
                     }
                 }
-                .disabled(workoutName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                Button("キャンセル", role: .cancel) { }
+            } message: {
+                Text("「\(workoutName)」を完全に削除しますか？この操作は取り消せません。")
             }
-        }
-        .alert("エラー", isPresented: $viewModel.showError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(viewModel.errorMessage)
-        }
-        .alert("ワークアウト削除確認", isPresented: $viewModel.showDeleteConfirmAlert) {
-            Button("削除", role: .destructive) {
-                Task {
-                    if await viewModel.deleteWorkout() {
-                        workoutDeleted = true
-                        dismiss()
-                    }
-                }
+            .alert("エラー", isPresented: $viewModel.showRoutineAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("ワークアウトを行う曜日を選択して下さい")
             }
-            Button("キャンセル", role: .cancel) { }
-        } message: {
-            Text("「\(workoutName)」を完全に削除しますか？この操作は取り消せません。")
-        }
-        .onAppear {
-            // Log screen view
-            analyticsService.logScreenView(screenName: "WorkoutEdit")
+            .onAppear {
+                // Log screen view
+                analyticsService.logScreenView(screenName: "WorkoutEdit")
+            }
         }
     }
     
