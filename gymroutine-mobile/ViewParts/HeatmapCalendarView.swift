@@ -4,14 +4,16 @@ struct HeatmapCalendarView: View {
     let heatmapData: [Date: Int] // Expects data like [Date: WorkoutCount]
     var startDate: Date // Starting date to display
     var numberOfMonths: Int = 6 // Default to show 6 months
+    var isCompactMode: Bool = false // Compact mode for profile view
     
     private let daysOfWeek = ["日", "月", "火", "水", "木", "金", "土"]
     // MARK: - 셀 크기 설정 (flexible로 설정하여 화면에 맞게 동적 조정)
     private let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 7)
     private let cellSpacing: CGFloat = 3 // Reduced spacing
     
-    // 멀티 월 뷰의 기본 셀 크기 (싱글 월은 동적 계산)
+    // 셀 크기 설정
     private let multiMonthCellSize: CGFloat = 25 // 멀티 월 뷰 셀 크기
+    private let compactCellSize: CGFloat = 16 // Compact 모드 셀 크기
     
     // Month formatter
     private let monthFormatter: DateFormatter = {
@@ -28,8 +30,9 @@ struct HeatmapCalendarView: View {
         return formatter
     }()
     
-    init(heatmapData: [Date: Int], startDate: Date? = nil, numberOfMonths: Int = 6) {
+    init(heatmapData: [Date: Int], startDate: Date? = nil, numberOfMonths: Int = 6, isCompactMode: Bool = false) {
         self.heatmapData = heatmapData
+        self.isCompactMode = isCompactMode
         
         // If startDate is not provided, calculate to show the most recent months
         if let startDate = startDate {
@@ -49,53 +52,163 @@ struct HeatmapCalendarView: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            // MARK: - 화면 너비에서 패딩을 고려하여 가용 너비 계산
-            let availableWidth = geometry.size.width - 32  // 좌우 패딩 고려
-            
-            VStack(alignment: .leading, spacing: 12) {
-                // Only show title for multi-month view
-                if numberOfMonths > 1 {
-                    Text("Workout Activity")
-                        .font(.headline)
-                        .padding(.bottom, 4)
-                }
+        if isCompactMode {
+            // 프로필 뷰를 위한 컴팩트 모드 - GeometryReader 없이 직접 렌더링
+            compactHeatmapView()
+        } else {
+            // 기존의 GeometryReader 기반 뷰
+            GeometryReader { geometry in
+                // MARK: - 화면 너비에서 패딩을 고려하여 가용 너비 계산
+                let availableWidth = geometry.size.width - 32  // 좌우 패딩 고려
                 
-                if numberOfMonths == 1 {
-                    // Optimized single month view for home screen
-                    singleMonthView(for: startDate, availableWidth: availableWidth)
-                } else {
-                    // Multi-month scrollable view
-                    multiMonthView()
-                }
-                
-                // Only show legend for multi-month view or if space allows
-                if numberOfMonths > 1 {
-                    // Color legend
-                    HStack(spacing: 3) {
-                        Text("Less")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        
-                        ForEach(0...4, id: \.self) { level in
-                            Rectangle()
-                                .fill(colorForLevel(level))
-                                .frame(width: 12, height: 12)
-                                .cornerRadius(2)
-                        }
-                        
-                        Text("More")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
+                VStack(alignment: .leading, spacing: 12) {
+                    // Only show title for multi-month view
+                    if numberOfMonths > 1 {
+                        Text("Workout Activity")
+                            .font(.headline)
+                            .padding(.bottom, 4)
                     }
-                    .padding(.top, 4)
-                    .padding(.leading, 24) // Align with grid
+                    
+                    if numberOfMonths == 1 {
+                        // Optimized single month view for home screen
+                        singleMonthView(for: startDate, availableWidth: availableWidth)
+                    } else {
+                        // Multi-month scrollable view
+                        multiMonthView()
+                    }
+                    
+                    // Only show legend for multi-month view or if space allows
+                    if numberOfMonths > 1 {
+                        // Color legend
+                        HStack(spacing: 3) {
+                            Text("Less")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            
+                            ForEach(0...4, id: \.self) { level in
+                                Rectangle()
+                                    .fill(colorForLevel(level))
+                                    .frame(width: 12, height: 12)
+                                    .cornerRadius(2)
+                            }
+                            
+                            Text("More")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.top, 4)
+                        .padding(.leading, 24) // Align with grid
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(10)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+            }
+        }
+    }
+    
+    // MARK: - 프로필 뷰를 위한 컴팩트 모드
+    private func compactHeatmapView() -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Month header
+            HStack {
+                let month = monthFormatter.string(from: startDate)
+                let year = yearFormatter.string(from: startDate)
+                Text("\(month) \(year)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+            }
+            
+            // 컴팩트한 일주일 표시
+            HStack(spacing: 4) {
+                ForEach(daysOfWeek, id: \.self) { day in
+                    Text(day)
+                        .font(.system(size: 9))
+                        .foregroundColor(.gray)
+                        .frame(maxWidth: .infinity)
                 }
             }
-            .padding()
-            .background(Color.white)
-            .cornerRadius(10)
-            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+            
+            // Compact month grid for first 2 months
+            VStack(spacing: 12) {
+                ForEach(0..<min(numberOfMonths, 3), id: \.self) { monthIndex in
+                    if let monthDate = Calendar.current.date(byAdding: .month, value: -monthIndex, to: startDate) {
+                        compactMonthHeatmapGrid(for: monthDate)
+                    }
+                }
+            }
+            
+            // Color legend (more compact)
+            HStack(spacing: 2) {
+                Text("Less")
+                    .font(.system(size: 8))
+                    .foregroundColor(.secondary)
+                
+                ForEach(0...4, id: \.self) { level in
+                    Rectangle()
+                        .fill(colorForLevel(level))
+                        .frame(width: 8, height: 8)
+                        .cornerRadius(1)
+                }
+                
+                Text("More")
+                    .font(.system(size: 8))
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, 2)
+            .frame(maxWidth: .infinity, alignment: .center) // hAlign(.center) 대신에 직접 frame 사용
+        }
+        .padding(12)
+        .background(Color.white)
+        .cornerRadius(10)
+    }
+    
+    // 컴팩트 모드용 월 그리드
+    private func compactMonthHeatmapGrid(for date: Date) -> some View {
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: date)
+        let year = calendar.component(.year, from: date)
+        
+        // Calculate days in month
+        let range = calendar.range(of: .day, in: .month, for: date)!
+        let numDays = range.count
+        
+        // Get first day of month and its weekday
+        let firstDay = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
+        let firstWeekday = calendar.component(.weekday, from: firstDay) // 1 = Sunday, 7 = Saturday
+        
+        let emptyCellsCount = firstWeekday - 1
+        
+        let monthName = monthFormatter.string(from: date)
+        
+        return VStack(alignment: .leading, spacing: 4) {
+            Text(monthName)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            
+            LazyVGrid(columns: columns, spacing: cellSpacing) {
+                // Empty cells for padding before first day
+                ForEach(0..<emptyCellsCount, id: \.self) { _ in
+                    Rectangle()
+                        .fill(Color.clear)
+                        .frame(width: compactCellSize, height: compactCellSize)
+                }
+                
+                // Day cells
+                ForEach(1...numDays, id: \.self) { day in
+                    if let date = calendar.date(from: DateComponents(year: year, month: month, day: day)) {
+                        let dayCount = heatmapData[calendar.startOfDay(for: date)] ?? 0
+                        ZStack {
+                            Rectangle()
+                                .fill(colorForCount(dayCount))
+                                .frame(width: compactCellSize, height: compactCellSize)
+                                .cornerRadius(2)
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -363,6 +476,14 @@ struct HeatmapCalendarView_Previews: PreviewProvider {
                 .padding()
                 .background(Color.gray.opacity(0.1))
                 .previewDisplayName("Single Month View")
+            
+            // Compact view for profile
+            HeatmapCalendarView(heatmapData: sampleData, numberOfMonths: 3, isCompactMode: true)
+                .frame(height: 160)
+                .previewLayout(.sizeThatFits)
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .previewDisplayName("Compact Mode for Profile")
             
             // Dark mode
             HeatmapCalendarView(heatmapData: sampleData, numberOfMonths: 2)

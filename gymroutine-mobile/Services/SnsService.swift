@@ -23,14 +23,14 @@ class SnsService {
     /// - Parameter userId: 現在ログイン中のユーザーID
     /// - Returns: 推薦ユーザーの配列またはエラーをResultで返す
     func getRecommendedUsers(for userId: String) async -> Result<[RecommendedUser], Error> {
-        print("📣 [SnsService] getRecommendedUsers 호출됨 - userId: \(userId)")
+        print("📣 [SnsService] getRecommendedUsers が呼び出されました - userId: \(userId)")
         let result = await repository.fetchRecommendedUsers(for: userId)
         
         switch result {
         case .success(let users):
-            print("📣 [SnsService] getRecommendedUsers 성공 - \(users.count)명의 추천 사용자")
+            print("📣 [SnsService] getRecommendedUsers 成功 - \(users.count)人のおすすめユーザー")
         case .failure(let error):
-            print("📣 [SnsService] getRecommendedUsers 실패 - \(error.localizedDescription)")
+            print("📣 [SnsService] getRecommendedUsers 失敗 - \(error.localizedDescription)")
         }
         
         return result
@@ -40,14 +40,14 @@ class SnsService {
     /// - Parameter userId: 現在ログイン中のユーザーID
     /// - Returns: 更新成功かどうかをResultで返す
     func refreshRecommendations(for userId: String) async -> Result<Bool, Error> {
-        print("📣 [SnsService] refreshRecommendations 호출됨 - userId: \(userId)")
+        print("📣 [SnsService] refreshRecommendations が呼び出されました - userId: \(userId)")
         let result = await repository.forceUpdateRecommendations(for: userId)
         
         switch result {
         case .success(let success):
-            print("📣 [SnsService] refreshRecommendations 성공 - \(success)")
+            print("📣 [SnsService] refreshRecommendations 成功 - \(success)")
         case .failure(let error):
-            print("📣 [SnsService] refreshRecommendations 실패 - \(error.localizedDescription)")
+            print("📣 [SnsService] refreshRecommendations 失敗 - \(error.localizedDescription)")
         }
         
         return result

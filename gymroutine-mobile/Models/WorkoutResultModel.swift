@@ -31,11 +31,13 @@ struct WorkoutResult: Codable, Identifiable {
 struct ExerciseResult: Codable, Identifiable {
     var id: String { exerciseName }
     var exerciseName: String
+    var key: String // CalenderViewアイコン表示用
     var sets: [ExerciseSetResult]?
     var setsCompleted: Int?
     
     enum CodingKeys: String, CodingKey {
         case exerciseName
+        case key
         case sets
         case setsCompleted
     }
@@ -43,6 +45,7 @@ struct ExerciseResult: Codable, Identifiable {
     // Firestoreからのデコード用
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        key = try container.decode(String.self, forKey: .key)
         exerciseName = try container.decode(String.self, forKey: .exerciseName)
         setsCompleted = try? container.decode(Int.self, forKey: .setsCompleted)
         
@@ -81,8 +84,22 @@ struct SetResultModel: Codable, Hashable {
 // Firestoreの'exercises'配列アイテム（生データ構造）
 struct ExerciseResultModel: Codable, Hashable {
     let exerciseName: String
+    let key : String
     let setsCompleted: Int
     let sets: [SetResultModel]
+    
+    static var mock: ExerciseResultModel {
+        ExerciseResultModel(
+            exerciseName: "ベンチプレス",
+            key: "Bench Press",
+            setsCompleted: 3,
+            sets: [
+                SetResultModel(Reps: 10, Weight: 50.0),
+                SetResultModel(Reps: 8, Weight: 55.0),
+                SetResultModel(Reps: 6, Weight: 60.0)
+            ]
+        )
+    }
 }
 
 // 注意: このモデルは古い構造です。代わりにWorkoutResultを使用してください

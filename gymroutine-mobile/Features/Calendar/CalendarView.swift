@@ -13,6 +13,7 @@ struct CalendarView: View {
     
     @StateObject private var viewModel = CalendarViewModel()
     @State private var routineFlg = false
+    private let analyticsService = AnalyticsService.shared
     
     private let weekdays = ["日", "月", "火", "水", "木", "金", "土"]
     
@@ -21,12 +22,19 @@ struct CalendarView: View {
             headerBox()
             
             calendarBox
+                .onAppear {
+                    viewModel.fetchUserRoutine()
+                }
             
             contentBox
         }
         .background(Color.gray.opacity(0.1))
         .sheet(isPresented: $routineFlg) {
             Text("ルーティーン追加画面を\nここに作成")
+        }
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "Calendar")
         }
     }
 }
@@ -40,15 +48,6 @@ extension CalendarView {
                 .font(.title2.bold())
                 .padding()
                 .hAlign(.center)
-                .overlay(alignment: .trailing) {
-                    Button(action: {
-                        routineFlg.toggle()
-                    }, label: {
-                        Image(systemName: "plus")
-                            .imageScale(.large).bold()
-                            .padding(.trailing)
-                    })
-                }
         }
     }
     
@@ -220,7 +219,7 @@ extension CalendarView {
         NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
             WorkoutCell(
                 workoutName: workout.name,
-                exerciseImageName: workout.exercises.first?.name,
+                exerciseImageName: workout.exercises.first?.key,
                 count: workout.exercises.count
             )
         }

@@ -13,6 +13,7 @@ struct ExerciseDetailView: View {
     let exercise: Exercise
     let isReadOnly: Bool
     let onAddButtonTapped: (() -> Void)?
+    private let analyticsService = AnalyticsService.shared
     
     
     init(exercise: Exercise, isReadOnly: Bool, onAddButtonTapped: (() -> Void)? = nil) {
@@ -43,27 +44,50 @@ struct ExerciseDetailView: View {
         .contentMargins(.bottom, 80)
         .navigationTitle(LocalizedStringKey(exercise.name))
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "ExerciseDetail")
+        }
     }
 }
 
 extension ExerciseDetailView {
     private var headerBox: some View {
-        Image(.welcomeLogo)
-            .resizable()
-            .scaledToFit()
-            .frame(height: 400)
+        if let image = UIImage(named: exercise.key) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 400)
+                        .background(.white)
+        } else {
+                    Image(.welcomeLogo)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 400)
+                        .background(.white)
+        }
     }
+
     
     private var exercisePartBox: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("部位")
                 .font(.headline)
             
-            Text(LocalizedStringKey(exercise.part))
-                .padding(.vertical, 8)
-                .padding(.horizontal)
-                .background()
-                .clipShape(Capsule())
+            HStack{
+                Text(LocalizedStringKey(exercise.part))
+                    .padding(.vertical, 8)
+                    .padding(.horizontal)
+                    .background()
+                    .clipShape(Capsule())
+                
+                Text(LocalizedStringKey(exercise.detailedPart))
+                    .padding(.vertical, 8)
+                    .padding(.horizontal)
+                    .background()
+                    .clipShape(Capsule())
+            }
+            
         }
         .hAlign(.leading)
     }

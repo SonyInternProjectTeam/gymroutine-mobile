@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# GymRoutine Mobile Development Workflow
+
+## Feature Development
+
+1. **Planning**
+   - Define feature requirements
+   - Create necessary models in Models directory
+   - Outline UI components needed
+
+2. **Implementation**
+   - Create/update Models as needed
+   - Implement Repository layer for data access
+   - Create Services for API interactions
+   - Implement ViewModels for business logic
+   - Build SwiftUI Views in the Features directory
+
+3. **Testing**
+   - Write unit tests in gymroutine-mobileTests directory
+   - Create UI tests in gymroutine-mobileUITests directory
+   - Perform manual testing on device/simulator
+
+4. **Firebase Backend**
+   - Update Cloud Functions in backend/functions as needed
+   - Test functions locally before deployment
+   - Update security rules as necessary
+
+## App Flow
+
+The app starts with [gymroutine_mobileApp.swift](mdc:gymroutine-mobile/Application/gymroutine_mobileApp.swift) which initializes Firebase and sets up the main window. Navigation is handled by [Router.swift](mdc:gymroutine-mobile/Application/Router.swift) which manages the app's navigation state.

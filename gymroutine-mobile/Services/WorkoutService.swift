@@ -24,7 +24,7 @@ class WorkoutService {
         }
     }
     
-    /// 기존 워크아웃 도큐먼트의 요일 데이터를 업데이트 (새로운 구조에서는 ScheduledDays는 [String] 타입)
+    /// 既存ワークアウトの曜日データを更新（新しい構造ではScheduledDaysは[String]タイプ）
     func updateScheduledDaysForWorkout(workoutID: String, scheduledDays: [String], completion: @escaping (Bool) -> Void) {
         db.collection("Workouts").document(workoutID).updateData([
             "ScheduledDays": scheduledDays
@@ -38,7 +38,7 @@ class WorkoutService {
         }
     }
     
-    /// 워크아웃의 exercises 필드를 업데이트하는 메서드
+    /// ワークアウトのexercisesフィールドを更新するメソッド
     func updateWorkoutExercises(workoutID: String, exercises: [WorkoutExercise]) async -> Result<Void, Error> {
         do {
             // Convert WorkoutExercise objects to Firestore-compatible dictionaries
@@ -46,7 +46,8 @@ class WorkoutService {
                 var exerciseDict: [String: Any] = [
                     "id": exercise.id,
                     "name": exercise.name,
-                    "part": exercise.part
+                    "part": exercise.part,
+                    "key": exercise.key
                 ]
                 
                 // Add restTime if available
@@ -71,18 +72,19 @@ class WorkoutService {
             ])
             return .success(())
         } catch {
-            print("🔥 워크아웃 exercises 업데이트 에러: \(error.localizedDescription)")
+            print("🔥 ワークアウトexercises更新エラー: \(error.localizedDescription)")
             return .failure(error)
         }
     }
     
-    /// 워크아웃에 운동을 추가하는 메서드 (새로운 운동 구조: name, part, 그리고 빈 Sets 배열)
+    /// ワークアウトに運動を追加するメソッド（新しい運動構造: name, part, そして空のSets配列）
     func addExerciseToWorkout(workoutID: String, exercise: WorkoutExercise, completion: @escaping (Bool) -> Void) {
         var exerciseData: [String: Any] = [
-            "id": exercise.id,         // 고유 ID 저장
+            "id": exercise.id,         // 一意のID保存
             "name": exercise.name,
             "part": exercise.part,
-            "sets": []  // 초기 세트 배열 (빈 배열)
+            "key": exercise.key,
+            "sets": []  // 初期セット配列（空配列）
         ]
         
         // Add restTime if available
@@ -94,37 +96,34 @@ class WorkoutService {
             "exercises": FieldValue.arrayUnion([exerciseData])
         ]) { error in
             if let error = error {
-                print("🔥 에크서사이즈 추가 에러: \(error.localizedDescription)")
+                print("🔥 エクササイズ追加エラー: \(error.localizedDescription)")
                 completion(false)
             } else {
-                print("✅ 에크서사이즈가 정상적으로 추가되었습니다!")
+                print("✅ エクササイズが正常に追加されました!")
                 completion(true)
             }
         }
     }
     
-    /// 워크아웃 상세 정보를 불러오는 메서드 (exercises 필드도 디코딩)
-    func fetchWorkoutById(workoutID: String) async throws -> Workout {
-        let documentSnapshot = try await db.collection("Workouts").document(workoutID).getDocument()
-        
-        guard documentSnapshot.exists else {
-            throw NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"])
-        }
-        
-        // Firestore 문서를 Workout 모델로 변환
+    func fetchWorkoutById(workoutID: String) async -> Result<Workout, Error> {
+        let workoutRef = db.collection("Workouts").document(workoutID)
+
         do {
-            var workout = try documentSnapshot.data(as: Workout.self)
-            workout.id = documentSnapshot.documentID
-            return workout
+            let snapshot = try await workoutRef.getDocument()
+            print(snapshot)
+            do {
+                let workout = try snapshot.data(as: Workout.self)
+                return .success(workout)
+            } catch {
+                return .failure(NSError(domain: "Firestore", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Decode Error"]))
+            }
         } catch {
-            print("🔥 워크아웃 디코딩 에러: \(error.localizedDescription)")
-            throw error
+            return .failure(NSError(domain: "Firestore", code: 404, userInfo: [NSLocalizedDescriptionKey: "Workout not found"]))
         }
     }
     
     /// 引数のユーザーが登録済みのワークアウトを全て取得
     func fetchUserWorkouts(uid: String) async -> [Workout]? {
-        let db = Firestore.firestore()
         let workoutsRef = db.collection("Workouts").whereField("userId", isEqualTo: uid)
         
         do {
@@ -147,7 +146,7 @@ class WorkoutService {
         }
     }
     
-    /// 운동 옵션(Trains 컬렉션) 불러오기
+    /// 運動オプション(Trainsコレクション)を読み込む
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
         db.collection("Trains").getDocuments { (snapshot, error) in
             guard let documents = snapshot?.documents, error == nil else {
@@ -160,7 +159,7 @@ class WorkoutService {
         }
     }
     
-    /// 특정 트레인의 운동 목록 불러오기
+    /// 特定トレインの運動リストを読み込む
     func fetchExercises(for train: String, completion: @escaping ([String]) -> Void) {
         db.collection("Trains").document(train).collection("exercises").getDocuments { (snapshot, error) in
             guard let documents = snapshot?.documents, error == nil else {
@@ -175,41 +174,41 @@ class WorkoutService {
     
     // MARK: - Workout Result Saving
     
-    /// 워크아웃 결과를 Firestore에 저장하는 함수
+    /// ワークアウト結果をFirestoreに保存する関数
     /// - Parameters:
-    ///   - userId: 사용자 ID
-    ///   - result: 저장할 WorkoutResultModel 데이터
+    ///   - userId: ユーザーID
+    ///   - result: 保存するWorkoutResultModelデータ
     func saveWorkoutResult(userId: String, result: WorkoutResultModel) async -> Result<Void, Error> {
-        // 월별 서브 컬렉션 경로 생성 (YYYYMM)
+        // 月別サブコレクションパスを作成 (YYYYMM)
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyyMM"
         let monthCollectionId = dateFormatter.string(from: result.createdAt.dateValue())
         
-        // Firestore 경로 설정 - 문서 ID 자동 생성
+        // Firestoreパス設定 - ドキュメントID自動生成
         let resultDocRef = db.collection("Result")
             .document(userId)
             .collection(monthCollectionId)
-            .document() // << 문서 ID 자동 생성을 위해 인자 없이 호출
+            .document() // << ドキュメントID自動生成のため引数なしで呼び出し
         
         do {
-            // WorkoutResultModel을 Firestore에 직접 인코딩하여 저장
-            // 자동 생성된 ID를 모델에 저장할 필요는 없지만, 필요 시 resultDocRef.documentID로 접근 가능
-            try resultDocRef.setData(from: result) // merge는 새 문서이므로 불필요
-            print("✅ 워크아웃 결과 저장 성공: \(userId) / \(monthCollectionId) / \(resultDocRef.documentID)") // 자동 생성 ID 로그 출력
+            // WorkoutResultModelをFirestoreに直接エンコーディングして保存
+            // 自動生成されたIDをモデルに保存する必要はないが、必要な場合はresultDocRef.documentIDでアクセス可能
+            try resultDocRef.setData(from: result) // 新しいドキュメントなのでmergeは不要
+            print("✅ ワークアウト結果保存成功: \(userId) / \(monthCollectionId) / \(resultDocRef.documentID)") // 自動生成ID出力
             return .success(())
         } catch {
-            print("🔥 워크아웃 결과 저장 실패: \(error.localizedDescription)")
+            print("🔥 ワークアウト結果保存失敗: \(error.localizedDescription)")
             return .failure(error)
         }
     }
     
     // MARK: - Workout Result Fetching
 
-    /// 특정 사용자의 특정 월의 특정 운동 결과를 ID로 가져오는 함수
+    /// 特定ユーザーの特定月の特定運動結果をIDで取得する関数
     /// - Parameters:
-    ///   - userId: 사용자 ID
-    ///   - month: 조회할 월 (YYYYMM 형식 문자열)
-    ///   - resultId: 가져올 결과의 문서 ID
+    ///   - userId: ユーザーID
+    ///   - month: 照会する月 (YYYYMM形式の文字列)
+    ///   - resultId: 取得する結果のドキュメントID
     func fetchWorkoutResultById(userId: String, month: String, resultId: String) async throws -> WorkoutResultModel {
         let resultDocRef = db.collection("Result") // Base collection is "Result"
             .document(userId)
@@ -223,10 +222,10 @@ class WorkoutService {
             }
             
             let result = try documentSnapshot.data(as: WorkoutResultModel.self)
-            print("✅ Successfully fetched workout result: \(resultId)")
+            print("✅ ワークアウト結果取得成功: \(resultId)")
             return result
         } catch {
-            print("🔥 Error fetching workout result \(resultId): \(error.localizedDescription)")
+            print("🔥 ワークアウト結果取得エラー \(resultId): \(error.localizedDescription)")
             throw error
         }
     }
@@ -236,7 +235,7 @@ class WorkoutService {
     // MARK: - Workout Update
 
     /// ワークアウトの基本情報（名前、メモなど）を更新するメソッド
-    func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String]? = nil) async -> Result<Void, Error> {
+    func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String] = []) async -> Result<Void, Error> {
         do {
             // 更新するフィールドのみを含める
             var updateData: [String: Any] = [
@@ -251,10 +250,8 @@ class WorkoutService {
                 updateData["notes"] = FieldValue.delete()
             }
             
-            // ルーチンの曜日がある場合は追加
-            if let scheduledDays = scheduledDays {
                 updateData["scheduledDays"] = scheduledDays
-            }
+                updateData["isRoutine"] = scheduledDays.isEmpty ? false : true
             
             try await db.collection("Workouts").document(workoutID).updateData(updateData)
             return .success(())

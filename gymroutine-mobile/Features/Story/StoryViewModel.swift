@@ -14,9 +14,42 @@ class StoryViewModel: ObservableObject {
     @Published var workoutResult: WorkoutResultModel? = nil // To hold the fetched workout result
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
+    
+    //ViewModelからViewを閉じる
+    var viewDismissalModePublisher = PassthroughSubject<Bool, Never>()
+    private var shouldDismissView = false {
+        didSet {
+            viewDismissalModePublisher.send(shouldDismissView)
+        }
+    }
 
     private var cancellables = Set<AnyCancellable>()
     private let workoutService = WorkoutService() // Assuming WorkoutService fetches results
+    
+    // 合計セット数
+    var totalSets: Int {
+        guard let workoutResult = workoutResult else { return 0 }
+        
+        var total = 0
+        for exercise in workoutResult.exercises {
+            total += exercise.sets.count
+        }
+        return total
+    }
+    
+    // 総重量
+    var totalVolume: Int {
+        guard let workoutResult = workoutResult else { return 0 }
+        
+        var total = 0
+        for exercise in workoutResult.exercises {
+            for set in exercise.sets {
+                let weight = set.Weight ?? 0.0
+                total += Int(Double(set.Reps) * weight)
+            }
+        }
+        return total
+    }
 
     init(user: User, stories: [Story]) {
         self.user = user
@@ -76,19 +109,25 @@ class StoryViewModel: ObservableObject {
 
     func advanceStory() {
         if currentStoryIndex < stories.count - 1 {
+            print("DEBUG: 次のストーリーを表示します。")
             currentStoryIndex += 1
         } else {
-            // Optionally close the story view or loop back
-            // closeStoryView() // Needs implementation
+            shouldDismissView = true
         }
     }
 
     func previousStory() {
         if currentStoryIndex > 0 {
+            print("DEBUG: 前のストーリーを表示します。")
             currentStoryIndex -= 1
+        } else {
+            shouldDismissView = true
         }
     }
 
-    // TODO: Implement logic for story timer/progress bar
-    // TODO: Add function to mark a story as viewed if necessary
+    func formattedTime(from seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        return "\(minutes)分 \(remainingSeconds)秒"
+    }
 } 

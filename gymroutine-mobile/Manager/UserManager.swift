@@ -52,12 +52,18 @@ final class UserManager: ObservableObject { // Make final
             // Setup listener only if not already listening for this user
             if currentUser?.uid != firebaseUser.uid || userListener == nil {
                 await self.setupUserListener(userId: firebaseUser.uid)
+                await self.waitForUserData()
             }
             // Update isLoggedIn along with isUserAuthenticated
             if !self.isLoggedIn { self.isLoggedIn = true } 
             // isLoading will be set to false within setupUserListener
         } else {
             print("DEBUG: User is not authenticated.")
+            // 로그아웃 알림 전송
+            if self.currentUser != nil {
+                NotificationCenter.default.post(name: NSNotification.Name("UserLoggedOut"), object: nil)
+            }
+            
             // Update isLoggedIn along with isUserAuthenticated
             if self.isLoggedIn { self.isLoggedIn = false } 
             self.currentUser = nil // Clear user data
@@ -109,6 +115,9 @@ final class UserManager: ObservableObject { // Make final
                     if self.currentUser != user { // Requires User to be Equatable
                          self.currentUser = user
                          print("DEBUG: User data UPDATED via listener: Name=\(user.name ?? "N/A"), Total=\(user.totalWorkoutDays ?? -1), Consec=\(user.consecutiveWorkoutDays ?? -1)")
+                         
+                         // 로그인 알림 전송
+                         NotificationCenter.default.post(name: NSNotification.Name("UserLoggedIn"), object: user)
                     } else {
                          print("DEBUG: User data received via listener, but NO changes detected.")
                     }
@@ -134,6 +143,28 @@ final class UserManager: ObservableObject { // Make final
              // If already listening, data should arrive automatically. 
              // Optionally force a re-fetch if immediate data is critical (though listener should handle it)
              // self.isLoading = false // We might already have data
+        }
+    }
+    
+    func waitForUserData() async {
+        await withCheckedContinuation { continuation in
+            var observer: NSObjectProtocol? = nil 
+
+            observer = NotificationCenter.default.addObserver(
+                forName: NSNotification.Name("UserLoggedIn"),
+                object: nil,
+                queue: .main
+            ) { notification in
+                if let user = notification.object as? User {
+                    print("User data received: \(user.name ?? "Unknown")")
+                }
+                // 続きを再開
+                continuation.resume()
+                // メモリリーク防止のため解除
+                if let observer = observer {
+                    NotificationCenter.default.removeObserver(observer)
+                }
+            }
         }
     }
     

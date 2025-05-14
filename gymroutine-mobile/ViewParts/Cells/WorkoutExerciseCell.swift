@@ -17,7 +17,7 @@ struct WorkoutExerciseCell: View {
     var body: some View {
         VStack(spacing: 16) {
             HStack(spacing: 16) {
-                ExerciseImageCell(imageName: workoutExercise.name)
+                ExerciseImageCell(imageName: workoutExercise.key)
                     .frame(width: 56, height: 56)
 
                 VStack(alignment: .leading, spacing: 8) {

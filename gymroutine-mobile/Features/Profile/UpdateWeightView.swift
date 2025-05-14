@@ -3,10 +3,12 @@ import SwiftUI
 struct UpdateWeightView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject private var userManager = UserManager.shared
+    private let analyticsService = AnalyticsService.shared
     
     @State private var weightInput: String = ""
     @State private var isLoading: Bool = false
     @State private var errorMessage: String? = nil
+    @FocusState var isFocused: Bool
     
     // Inject UserService or use shared instance
     private let userService = UserService.shared
@@ -22,34 +24,32 @@ struct UpdateWeightView: View {
     
     var body: some View {
         NavigationView { // Use NavigationView for title and buttons
-            VStack(spacing: 20) {
+            VStack(alignment: .leading, spacing: 24) {
                 
-                if let currentWeight = userManager.currentUser?.currentWeight {
-                    Text("現在の体重: \(String(format: "%.1f", currentWeight)) kg")
-                        .font(.title2)
-                } else {
-                    Text("現在の体重: -- kg")
-                        .font(.title2)
+                Text("体重を入力しましょう")
+                    .font(.title.bold())
+                
+                Group {
+                    if let currentWeight = userManager.currentUser?.currentWeight {
+                        Text("現在の体重: \(String(format: "%.1f", currentWeight)) kg")
+                    } else {
+                        Text("現在の体重: -- kg")
+                    }
                 }
+                .foregroundStyle(.secondary)
                 
                 TextField("新しい体重 (kg)", text: $weightInput)
+                    .focused($isFocused)
                     .keyboardType(.decimalPad)
-                    .padding()
+                    .font(.title2.bold())
+                    .padding(12)
                     .background(Color(UIColor.systemGray6))
-                    .cornerRadius(8)
                     .multilineTextAlignment(.center)
-                    .font(.title)
-                    .frame(maxWidth: 200)
-                
-                if let error = errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .font(.caption)
-                }
-                
-                Spacer()
+                    .cornerRadius(16)
+                    .padding(.horizontal, 24)
             }
             .padding()
+            .vAlign(.top)
             .navigationTitle("体重更新")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -71,13 +71,18 @@ struct UpdateWeightView: View {
                         .scaleEffect(1.5)
                 }
             }
-            .onAppear {
-                 // Initialize text field with current weight if available
-                 if let weight = userManager.currentUser?.currentWeight {
-                     weightInput = String(format: "%.1f", weight)
-                 }
-            }
+            .onAppear(perform: onAppear)
         }
+    }
+    
+    private func onAppear() {
+        if let weight = userManager.currentUser?.currentWeight {
+            weightInput = String(format: "%.1f", weight)
+        }
+
+        analyticsService.logScreenView(screenName: "UpdateWeight")
+        
+        isFocused = true
     }
     
     private func isValidWeight(_ input: String) -> Bool {

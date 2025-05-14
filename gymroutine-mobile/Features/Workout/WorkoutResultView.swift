@@ -7,141 +7,287 @@ struct WorkoutResultView: View {
     let workoutSession: WorkoutSessionModel // TODO: Pass the actual completed session data
     // 노트 입력을 위한 상태 변수
     @State private var notes: String
+    private let analyticsService = AnalyticsService.shared
 
-    // 초기화 시 workoutSession의 노트를 @State 변수에 할당
+    private let totalSets: Int  //合計セット
+    private let totalVolume: Double //総重量
+    private let partCounts: [String: Int]   //partごとのセット数
+
     init(workoutSession: WorkoutSessionModel) {
         self.workoutSession = workoutSession
-        // workoutSession.workout.notes가 nil이면 빈 문자열로 초기화
         _notes = State(initialValue: workoutSession.workout.notes ?? "")
+
+        var setsCount = 0
+        var volumeSum = 0.0
+        var partCounter = [String: Int]()
+
+        for exercise in workoutSession.workout.exercises {
+            for set in exercise.sets {
+                setsCount += 1
+                volumeSum += (set.weight * Double(set.reps))
+            }
+        }
+        
+        for exercise in workoutSession.workout.exercises {
+            partCounter[exercise.part, default: 0] += exercise.sets.count
+        }
+
+        self.partCounts = partCounter
+        self.totalSets = setsCount
+        self.totalVolume = volumeSum
     }
 
     var body: some View {
-        NavigationView { // 결과 화면 내에서 네비게이션이 필요할 수 있으므로 추가
-            VStack {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        Text("Workout Completed!")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .padding(.bottom)
+        VStack {
+            ScrollView {
+                VStack(alignment: .center, spacing: 16) {
+                    VStack() {
+                        Spacer(minLength: 256)
+                        
+                        headerBox
 
-                        // 요약 섹션
-                        workoutSummarySection
-
-                        // 운동 상세 섹션
-                        exerciseDetailsSection
-
-                        // 노트 섹션 추가
-                        notesSection
-
-                        Spacer() // 콘텐츠를 위로 밀기
+                        flameTitleBox
+                        
+                        shareButtonBox.padding(.horizontal)
                     }
-                    .padding() // ScrollView 콘텐츠 패딩
-                }
-                
-                // 하단 버튼 영역
-                bottomButtons
-            }
-            .navigationTitle("Workout Result")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("닫기") {
-                        workoutManager.dismissResultView()
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.main, .clear]),
+                            startPoint: .center,
+                            endPoint: .bottom
+                        )
+                    )
+                    
+                    VStack(spacing: 24) {
+                        CustomDivider()
+                        
+                        summaryBox
+                        
+                        CustomDivider()
+                        
+                        partSummaryBox
+                        
+                        CustomDivider()
+                        
+                        exerciseResultBox
+                        
+                        notesBox
                     }
+                    .padding()
                 }
+                .offset(y: -256)
             }
+            .vAlign(.top)
+            .background(Color.gray.opacity(0.1))
+            .scrollDismissesKeyboard(.immediately)
+            
+            bottomButtons
+        }
+        .edgesIgnoringSafeArea(.top)
+        .onAppear {
+            // Log screen view
+            analyticsService.logScreenView(screenName: "WorkoutResult")
         }
     }
 
     // MARK: - Subviews
-    
-    // 워크아웃 요약 섹션
-    private var workoutSummarySection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Summary")
-                .font(.title2)
-                .fontWeight(.semibold)
-            Text("Workout Name: \(workoutSession.workout.name)")
-            Text("Total Time: \(formattedTotalTime(workoutSession.elapsedTime))")
-            Text("Rest Time: \(formattedTotalTime(workoutSession.totalRestTime))")
-            Text("Active Time: \(formattedTotalTime(workoutSession.elapsedTime - workoutSession.totalRestTime))")
-            // TODO: 총 볼륨 등 추가 요약 정보 표시
-            // let totalVolume = calculateTotalVolume()
-            // Text("Total Volume: \(String(format: "%.1f", totalVolume)) kg")
-        }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
+    private var headerBox: some View {
+        Text("ワークアウト完了")
+            .font(.largeTitle).bold()
+            .foregroundStyle(.white)
+            .shadow(radius: 2)
+            .padding()
+            .hAlign(.center)
+            .padding(.top, 56)
     }
     
-    // 운동 상세 정보 섹션
-    private var exerciseDetailsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Exercises")
-                .font(.title2)
-                .fontWeight(.semibold)
-
-            // 운동 목록
-            // Workout 모델의 exercises는 [WorkoutExercise] 타입입니다.
-            ForEach(Array(workoutSession.workout.exercises.enumerated()), id: \.element.id) { exerciseIndex, workoutExercise in
-                VStack(alignment: .leading, spacing: 8) {
-                    // 운동 이름 표시 (WorkoutExercise 구조체 사용)
-                    Text(workoutExercise.name).fontWeight(.medium)
-                    
-                    // 세트 정보 표시 (WorkoutExercise의 sets는 [ExerciseSet] 타입)
-                    ForEach(Array(workoutExercise.sets.enumerated()), id: \.offset) { setIndex, setInfo in
-                        setRow(exerciseIndex: exerciseIndex, setIndex: setIndex, setInfo: setInfo)
-                    }
-                }
-                .padding(.bottom, 10)
+    private var flameTitleBox: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "flame.fill")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 180)
+                .foregroundStyle(.red.gradient)
+            
+            VStack(spacing: 8) {
+                Text("ワークアウト名")
+                    .foregroundStyle(.secondary)
+                    .font(.callout)
+                    .fontWeight(.semibold)
+                
+                
+                Text(workoutSession.workout.name)
+                    .font(.title.bold())
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
     }
     
-    // 각 세트 정보 행 (ExerciseSet 구조체 사용)
-    private func setRow(exerciseIndex: Int, setIndex: Int, setInfo: ExerciseSet) -> some View {
-        let isCompleted = workoutSession.completedSets.contains("\(exerciseIndex)-\(setIndex)")
-        
-        return HStack {
-            Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                .foregroundColor(isCompleted ? .green : .gray)
-                .frame(width: 20)
+    private var summaryBox: some View {
+        VStack(spacing: 16) {
+            totalSummaryBox
             
-            Text("Set \(setIndex + 1):")
-                .font(.callout)
-                .frame(width: 60, alignment: .leading)
-            
-            // ExerciseSet의 reps, weight 사용
-            Text("\(String(format: "%.1f", setInfo.weight)) kg x \(setInfo.reps) reps")
-                .font(.callout)
-            
-            Spacer()
+            workoutTimeSummaryBox
         }
-        .opacity(isCompleted ? 1.0 : 0.7)
     }
     
-    // 노트 섹션
-    private var notesSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Notes")
-                .font(.title2)
+    private var totalSummaryBox: some View {
+        HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 16) {
+                Label("総重量", systemImage: "figure.strengthtraining.traditional")
+                    .font(.headline)
+                
+                HStack(alignment: .lastTextBaseline) {
+                    Text("\(Int(totalVolume))")
+                        .font(.largeTitle).bold()
+                        .foregroundStyle(.main)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.1)
+                    Text("kg")
+                        .fontWeight(.semibold)
+                }
+                .hAlign(.center)
+            }
+            .padding()
+            .background()
+            .clipShape(.rect(cornerRadius: 8))
+            .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
+            
+            VStack(alignment: .leading, spacing: 16) {
+                Label("合計セット数", systemImage: "list.number.rtl")
+                    .font(.headline)
+                
+                HStack(alignment: .lastTextBaseline) {
+                    Text("\(totalSets)")
+                        .font(.largeTitle).bold()
+                        .foregroundStyle(.main)
+                    Text("回")
+                        .fontWeight(.semibold)
+                }
+                .hAlign(.center)
+            }
+            .padding()
+            .background()
+            .clipShape(.rect(cornerRadius: 8))
+            .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
+        }
+    }
+    
+    private var workoutTimeSummaryBox: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Label("時間", systemImage: "timer")
+                .font(.headline)
+            
+            HStack(spacing: 0) {
+                summaryCell(title: "合計", value: workoutSession.elapsedTime)
+                summaryCell(title: "休憩", value: workoutSession.totalRestTime)
+                summaryCell(title: "運動", value: workoutSession.elapsedTime - workoutSession.totalRestTime)
+            }
+        }
+        .padding(12)
+        .background()
+        .clipShape(.rect(cornerRadius: 8))
+        .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
+    }
+    
+    @ViewBuilder
+    private func summaryCell(title: String, value: Double) -> some View {
+        VStack {
+            Text(title)
+                .font(.caption)
+            
+            Text(Int(value).formattedDuration)
+                .font(.title2).bold()
+        }
+        .hAlign(.center)
+    }
+    
+    private var partSummaryBox: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Label("鍛えた部位", systemImage: "dumbbell.fill")
+                .font(.headline)
                 .fontWeight(.semibold)
 
-            TextEditor(text: $notes)
-                .frame(height: 100) // 적절한 높이 지정
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color(.systemGray4), lineWidth: 1)
-                )
-                .submitLabel(.done) // 키보드 완료 버튼
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(partCounts.sorted(by: { $0.value > $1.value }), id: \.key) { part, count in
+                    let percentage = totalSets > 0 ? Double(count) / Double(totalSets) : 0
+                    HStack {
+                        Text(part.capitalized)
+                            .font(.headline)
+                            .frame(width: 56, alignment: .center)
+
+                        ZStack(alignment: .leading) {
+                            Rectangle()
+                                .fill(Color(.systemGray4))
+                                .frame(height: 24)
+                                .cornerRadius(4)
+
+                            // 塗りつぶしバー（percentageに応じた幅）
+                            GeometryReader { geo in
+                                Rectangle()
+                                    .fill(.main.gradient)
+                                    .frame(width: geo.size.width * percentage)
+                                    .cornerRadius(4)
+                            }
+                        }
+                        .frame(height: 24)
+                        
+                        Text("\(Int(percentage * 100))%")
+                            .font(.footnote)
+                            .fontWeight(.semibold)
+                            .frame(width: 40, alignment: .center)
+                    }
+                }
+            }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
+    }
+    
+    private var shareButtonBox: some View {
+        Button {
+            shareWorkoutResult()
+        } label: {
+            Label("共有する", systemImage: "square.and.arrow.up")
+                .font(.headline)
+        }
+        .buttonStyle(CapsuleButtonStyle(color: .main))
+        .padding(.horizontal)
+    }
+    
+    private var exerciseResultBox: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Label("エクササイズ", systemImage: "flame.fill")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            ForEach(Array(workoutSession.workout.exercises.enumerated()), id: \.element.id) { exerciseIndex, workoutExercise in
+                WorkoutExerciseCell(workoutExercise: workoutExercise)
+                    .overlay(alignment: .topTrailing) {
+                        Text("\(exerciseIndex + 1)")
+                            .font(.largeTitle).bold()
+                            .foregroundStyle(.secondary)
+                            .padding()
+                    }
+            }
+        }
+    }
+    
+    private var notesBox: some View {
+        VStack(alignment: .leading) {
+            Text("メモ")
+                .font(.headline)
+            
+            TextField(
+                "メモを残す...",
+                text: $notes,
+                axis: .vertical
+            )
+            .submitLabel(.done)
+            .frame(maxHeight: 248)
+            .padding(12)
+            .background(Color(UIColor.systemGray6))
+            .clipShape(.rect(cornerRadius: 10))
+            .clipped()
+            .shadow(radius: 1)
+        }
     }
 
     // 하단 버튼 (HStack으로 변경)
@@ -151,17 +297,25 @@ struct WorkoutResultView: View {
              HStack(spacing: 10) {
                  // 공유 버튼
                  Button {
-                     shareWorkoutResult()
+                     workoutManager.dismissResultView()
                  } label: {
-                     Label("共有", systemImage: "square.and.arrow.up")
+                     Text("閉じる")
                  }
                  .buttonStyle(SecondaryButtonStyle()) // 스타일 적용 (프로젝트에 정의된 스타일 사용 가정)
 
                  // 보존 버튼
                  Button {
                      saveWorkoutResultWithNotes()
+                     
+                     // Log save workout result
+                     analyticsService.logUserAction(
+                         action: "save_workout_result",
+                         itemId: workoutSession.workout.id,
+                         itemName: workoutSession.workout.name,
+                         contentType: "workout_result"
+                     )
                  } label: {
-                     Label("保存", systemImage: "tray.and.arrow.down") // 아이콘 변경 제안
+                     Label("保存する", systemImage: "tray.and.arrow.down")
                  }
                  .buttonStyle(PrimaryButtonStyle()) // 스타일 적용
              }
@@ -169,29 +323,7 @@ struct WorkoutResultView: View {
          }
         .background(Color(UIColor.systemGray6)) // 배경색 추가
     }
-
-    // MARK: - Helper Functions
-
-    private func formattedTotalTime(_ time: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: time) ?? "0s"
-    }
-
-    // TODO: 총 볼륨 계산 로직 (필요 시)
-    // private func calculateTotalVolume() -> Double {
-    //     var totalVolume: Double = 0
-    //     for (exerciseIndex, exercise) in workoutSession.workout.exercises.enumerated() {
-    //         for (setIndex, setInfo) in exercise.sets.enumerated() {
-    //             if workoutSession.completedSets.contains("\(exerciseIndex)-\(setIndex)") {
-    //                 totalVolume += Double(setInfo.reps) * setInfo.weight
-    //             }
-    //         }
-    //     }
-    //     return totalVolume
-    // }
-
+    
     // 노트 포함하여 결과 저장 요청
     private func saveWorkoutResultWithNotes() {
         print("Save button tapped with notes: \(notes)")
@@ -203,14 +335,13 @@ struct WorkoutResultView: View {
 
     // 공유 기능 구현 (ActivityViewController 사용)
     private func shareWorkoutResult() {
-        // 공유할 내용 생성 (텍스트, 이미지 등)
-        let shareText = """
-        Workout Completed!
-        Name: \(workoutSession.workout.name)
-        Time: \(formattedTotalTime(workoutSession.elapsedTime))
-        \(notes.isEmpty ? "" : "\nNotes: \(notes)")
+        let shareText =
         """
-        // TODO: 운동 상세 정보나 스크린샷 등 추가 가능
+        ワークアウト完了！
+        総重量: \(Int(totalVolume))kg
+        合計セット数: \(totalSets)
+        合計時間: \(Int(workoutSession.elapsedTime).formattedDuration)
+        """
 
         let activityVC = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
 
@@ -243,13 +374,13 @@ struct WorkoutResultView_Previews: PreviewProvider {
             ExerciseSet(reps: 6, weight: 70)
         ]
         // WorkoutExercise 생성 시 Exercise 정보 직접 전달 불필요 (name, part만 사용)
-        let sampleWorkoutExercise1 = WorkoutExercise(name: "벤치 프레스", part: ExercisePart.chest.rawValue, sets: sampleSets1)
+        let sampleWorkoutExercise1 = WorkoutExercise(name: "벤치 프레스", part: ExercisePart.chest.rawValue, key: "Bench Press", sets: sampleSets1)
 
         let sampleSets2 = [
             ExerciseSet(reps: 12, weight: 100),
             ExerciseSet(reps: 10, weight: 110)
         ]
-        let sampleWorkoutExercise2 = WorkoutExercise(name: "스쿼트", part: ExercisePart.legs.rawValue, sets: sampleSets2)
+        let sampleWorkoutExercise2 = WorkoutExercise(name: "스쿼트", part: ExercisePart.lowerbody.rawValue, key:"Squat", sets: sampleSets2)
 
         // Workout 모델 사용
         let sampleWorkout = Workout(
@@ -281,9 +412,3 @@ struct WorkoutResultView_Previews: PreviewProvider {
             .environmentObject(manager)
     }
 }
-
-// MARK: - Preview Provider
-
-// WorkoutModel, WorkoutExerciseDetail, ExerciseModel, WorkoutSet 정의가 포함된
-// Models/WorkoutModel.swift 또는 유사한 파일을 임포트해야 할 수 있습니다.
-// import Models // <- 실제 파일 구조에 맞게 수정

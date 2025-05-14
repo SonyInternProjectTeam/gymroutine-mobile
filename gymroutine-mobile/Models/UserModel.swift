@@ -30,10 +30,9 @@ struct User: Decodable, Identifiable, Equatable { // Add Equatable conformance
     var totalWorkoutDays: Int? = 0 // Changed to Optional Int
     var currentWeight: Double? = nil // Already Optional
     var consecutiveWorkoutDays: Int? = 0 // Changed to Optional Int
-    var weightHistory: [WeightEntry]? = [] // Changed to Optional Array, default empty array still handles missing data upon creation
     var lastWorkoutDate: String? // Add lastWorkoutDate field (String)
 
-    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date(), totalWorkoutDays: Int? = 0, currentWeight: Double? = nil, consecutiveWorkoutDays: Int? = 0, weightHistory: [WeightEntry]? = [], lastWorkoutDate: String? = nil) {
+    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date(), totalWorkoutDays: Int? = 0, currentWeight: Double? = nil, consecutiveWorkoutDays: Int? = 0, lastWorkoutDate: String? = nil) {
         self.uid = uid
         self.email = email
         self.name = name
@@ -47,7 +46,6 @@ struct User: Decodable, Identifiable, Equatable { // Add Equatable conformance
         self.totalWorkoutDays = totalWorkoutDays
         self.currentWeight = currentWeight
         self.consecutiveWorkoutDays = consecutiveWorkoutDays
-        self.weightHistory = weightHistory
         self.lastWorkoutDate = lastWorkoutDate // Initialize lastWorkoutDate
     }
     
@@ -65,7 +63,6 @@ struct User: Decodable, Identifiable, Equatable { // Add Equatable conformance
                lhs.totalWorkoutDays == rhs.totalWorkoutDays &&
                lhs.currentWeight == rhs.currentWeight &&
                lhs.consecutiveWorkoutDays == rhs.consecutiveWorkoutDays &&
-               lhs.weightHistory == rhs.weightHistory && // Compare weightHistory array
                lhs.lastWorkoutDate == rhs.lastWorkoutDate // Compare lastWorkoutDate
     }
 }

@@ -13,6 +13,7 @@ import FirebaseAuth
 final class SnsViewModel: ObservableObject {
     @Published var userDetails: [User] = []       // User 型の配列に変更
     @Published var searchName: String = ""
+    @Published var lastSearchedName: String = ""
     @Published var errorMessage: String? = nil
     
     // 推薦ユーザー関連の状態
@@ -32,6 +33,7 @@ final class SnsViewModel: ObservableObject {
         Task {
             UIApplication.showLoading()
             let result = await userService.searchUsersByName(name: searchName)
+            lastSearchedName = searchName
             switch result {
             case .success(let users):
                 // 直接 User 型の配列を設定

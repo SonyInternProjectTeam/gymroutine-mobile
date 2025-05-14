@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SearchUserView: View {
     @StateObject private var viewModel = SearchUserViewModel()
+    private let analyticsService = AnalyticsService.shared
 
     var body: some View {
         NavigationStack {
@@ -41,6 +42,10 @@ struct SearchUserView: View {
                 }
             }
             .navigationTitle("Search Users")
+            .onAppear {
+                // Log screen view
+                analyticsService.logScreenView(screenName: "SearchUser")
+            }
         }
     }
 

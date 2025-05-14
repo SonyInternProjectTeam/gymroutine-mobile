@@ -12,8 +12,8 @@ import Combine
 
 class AuthService {
     private let db = Firestore.firestore()
-    // userManager는 @MainActor 클래스이므로 접근 시 주의 필요
-    // private let userManager = UserManager.shared // 직접 접근 대신 필요 시 함수 인자로 전달하거나 @MainActor 컨텍스트에서 사용
+    // userManagerは@MainActorクラスなので、アクセス時に注意が必要
+    // private let userManager = UserManager.shared // 直接アクセスの代わりに必要な場合は関数引数として渡すか、@MainActorコンテキストで使用
     
     /// Checks if the user is currently logged in and returns their user ID.
     func getCurrentUser() -> FirebaseAuth.User? {
@@ -50,8 +50,8 @@ class AuthService {
                 if let error = error {
                     promise(.failure(error))
                 } else if let userUID = authResult?.user.uid {
-                    // UserManager 업데이트는 여기서 직접 하지 않고, 로그인 또는 초기화 시 처리
-                    // let newUser = User(uid: userUID, email: email) // 변수 미사용 제거
+                    // UserManagerのアップデートはここで直接行わず、ログインまたは初期化時に処理
+                    // let newUser = User(uid: userUID, email: email) // 未使用変数の削除
                     promise(.success(userUID))
                 } else {
                     promise(.failure(NSError(domain: "SignupError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User creation failed"])))
@@ -65,12 +65,6 @@ class AuthService {
         do {
             let documentRef = db.collection("Users").document(user.uid)
             
-            // Convert weightHistory to an array of dictionaries for Firestore
-            // Use nil-coalescing to handle optional user.weightHistory
-            let weightHistoryData = (user.weightHistory ?? []).map { entry -> [String: Any] in
-                return ["weight": entry.weight, "date": entry.date] // entry.date is already a Timestamp
-            }
-
             var userData: [String: Any] = [
                 "uid": user.uid,
                 "email": user.email,
@@ -96,12 +90,9 @@ class AuthService {
             if let consecutiveDays = user.consecutiveWorkoutDays {
                 userData["consecutiveWorkoutDays"] = consecutiveDays
             }
-
+            
             // Set data (merge is true, so existing fields won't be overwritten unnecessarily)
             try await documentRef.setData(userData, merge: true)
-            
-            // Initialize UserManager after saving - @MainActor 컨텍스트에서 호출 필요
-            // await UserManager.shared.initializeUser() // 호출하는 쪽에서 처리하도록 변경
             
             return .success(())
         } catch {
@@ -118,18 +109,18 @@ class AuthService {
                     promise(.failure(error))
                 } else if let _ = authResult {
                     Task {
-                        // initializeUser는 @MainActor 함수이므로 await 필요
+                        // initializeUserは@MainActor関数なのでawaitが必要
                         await UserManager.shared.initializeUser()
                         
-                        // initializeUser 호출 후 상태 확인 (@MainActor)
+                        // initializeUser呼び出し後の状態確認（@MainActor）
                         let user = await UserManager.shared.currentUser
                         if let user = user {
                             promise(.success(user))
                         } else {
-                            // initializeUser가 성공했지만 user가 nil인 경우 (드물지만 처리)
+                            // initializeUserが成功したがuserがnilの場合（稀だが処理）
                             promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User initialization failed."])))
                         }
-                        // initializeUser 자체에서 발생하는 에러는 내부에서 처리되므로 여기서 catch 불필요
+                        // initializeUser自体で発生するエラーは内部で処理されるため、ここでcatchは不要
                     }
                 } else {
                     promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Login failed."])))
@@ -143,9 +134,9 @@ class AuthService {
     
     /// Firebase Authentication - logout
     func logout() {
-        // signOut은 에러를 던질 수 있으므로 try? 사용
+        // signOutはエラーを投げる可能性があるためtry?を使用
         try? Auth.auth().signOut()
-        // 로그아웃 시 UserManager 상태 업데이트 (@MainActor에서 실행)
+        // ログアウト時にUserManagerの状態を更新（@MainActorで実行）
         Task { @MainActor in
             UserManager.shared.currentUser = nil
             UserManager.shared.isLoggedIn = false
