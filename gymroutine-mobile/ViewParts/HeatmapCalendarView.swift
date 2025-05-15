@@ -18,15 +18,14 @@ struct HeatmapCalendarView: View {
     // Month formatter
     private let monthFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM" // Short month name (e.g., "Jan")
-        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "M月" // Short month name (e.g., "Jan")
         return formatter
     }()
     
     // Year formatter
     private let yearFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy"
+        formatter.dateFormat = "yyyy年"
         return formatter
     }()
     
@@ -115,7 +114,7 @@ struct HeatmapCalendarView: View {
             HStack {
                 let month = monthFormatter.string(from: startDate)
                 let year = yearFormatter.string(from: startDate)
-                Text("\(month) \(year)")
+                Text("\(year)")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -224,7 +223,7 @@ struct HeatmapCalendarView: View {
             HStack {
                 let month = monthFormatter.string(from: date)
                 let year = yearFormatter.string(from: date)
-                Text("\(month) \(year)")
+                Text("\(year) \(month)")
                     .font(.headline)
                 Spacer()
             }
