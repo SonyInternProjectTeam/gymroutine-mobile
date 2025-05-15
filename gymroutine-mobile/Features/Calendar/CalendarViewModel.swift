@@ -38,14 +38,13 @@ final class CalendarViewModel: ObservableObject {
         // subscribeToResultUpdates() // PassthroughSubject 구독 제거
     }
     
-    // ViewModel 소멸 시 리스너 제거
     deinit {
-        // Task를 사용하여 메인 액터에서 리스너 제거 실행
-        Task { @MainActor in
-            removeListener()
+        // CalendarViewModel is @MainActor, so this deinit is always run on MainActor.
+        // Therefore, we can safely assume isolation here.
+        MainActor.assumeIsolated {
+            self.removeListener()
         }
     }
-    
     // 리스너 제거 함수
     func removeListener() {
         listenerRegistration?.remove()

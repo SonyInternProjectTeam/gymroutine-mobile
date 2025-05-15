@@ -48,7 +48,7 @@ struct WorkoutResultView: View {
 
                         flameTitleBox
                         
-                        shareButtonBox.padding(.horizontal)
+                        // shareButtonBox.padding(.horizontal)
                     }
                     .background(
                         LinearGradient(
@@ -241,16 +241,17 @@ struct WorkoutResultView: View {
         }
     }
     
-    private var shareButtonBox: some View {
-        Button {
-            shareWorkoutResult()
-        } label: {
-            Label("共有する", systemImage: "square.and.arrow.up")
-                .font(.headline)
-        }
-        .buttonStyle(CapsuleButtonStyle(color: .main))
-        .padding(.horizontal)
-    }
+    // TODO: create share logic for share workout result
+    // private var shareButtonBox: some View {
+    //     Button {
+    //         shareWorkoutResult()
+    //     } label: {
+    //         Label("共有する", systemImage: "square.and.arrow.up")
+    //             .font(.headline)
+    //     }
+    //     .buttonStyle(CapsuleButtonStyle(color: .main))
+    //     .padding(.horizontal)
+    // }
     
     private var exerciseResultBox: some View {
         VStack(alignment: .leading, spacing: 16) {
