@@ -22,7 +22,7 @@ struct WorkoutExerciseCell: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text(LocalizedStringKey(workoutExercise.part))
+                        Text(workoutExercise.toPartName())
                             .font(.caption)
                             .padding(.vertical, 4)
                             .padding(.horizontal, 12)

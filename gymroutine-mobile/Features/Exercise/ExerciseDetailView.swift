@@ -75,12 +75,12 @@ extension ExerciseDetailView {
                 .font(.headline)
             
             HStack{
-                Text(LocalizedStringKey(exercise.part))
+                Text(exercise.toPartName())
                     .padding(.vertical, 8)
                     .padding(.horizontal)
                     .background()
                     .clipShape(Capsule())
-                
+
                 Text(LocalizedStringKey(exercise.detailedPart))
                     .padding(.vertical, 8)
                     .padding(.horizontal)

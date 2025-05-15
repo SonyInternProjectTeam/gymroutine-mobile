@@ -16,8 +16,8 @@ struct Exercise: Codable, Hashable {
     let part: String
     let detailedPart: String
     
-    func toExercisePart() -> ExercisePart? {
-        return ExercisePart(rawValue: part)
+    func toPartName() -> String {
+        return ExercisePart(rawValue: part)?.japaneseName ?? "その他"
     }
 
     static func mock() -> Exercise{
@@ -41,8 +41,20 @@ enum ExercisePart: String, CaseIterable {
     
     // 画像表示用に定義
     var assetName: String {
-            return self.rawValue.replacingOccurrences(of: "/", with: ":")
+        return self.rawValue.replacingOccurrences(of: "/", with: ":")
+    }
+
+    // 日本語名の追加
+    var japaneseName: String {
+        switch self {
+        case .arms: return "腕"
+        case .abscore: return "腹筋・体幹"
+        case .chest: return "胸"
+        case .back: return "背中"
+        case .lowerbody: return "下半身"
+        case .shoulders: return "肩"
         }
+    }
 }
 
 
@@ -101,7 +113,11 @@ struct WorkoutExercise: Identifiable, Codable {
     private enum CodingKeys: String, CodingKey {
         case id, name, part, key, sets, restTime
     }
-    
+
+    func toPartName() -> String {
+        return ExercisePart(rawValue: part)?.japaneseName ?? "その他"
+    }
+
     static func mock() -> WorkoutExercise {
         return WorkoutExercise(
             name: "Bench Press",

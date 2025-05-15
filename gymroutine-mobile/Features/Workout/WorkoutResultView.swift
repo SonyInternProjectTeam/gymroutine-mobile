@@ -211,7 +211,7 @@ struct WorkoutResultView: View {
                 ForEach(partCounts.sorted(by: { $0.value > $1.value }), id: \.key) { part, count in
                     let percentage = totalSets > 0 ? Double(count) / Double(totalSets) : 0
                     HStack {
-                        Text(part.capitalized)
+                        Text(ExercisePart(rawValue: part)?.japaneseName ?? "その他")
                             .font(.headline)
                             .frame(width: 56, alignment: .center)
 

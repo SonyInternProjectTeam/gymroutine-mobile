@@ -28,7 +28,7 @@ struct WorkoutSortView: View {
                         .frame(width: 56, height: 56)
                     
                     VStack(alignment: .leading) {
-                        Text("\(exercise.part)")
+                        Text(exercise.toPartName())
                             .font(.caption)
                             .padding(.vertical, 4)
                             .padding(.horizontal, 12)

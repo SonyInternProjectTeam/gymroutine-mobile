@@ -67,7 +67,7 @@ struct ExerciseSearchView: View {
                         } else {
                             exercisesGridView(
                                 title: viewModel.searchedWord.isEmpty ?
-                                    "「\(viewModel.selectedExercisePart?.rawValue ?? "")」の絞り込み結果" :
+                                    "「\(viewModel.selectedExercisePart?.japaneseName ?? "")」の絞り込み結果" :
                                     "「\(viewModel.searchedWord)」の検索結果",
                                 exercises: viewModel.filterExercises
                             )
@@ -146,7 +146,7 @@ struct ExerciseSearchView: View {
             viewModel.handleFilterExerisePart(part: part)
         }) {
             VStack(alignment: .leading, spacing: 0) {
-                Text(LocalizedStringKey(part.rawValue))
+                Text(part.japaneseName)
                     .font(.headline)
                 
                 if let image = UIImage(named: part.assetName) {
@@ -184,7 +184,7 @@ struct ExerciseSearchView: View {
             } label: {
                 Group {
                     if let part = viewModel.selectedExercisePart {
-                        Label(LocalizedStringKey(part.rawValue), systemImage: "slider.horizontal.3")
+                        Label(part.japaneseName, systemImage: "slider.horizontal.3")
                             .foregroundStyle(.main)
                     } else {
                         Label("絞り込み", systemImage: "slider.horizontal.3")
@@ -222,7 +222,7 @@ struct ExerciseSearchView: View {
                         Button(action: {
                             viewModel.handleFilterExerisePart(part: part)
                         }) {
-                            Text(LocalizedStringKey(part.rawValue))
+                            Text(part.japaneseName)
                                 .font(.headline)
                                 .foregroundColor(.primary)
                                 .padding(.vertical, 12)
