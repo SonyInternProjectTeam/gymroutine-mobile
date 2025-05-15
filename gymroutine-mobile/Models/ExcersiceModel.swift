@@ -20,6 +20,10 @@ struct Exercise: Codable, Hashable {
         return ExercisePart(rawValue: part)?.japaneseName ?? "その他"
     }
 
+    func toDetailedPartName() -> String {
+        return ExerciseDetailedPart(rawValue: detailedPart)?.japaneseName ?? "その他"
+    }
+
     static func mock() -> Exercise{
         return Exercise(
             key: "sample",
@@ -59,35 +63,72 @@ enum ExercisePart: String, CaseIterable {
 
 
 // 今後detailedPart検索機能実装の際に使用
-//enum ExerciseDetailedPart: String, CaseIterable {
-//    // Lower body
-//    case quadriceps
-//    case adductors
-//    case hamstrings
-//    case glutes
-//    case calves
-//    // Chest
-//    case upperChest
-//    case midChest
-//    case lowerChest
-//    // Back
-//    case lats
-//    case midBack
-//    case traps
-//    case lowerBack
-//    // Shoulders
-//    case anteriorDeltoid
-//    case lateralDeltoid
-//    case posteriorDeltoid
-//    // Arms
-//    case biceps
-//    case triceps
-//    case forearms
-//    // Abs
-//    case rectusAbdominis
-//    case obliques
-//    case deepCore
-//}
+enum ExerciseDetailedPart: String, CaseIterable {
+    // Lower body
+    case quadriceps = "quadriceps"         // 大腿四頭筋
+    case adductors = "adductors"           // 内転筋
+    case hamstrings = "hamstrings"         // ハムストリングス
+    case glutes = "glutes"                 // 臀筋
+    case calves = "calves"                 // ふくらはぎ（腓腹筋）
+
+    // Chest
+    case upperChest = "upper-chest"        // 上部胸筋
+    case midChest = "mid-chest"            // 中部胸筋
+    case lowerChest = "lower-chest"        // 下部胸筋
+
+    // Back
+    case lats = "lats"                     // 広背筋
+    case midBack = "mid-back"              // 背中中央
+    case traps = "traps"                   // 僧帽筋
+    case lowerBack = "lower-back"          // 下背部
+
+    // Shoulders
+    case anteriorDeltoid = "anterior-deltoid"   // 前部三角筋
+    case lateralDeltoid = "lateral-deltoid"     // 側部三角筋
+    case posteriorDeltoid = "posterior-deltoid" // 後部三角筋
+
+    // Arms
+    case biceps = "biceps"                 // 上腕二頭筋
+    case triceps = "triceps"               // 上腕三頭筋
+    case forearms = "forearms"             // 前腕筋
+
+    // Abs
+    case rectusAbdominis = "rectus-abdomini"   // 腹直筋
+    case obliques = "obliques"                 // 腹斜筋
+    case deepCore = "deep-core"                // 深層筋（インナーユニット）
+
+    var japaneseName: String {
+        switch self {
+        case .quadriceps: return "大腿四頭筋"
+        case .adductors: return "内転筋"
+        case .hamstrings: return "ハムストリングス"
+        case .glutes: return "臀筋"
+        case .calves: return "ふくらはぎ"
+
+        case .upperChest: return "上部胸筋"
+        case .midChest: return "中部胸筋"
+        case .lowerChest: return "下部胸筋"
+
+        case .lats: return "広背筋"
+        case .midBack: return "背中中央"
+        case .traps: return "僧帽筋"
+        case .lowerBack: return "下背部"
+
+        case .anteriorDeltoid: return "前部三角筋"
+        case .lateralDeltoid: return "側部三角筋"
+        case .posteriorDeltoid: return "後部三角筋"
+
+        case .biceps: return "上腕二頭筋"
+        case .triceps: return "上腕三頭筋"
+        case .forearms: return "前腕筋"
+
+        case .rectusAbdominis: return "腹直筋"
+        case .obliques: return "腹斜筋"
+        case .deepCore: return "深層筋"
+        }
+    }
+}
+
 
 // 새롭게 추가: 각 세트의 정보를 관리하는 모델
 struct ExerciseSet: Identifiable, Codable {

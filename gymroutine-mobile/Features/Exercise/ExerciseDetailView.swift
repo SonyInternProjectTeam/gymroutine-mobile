@@ -81,7 +81,7 @@ extension ExerciseDetailView {
                     .background()
                     .clipShape(Capsule())
 
-                Text(LocalizedStringKey(exercise.detailedPart))
+                Text(exercise.toDetailedPartName())
                     .padding(.vertical, 8)
                     .padding(.horizontal)
                     .background()
