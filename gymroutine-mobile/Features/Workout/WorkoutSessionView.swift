@@ -376,7 +376,7 @@ struct WorkoutSessionView: View {
                 .fill(Color(.systemGray6))
 
             Group {
-                if let uiImage = UIImage(named: exercise.key)  {
+                if let key = exercise.key, let uiImage = UIImage(named: key) {
                     Image(uiImage: uiImage)
                         .resizable()
                         .padding(28)

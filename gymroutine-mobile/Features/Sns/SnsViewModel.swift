@@ -21,12 +21,18 @@ final class SnsViewModel: ObservableObject {
     @Published var isLoadingRecommendations: Bool = false
     @Published var recommendationsError: String? = nil
     
+    // 워크아웃 템플릿 관련 상태
+    @Published var workoutTemplates: [WorkoutTemplate] = []
+    @Published var isLoadingTemplates: Bool = false
+    @Published var templatesError: String? = nil
+    
     // 추천 초기화 상태 (앱 실행 후 첫 번째 로드인지 확인)
     private var hasInitializedRecommendations = false
     
     private let userService = UserService()
     private let snsService = SnsService()
     private let authService = AuthService()
+    private let templateService = TemplateService()
     
     /// ユーザー名でユーザー検索を行い、結果を userDetails に設定する
     func fetchUsers() {
@@ -42,6 +48,30 @@ final class SnsViewModel: ObservableObject {
                 errorMessage = error.localizedDescription
             }
             UIApplication.hideLoading()
+        }
+    }
+    
+    /// 현재 사용자에게 추천할 워크아웃 템플릿 로드
+    func fetchWorkoutTemplates() {
+        Task {
+            isLoadingTemplates = true
+            templatesError = nil
+            
+            // 기본 템플릿만 로드 (isPremium: false)
+            let result = await templateService.getTemplates(isPremium: false)
+            
+            isLoadingTemplates = false
+            
+            switch result {
+            case .success(let templates):
+                print("✅ [fetchWorkoutTemplates] 성공 - 템플릿 \(templates.count)개 가져옴")
+                workoutTemplates = templates
+                
+            case .failure(let error):
+                print("⛔️ [fetchWorkoutTemplates] 오류 발생: \(error.localizedDescription)")
+                templatesError = "ワークアウトテンプレートの取得に失敗しました: \(error.localizedDescription)"
+                workoutTemplates = []
+            }
         }
     }
     
@@ -123,6 +153,11 @@ final class SnsViewModel: ObservableObject {
             
             isLoadingRecommendations = false
         }
+    }
+    
+    /// 템플릿 새로고침 - 사용자 액션으로 새로고침 할 경우
+    func refreshTemplates() {
+        fetchWorkoutTemplates()
     }
     
     /// 추천 초기화 함수 - 페이지가 처음 열릴 때만 호출됨
@@ -213,5 +248,8 @@ final class SnsViewModel: ObservableObject {
             isLoadingRecommendations = false
             hasInitializedRecommendations = true
         }
+        
+        // 템플릿 로드
+        fetchWorkoutTemplates()
     }
 }

@@ -23,7 +23,14 @@ struct SnsView: View {
                 searchResultsView
             }
             else {
-                recommendedUsersView
+                ScrollView {
+                    recommendedUsersView
+                    
+                    Divider()
+                        .padding(.vertical, 16)
+                    
+                    workoutTemplatesView
+                }
             }
         }
         .onChange(of: isFocused) {
@@ -158,10 +165,70 @@ struct SnsView: View {
                     .padding(.vertical,8)
                 }
             }
-
-            Spacer()
         }
         .padding(.top, 16)
+    }
+    
+    private var workoutTemplatesView: some View {
+        // 워크아웃 템플릿 영역
+        VStack(spacing: 10) {
+            HStack {
+                Image(systemName: "figure.run")
+                Text("おすすめトレーニング")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Spacer()
+                
+                Button(action: {
+                    // 템플릿 새로고침
+                    viewModel.refreshTemplates()
+                }) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.headline)
+                }
+                .disabled(viewModel.isLoadingTemplates)
+            }
+            .padding(.horizontal, 16)
+            
+            if viewModel.isLoadingTemplates {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                        .padding()
+                    Spacer()
+                }
+            } else if let error = viewModel.templatesError {
+                Text(error)
+                    .hAlign(.center)
+                    .foregroundColor(.red)
+                    .font(.subheadline)
+                    .padding(.horizontal, 16)
+            } else if viewModel.workoutTemplates.isEmpty {
+                VStack(alignment: .center) {
+                    Text("おすすめトレーニングが見つかりませんでした")
+                        .foregroundColor(.gray)
+                        .padding()
+                    
+                    Button("再取得") {
+                        viewModel.refreshTemplates()
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 30)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(viewModel.workoutTemplates) { template in
+                        NavigationLink(destination: TemplateDetailView(template: template)) {
+                            WorkoutTemplateCell(template: template)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+        }
     }
 
     /// 프로필 이미지 뷰
