@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ja">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>헬스 루틴 관리자</title>
+        <title>ジムルーティンマネージャー</title>
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
             rel="stylesheet" />
@@ -35,7 +35,8 @@
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="#">
-                        <i class="bi bi-cloud-fill me-2"></i>헬스 루틴 관리자
+                        <i class="bi bi-cloud-fill me-2"></i
+                        >ジムルーティンマネージャー
                     </a>
                     <button
                         class="navbar-toggler"
@@ -51,7 +52,7 @@
                                     class="nav-link active"
                                     href="#"
                                     id="view-templates"
-                                    >템플릿 보기</a
+                                    >テンプレート一覧</a
                                 >
                             </li>
                             <li class="nav-item">
@@ -59,7 +60,7 @@
                                     class="nav-link"
                                     href="#"
                                     id="create-template"
-                                    >새 템플릿 만들기</a
+                                    >新規テンプレート作成</a
                                 >
                             </li>
                             <li class="nav-item">
@@ -68,7 +69,7 @@
                                     href="#"
                                     id="firebase-status">
                                     <span class="firebase-indicator"></span>
-                                    Firebase 상태
+                                    Firebase状態
                                 </a>
                             </li>
                         </ul>
@@ -77,12 +78,12 @@
             </nav>
 
             <div class="row">
-                <!-- 사이드바 -->
+                <!-- サイドバー -->
                 <div class="col-md-3">
                     <div class="card">
                         <div
                             class="card-header d-flex justify-content-between align-items-center">
-                            템플릿 목록
+                            テンプレート一覧
                             <button
                                 id="refresh-templates"
                                 class="btn btn-sm btn-outline-primary">
@@ -92,7 +93,7 @@
                         <div class="card-body">
                             <div class="template-list-container">
                                 <ul class="list-group template-list">
-                                    <!-- 템플릿 목록이 여기에 동적으로 추가됩니다 -->
+                                    <!-- テンプレート一覧がここに動的に追加されます -->
                                 </ul>
                                 <div
                                     class="template-loading text-center mt-3"
@@ -101,33 +102,33 @@
                                         class="spinner-border text-primary"
                                         role="status">
                                         <span class="visually-hidden"
-                                            >로딩 중...</span
+                                            >読み込み中...</span
                                         >
                                     </div>
                                 </div>
                                 <div
                                     class="template-error alert alert-danger mt-3"
                                     style="display: none">
-                                    Firebase에서 데이터를 불러오는 중 오류가
-                                    발생했습니다.
+                                    Firebaseからデータを読み込む際にエラーが
+                                    発生しました。
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="card mt-3">
-                        <div class="card-header">Firebase 상태</div>
+                        <div class="card-header">Firebase状態</div>
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div
                                     class="firebase-status-indicator me-2"></div>
                                 <div class="firebase-status-text">
-                                    연결 확인 중...
+                                    接続確認中...
                                 </div>
                             </div>
                             <div class="mt-2 template-stats">
                                 <small
-                                    >총 템플릿 수:
+                                    >合計テンプレート数:
                                     <span id="template-count">0</span></small
                                 >
                             </div>
@@ -135,36 +136,38 @@
                     </div>
                 </div>
 
-                <!-- 메인 컨텐츠 -->
+                <!-- メインコンテンツ -->
                 <div class="col-md-9">
                     <div id="template-details" class="card">
                         <div class="card-header">
-                            <span id="template-title">템플릿 상세 정보</span>
+                            <span id="template-title"
+                                >テンプレート詳細情報</span
+                            >
                             <div class="float-end">
                                 <button
                                     id="edit-template"
                                     class="btn btn-sm btn-warning me-2"
                                     style="display: none">
-                                    <i class="bi bi-pencil"></i> 수정
+                                    <i class="bi bi-pencil"></i> 編集
                                 </button>
                                 <button
                                     id="delete-template"
                                     class="btn btn-sm btn-danger"
                                     style="display: none">
-                                    <i class="bi bi-trash"></i> 삭제
+                                    <i class="bi bi-trash"></i> 削除
                                 </button>
                             </div>
                         </div>
                         <div class="card-body">
                             <div id="detail-view">
                                 <p class="text-muted">
-                                    왼쪽에서 템플릿을 선택하거나 새 템플릿을
-                                    만드세요.
+                                    左側からテンプレートを選択するか、新しいテンプレートを
+                                    作成してください。
                                 </p>
                             </div>
 
                             <div id="template-form" style="display: none">
-                                <!-- 폼은 자바스크립트에서 동적으로 생성됩니다 -->
+                                <!-- フォームはJavaScriptで動的に生成されます -->
                             </div>
                         </div>
                     </div>
@@ -172,12 +175,12 @@
             </div>
         </div>
 
-        <!-- 모달 -->
+        <!-- モーダル -->
         <div class="modal fade" id="confirmModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">확인</h5>
+                        <h5 class="modal-title">確認</h5>
                         <button
                             type="button"
                             class="btn-close"
@@ -185,20 +188,20 @@
                             aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        정말로 이 템플릿을 삭제하시겠습니까?
+                        本当にこのテンプレートを削除しますか？
                     </div>
                     <div class="modal-footer">
                         <button
                             type="button"
                             class="btn btn-secondary"
                             data-bs-dismiss="modal">
-                            취소
+                            キャンセル
                         </button>
                         <button
                             type="button"
                             class="btn btn-danger"
                             id="confirm-delete">
-                            삭제
+                            削除
                         </button>
                     </div>
                 </div>

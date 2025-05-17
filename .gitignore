@@ -38,8 +38,8 @@ Thumbs.db
 *.swo
 
 # 서버 관련
-routes/
-services/
+# routes/  
+# services/
 
 xcuserdata/
 
