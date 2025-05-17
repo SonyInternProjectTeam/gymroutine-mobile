@@ -67,7 +67,7 @@ extension EditExerciseSetView {
                 .frame(width: 56, height: 56)
             
             VStack(alignment: .leading, spacing: 8) {
-                Text(LocalizedStringKey(workoutExercise.part))
+                Text(workoutExercise.toPartName())
                     .font(.caption)
                     .padding(.vertical, 4)
                     .padding(.horizontal, 12)

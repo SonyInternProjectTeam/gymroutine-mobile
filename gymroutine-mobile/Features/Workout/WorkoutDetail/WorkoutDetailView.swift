@@ -17,7 +17,17 @@ struct WorkoutDetailView: View {
     @ObservedObject var viewModel: WorkoutDetailViewModel
     @State private var workoutDeleted = false // State to track deletion
     private let analyticsService = AnalyticsService.shared
-    
+
+    let weekdayOrder: [(english: String, japanese: String)] = [
+        ("Monday", "月"),
+        ("Tuesday", "火"),
+        ("Wednesday", "水"),
+        ("Thursday", "木"),
+        ("Friday", "金"),
+        ("Saturday", "土"),
+        ("Sunday", "日"),
+    ]
+
     var body: some View {
         // NavigationStack(또는 NavigationView) 내부에서 뷰를 표시
         VStack(spacing: 0) {
@@ -118,7 +128,12 @@ struct WorkoutDetailView: View {
                 HStack {
                     Image(systemName: "repeat.circle.fill")
                     Text("毎週：") // "毎週：" (Weekly:) prefix
-                    Text(viewModel.workout.scheduledDays.joined(separator: ", "))
+                    + Text(
+                        weekdayOrder
+                            .filter { viewModel.workout.scheduledDays.contains($0.english) }
+                            .map { $0.japanese }
+                            .joined(separator: ", ")
+                    )
                 }
                 .font(.caption)
                 .foregroundStyle(.blue)

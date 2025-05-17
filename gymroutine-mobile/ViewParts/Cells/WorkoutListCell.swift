@@ -40,7 +40,7 @@ struct WorkoutListCell: View {
                 
                 // 부위 표시
                 HStack {
-                    Text(LocalizedStringKey(exercise.part))
+                    Text(exercise.toPartName())
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
                         .padding(.horizontal, 8)

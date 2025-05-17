@@ -17,11 +17,12 @@ struct ProfileView: View {
     @State private var showFollowers: Bool = false
     @State private var showFollowing: Bool = false
     @State private var showEditProfile: Bool = false
+    @State private var isShowSafeAreaBackground: Bool = false
 
     let router: Router?
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Group {
                 if let user = viewModel.user {
                     profileContentView(user: user)
@@ -30,57 +31,81 @@ struct ProfileView: View {
                         .font(.headline)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            // iOS 17 이상 대응 onChange 수정
-            .onChange(of: viewModel.selectedPhotoItem) {
-                viewModel.handleSelectedPhotoItemChange(viewModel.selectedPhotoItem)
-            }
-            .navigationDestination(isPresented: $showEditProfile) {
-                if let user = viewModel.user, let router = router {
-                    ProfileEditView(user: user, router: router)
+
+            // セーフエリアの背景色
+            if isShowSafeAreaBackground {
+                GeometryReader { reader in
+                    Color.mainBackground
+                        .frame(height: reader.safeAreaInsets.top)
+                        .ignoresSafeArea(edges: [.top])
                 }
             }
-            .onAppear {
-                // Only load user data if the viewModel's user is not already set
-                // This prevents overwriting the profile when navigating from followers/following list
-                if viewModel.user == nil {
-                    viewModel.loadUserData()
-                } else {
-                    // Always refresh workouts when view appears
-                    Task {
-                        await viewModel.fetchWorkouts()
-                    }
-                }
-                
-                // Add observer for workout deletion notification
-                NotificationCenter.default.addObserver(
-                    forName: .workoutDeleted,
-                    object: nil,
-                    queue: .main
-                ) { _ in
-                    // Refresh workouts when notification is received
-                    Task {
-                        await viewModel.fetchWorkouts()
-                    }
-                }
-                
-                // Log screen view
-                analyticsService.logScreenView(screenName: "Profile")
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        // iOS 17 이상 대응 onChange 수정
+        .onChange(of: viewModel.selectedPhotoItem) {
+            viewModel.handleSelectedPhotoItemChange(viewModel.selectedPhotoItem)
+        }
+        .navigationDestination(isPresented: $showEditProfile) {
+            if let user = viewModel.user, let router = router {
+                ProfileEditView(user: user, router: router)
             }
-            .onDisappear {
-                // Remove the observer when the view disappears
-                NotificationCenter.default.removeObserver(self, name: .workoutDeleted, object: nil)
+        }
+        .onAppear {
+            // Only load user data if the viewModel's user is not already set
+            // This prevents overwriting the profile when navigating from followers/following list
+            if viewModel.user == nil {
+                viewModel.loadUserData()
+            } else {
+                // Always refresh workouts when view appears
+                Task {
+                    await viewModel.fetchWorkouts()
+                }
             }
+
+            // Add observer for workout deletion notification
+            NotificationCenter.default.addObserver(
+                forName: .workoutDeleted,
+                object: nil,
+                queue: .main
+            ) { _ in
+                // Refresh workouts when notification is received
+                Task {
+                    await viewModel.fetchWorkouts()
+                }
+            }
+
+            // Log screen view
+            analyticsService.logScreenView(screenName: "Profile")
+        }
+        .onDisappear {
+            // Remove the observer when the view disappears
+            NotificationCenter.default.removeObserver(self, name: .workoutDeleted, object: nil)
         }
     }
     
     // MARK: - Private Helper Views
     private func profileContentView(user: User) -> some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                profileHeader(user: user)
-                profileTabBar()
-                profileDetailView()
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 0) {
+                // スクロール検知用のView
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(height: 0)
+                    .overlay(
+                        GeometryReader { geo -> AnyView in
+                            DispatchQueue.main.async {
+                                isShowSafeAreaBackground = geo.frame(in: .global).minY < CGFloat.zero
+                            }
+                            return AnyView(EmptyView())
+                        }
+                    )
+
+                VStack(spacing: 24) {
+                    profileHeader(user: user)
+                    profileTabBar()
+                    profileDetailView()
+                }
             }
         }
         .ignoresSafeArea(edges: [.top])

@@ -21,7 +21,7 @@ struct MainView: View {
                 }
                 .tabItem {
                     Image(systemName: "house.fill")
-                    Text("Home")
+                    Text("ホーム")
                 }
                 .tag(0)
                 
@@ -30,7 +30,7 @@ struct MainView: View {
                 }
                 .tabItem {
                     Image(systemName: "calendar")
-                    Text("Calendar")
+                    Text("カレンダー")
                 }
                 .tag(1)
                 
@@ -48,7 +48,7 @@ struct MainView: View {
                 }
                 .tabItem {
                     Image(systemName: "person.circle.fill")
-                    Text("Profile")
+                    Text("プロフィール")
                 }
                 .tag(3)
             }
