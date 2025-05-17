@@ -26,7 +26,7 @@ struct ExerciseGridCell: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text(LocalizedStringKey(exercise.part))
+                    Text(exercise.toPartName())
                         .font(.footnote)
                         .fontWeight(.regular)
                         .foregroundColor(.secondary)

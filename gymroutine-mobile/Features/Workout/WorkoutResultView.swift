@@ -48,7 +48,7 @@ struct WorkoutResultView: View {
 
                         flameTitleBox
                         
-                        shareButtonBox.padding(.horizontal)
+                        // shareButtonBox.padding(.horizontal)
                     }
                     .background(
                         LinearGradient(
@@ -211,7 +211,7 @@ struct WorkoutResultView: View {
                 ForEach(partCounts.sorted(by: { $0.value > $1.value }), id: \.key) { part, count in
                     let percentage = totalSets > 0 ? Double(count) / Double(totalSets) : 0
                     HStack {
-                        Text(part.capitalized)
+                        Text(ExercisePart(rawValue: part)?.japaneseName ?? "その他")
                             .font(.headline)
                             .frame(width: 56, alignment: .center)
 
@@ -241,16 +241,17 @@ struct WorkoutResultView: View {
         }
     }
     
-    private var shareButtonBox: some View {
-        Button {
-            shareWorkoutResult()
-        } label: {
-            Label("共有する", systemImage: "square.and.arrow.up")
-                .font(.headline)
-        }
-        .buttonStyle(CapsuleButtonStyle(color: .main))
-        .padding(.horizontal)
-    }
+    // TODO: create share logic for share workout result
+    // private var shareButtonBox: some View {
+    //     Button {
+    //         shareWorkoutResult()
+    //     } label: {
+    //         Label("共有する", systemImage: "square.and.arrow.up")
+    //             .font(.headline)
+    //     }
+    //     .buttonStyle(CapsuleButtonStyle(color: .main))
+    //     .padding(.horizontal)
+    // }
     
     private var exerciseResultBox: some View {
         VStack(alignment: .leading, spacing: 16) {

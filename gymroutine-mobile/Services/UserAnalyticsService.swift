@@ -111,7 +111,7 @@ class UserAnalyticsService {
     /// - Parameter distribution: 部位別分布辞書
     /// - Returns: チャート用データ配列
     func getDistributionChartData(from distribution: ExerciseDistribution) -> [(String, Double)] {
-        return distribution.map { ($0.key, $0.value) }
+        return distribution.map { (ExercisePart(rawValue: $0.key)?.japaneseName ?? "その他", $0.value) }
             .sorted { $0.1 > $1.1 } // 分布率が高い順に並び替え
     }
     

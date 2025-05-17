@@ -376,7 +376,7 @@ struct WorkoutSessionView: View {
                 .fill(Color(.systemGray6))
 
             Group {
-                if let uiImage = UIImage(named: exercise.key)  {
+                if let key = exercise.key, let uiImage = UIImage(named: key) {
                     Image(uiImage: uiImage)
                         .resizable()
                         .padding(28)
@@ -850,7 +850,7 @@ struct WorkoutExerciseCard: View {
                         .frame(width: 56, height: 56)
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(LocalizedStringKey(workoutExercise.part))
+                        Text(workoutExercise.toPartName())
                             .font(.caption)
                             .padding(.vertical, 4)
                             .padding(.horizontal, 12)

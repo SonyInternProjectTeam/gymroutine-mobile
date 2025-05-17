@@ -6,7 +6,7 @@ struct AdherenceCircleChartView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("運動遵守率")
+            Text("運動達成率")
                 .font(.headline)
             
             HStack(spacing: 20) {

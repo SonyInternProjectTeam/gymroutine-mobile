@@ -18,15 +18,14 @@ struct HeatmapCalendarView: View {
     // Month formatter
     private let monthFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM" // Short month name (e.g., "Jan")
-        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "M月" // Short month name (e.g., "Jan")
         return formatter
     }()
     
     // Year formatter
     private let yearFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy"
+        formatter.dateFormat = "yyyy年"
         return formatter
     }()
     
@@ -57,53 +56,53 @@ struct HeatmapCalendarView: View {
             compactHeatmapView()
         } else {
             // 기존의 GeometryReader 기반 뷰
-            GeometryReader { geometry in
-                // MARK: - 화면 너비에서 패딩을 고려하여 가용 너비 계산
-                let availableWidth = geometry.size.width - 32  // 좌우 패딩 고려
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    // Only show title for multi-month view
-                    if numberOfMonths > 1 {
-                        Text("Workout Activity")
-                            .font(.headline)
-                            .padding(.bottom, 4)
-                    }
-                    
-                    if numberOfMonths == 1 {
-                        // Optimized single month view for home screen
-                        singleMonthView(for: startDate, availableWidth: availableWidth)
-                    } else {
-                        // Multi-month scrollable view
-                        multiMonthView()
-                    }
-                    
-                    // Only show legend for multi-month view or if space allows
-                    if numberOfMonths > 1 {
-                        // Color legend
-                        HStack(spacing: 3) {
-                            Text("Less")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            
-                            ForEach(0...4, id: \.self) { level in
-                                Rectangle()
-                                    .fill(colorForLevel(level))
-                                    .frame(width: 12, height: 12)
-                                    .cornerRadius(2)
-                            }
-                            
-                            Text("More")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.top, 4)
-                        .padding(.leading, 24) // Align with grid
-                    }
+        GeometryReader { geometry in
+            // MARK: - 화면 너비에서 패딩을 고려하여 가용 너비 계산
+            let availableWidth = geometry.size.width - 32  // 좌우 패딩 고려
+            
+            VStack(alignment: .leading, spacing: 12) {
+                // Only show title for multi-month view
+                if numberOfMonths > 1 {
+                    Text("Workout Activity")
+                        .font(.headline)
+                        .padding(.bottom, 4)
                 }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(10)
-                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                
+                if numberOfMonths == 1 {
+                    // Optimized single month view for home screen
+                    singleMonthView(for: startDate, availableWidth: availableWidth)
+                } else {
+                    // Multi-month scrollable view
+                    multiMonthView()
+                }
+                
+                // Only show legend for multi-month view or if space allows
+                if numberOfMonths > 1 {
+                    // Color legend
+                    HStack(spacing: 3) {
+                        Text("Less")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        
+                        ForEach(0...4, id: \.self) { level in
+                            Rectangle()
+                                .fill(colorForLevel(level))
+                                .frame(width: 12, height: 12)
+                                .cornerRadius(2)
+                        }
+                        
+                        Text("More")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 4)
+                    .padding(.leading, 24) // Align with grid
+                }
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
             }
         }
     }
@@ -115,7 +114,7 @@ struct HeatmapCalendarView: View {
             HStack {
                 let month = monthFormatter.string(from: startDate)
                 let year = yearFormatter.string(from: startDate)
-                Text("\(month) \(year)")
+                Text("\(year)")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -224,7 +223,7 @@ struct HeatmapCalendarView: View {
             HStack {
                 let month = monthFormatter.string(from: date)
                 let year = yearFormatter.string(from: date)
-                Text("\(month) \(year)")
+                Text("\(year) \(month)")
                     .font(.headline)
                 Spacer()
             }
