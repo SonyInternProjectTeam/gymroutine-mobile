@@ -183,23 +183,23 @@ struct HomeView: View {
                         .padding()
                 } else {
                     ForEach(viewModel.todaysWorkouts, id: \.id) { workout in
-                        NavigationLink(destination: {
+                        NavigationLink {
                             WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))
-                        }) {
+                                .onAppear {
+                                    // Log todays workout selection
+                                    analyticsService.logUserAction(
+                                        action: "select_todays_workout",
+                                        itemId: workout.id ?? "",
+                                        itemName: workout.name,
+                                        contentType: "home_view"
+                                    )
+                                }
+                        } label: {
                             WorkoutCell(
                                 workoutName: workout.name,
                                 exerciseImageName: workout.exercises.first?.key,
                                 count: workout.exercises.count
                             )
-                            .onTapGesture {
-                                // Log todays workout selection
-                                analyticsService.logUserAction(
-                                    action: "select_todays_workout",
-                                    itemId: workout.id ?? "",
-                                    itemName: workout.name,
-                                    contentType: "home_view"
-                                )
-                            }
                         }
                         .buttonStyle(PlainButtonStyle()) // 기본 네비게이션 스타일 제거
                     }
