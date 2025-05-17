@@ -146,12 +146,6 @@ struct ExerciseCard: View {
                     .cornerRadius(4)
             }
             
-            if let key = exercise.key {
-                Text("ID: \(key)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
             Divider()
             
             ForEach(0..<exercise.sets.count, id: \.self) { index in
