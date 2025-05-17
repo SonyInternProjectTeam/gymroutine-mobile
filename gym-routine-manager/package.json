@@ -1,0 +1,27 @@
+{
+    "name": "gym-routine-manager",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "upload-templates": "node scripts/upload-templates.js",
+        "upload-exercises": "node scripts/upload-exercises.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "body-parser": "^2.2.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.5.0",
+        "express": "^5.1.0",
+        "firebase": "^11.7.3",
+        "mongoose": "^8.15.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10"
+    }
+}

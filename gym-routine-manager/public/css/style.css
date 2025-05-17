@@ -1,0 +1,120 @@
+body {
+    background-color: #f8f9fa;
+    padding-bottom: 2rem;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.list-group-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.list-group-item.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.exercise-card {
+    margin-bottom: 1rem;
+    border-left: 4px solid #0d6efd;
+}
+
+.sets-table th,
+.sets-table td {
+    padding: 0.5rem;
+}
+
+.template-info {
+    margin-bottom: 1.5rem;
+}
+
+.template-info .badge {
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+}
+
+.exercise-list {
+    margin-top: 1.5rem;
+}
+
+.add-exercise-btn {
+    margin-top: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.delete-exercise-btn,
+.delete-set-btn {
+    color: #dc3545;
+    cursor: pointer;
+}
+
+.add-set-btn {
+    color: #0d6efd;
+    cursor: pointer;
+}
+
+/* Firebase 관련 스타일 */
+.firebase-indicator,
+.firebase-status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #ffc107; /* 초기 상태는 노란색 */
+    margin-right: 5px;
+}
+
+.firebase-connected .firebase-indicator,
+.firebase-connected .firebase-status-indicator {
+    background-color: #198754; /* 연결됨: 녹색 */
+}
+
+.firebase-error .firebase-indicator,
+.firebase-error .firebase-status-indicator {
+    background-color: #dc3545; /* 오류: 빨간색 */
+}
+
+.firebase-status-text {
+    font-size: 0.9rem;
+}
+
+.template-stats {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* 로딩 인디케이터 */
+.template-loading {
+    padding: 1rem 0;
+}
+
+/* 템플릿 목록 컨테이너 */
+.template-list-container {
+    min-height: 200px;
+}
+
+/* Firebase 모달 스타일 */
+.firebase-details {
+    line-height: 1.6;
+}

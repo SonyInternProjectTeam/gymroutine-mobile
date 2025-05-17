@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ジムルーティンマネージャー</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+        <link rel="stylesheet" href="/css/style.css" />
+        <style>
+            .exercise-search-item {
+                cursor: pointer;
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+            }
+            .exercise-search-item:hover {
+                background-color: #f8f9fa;
+            }
+            .exercise-tag {
+                font-size: 0.8em;
+                padding: 3px 8px;
+                border-radius: 12px;
+                background-color: #e9ecef;
+                display: inline-block;
+                margin-right: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">
+                        <i class="bi bi-cloud-fill me-2"></i
+                        >ジムルーティンマネージャー
+                    </a>
+                    <button
+                        class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link active"
+                                    href="#"
+                                    id="view-templates"
+                                    >テンプレート一覧</a
+                                >
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link"
+                                    href="#"
+                                    id="create-template"
+                                    >新規テンプレート作成</a
+                                >
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link"
+                                    href="#"
+                                    id="firebase-status">
+                                    <span class="firebase-indicator"></span>
+                                    Firebase状態
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="row">
+                <!-- サイドバー -->
+                <div class="col-md-3">
+                    <div class="card">
+                        <div
+                            class="card-header d-flex justify-content-between align-items-center">
+                            テンプレート一覧
+                            <button
+                                id="refresh-templates"
+                                class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="template-list-container">
+                                <ul class="list-group template-list">
+                                    <!-- テンプレート一覧がここに動的に追加されます -->
+                                </ul>
+                                <div
+                                    class="template-loading text-center mt-3"
+                                    style="display: none">
+                                    <div
+                                        class="spinner-border text-primary"
+                                        role="status">
+                                        <span class="visually-hidden"
+                                            >読み込み中...</span
+                                        >
+                                    </div>
+                                </div>
+                                <div
+                                    class="template-error alert alert-danger mt-3"
+                                    style="display: none">
+                                    Firebaseからデータを読み込む際にエラーが
+                                    発生しました。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">Firebase状態</div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div
+                                    class="firebase-status-indicator me-2"></div>
+                                <div class="firebase-status-text">
+                                    接続確認中...
+                                </div>
+                            </div>
+                            <div class="mt-2 template-stats">
+                                <small
+                                    >合計テンプレート数:
+                                    <span id="template-count">0</span></small
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- メインコンテンツ -->
+                <div class="col-md-9">
+                    <div id="template-details" class="card">
+                        <div class="card-header">
+                            <span id="template-title"
+                                >テンプレート詳細情報</span
+                            >
+                            <div class="float-end">
+                                <button
+                                    id="edit-template"
+                                    class="btn btn-sm btn-warning me-2"
+                                    style="display: none">
+                                    <i class="bi bi-pencil"></i> 編集
+                                </button>
+                                <button
+                                    id="delete-template"
+                                    class="btn btn-sm btn-danger"
+                                    style="display: none">
+                                    <i class="bi bi-trash"></i> 削除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="detail-view">
+                                <p class="text-muted">
+                                    左側からテンプレートを選択するか、新しいテンプレートを
+                                    作成してください。
+                                </p>
+                            </div>
+
+                            <div id="template-form" style="display: none">
+                                <!-- フォームはJavaScriptで動的に生成されます -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- モーダル -->
+        <div class="modal fade" id="confirmModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">確認</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        本当にこのテンプレートを削除しますか？
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                            キャンセル
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-danger"
+                            id="confirm-delete">
+                            削除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firebase 상태 모달 -->
+        <div class="modal fade" id="firebaseStatusModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Firebase 연결 상태</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="firebase-details">
+                            <div class="mb-3">
+                                <strong>연결 상태:</strong>
+                                <span class="firebase-connection-status"
+                                    >확인 중...</span
+                                >
+                            </div>
+                            <div class="mb-3">
+                                <strong>프로젝트 ID:</strong>
+                                <span class="firebase-project-id">-</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>데이터베이스:</strong>
+                                <span class="firebase-database">Firestore</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>템플릿 컬렉션:</strong>
+                                <span class="firebase-collection"
+                                    >Templates</span
+                                >
+                            </div>
+                            <div class="mb-3">
+                                <strong>템플릿 수:</strong>
+                                <span class="firebase-template-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 운동 검색 모달 -->
+        <div class="modal fade" id="exerciseSearchModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">운동 검색</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3 input-group">
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="exercise-search-input"
+                                placeholder="운동 이름 검색..."
+                                autocomplete="off" />
+                            <button
+                                class="btn btn-primary"
+                                id="search-exercise-btn">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="btn-group w-100" role="group">
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary part-filter"
+                                    data-part="all">
+                                    전체
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary part-filter"
+                                    data-part="chest">
+                                    가슴
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary part-filter"
+                                    data-part="back">
+                                    등
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary part-filter"
+                                    data-part="shoulders">
+                                    어깨
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary part-filter"
+                                    data-part="legs">
+                                    하체
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary part-filter"
+                                    data-part="arms">
+                                    팔
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary part-filter"
+                                    data-part="core">
+                                    코어
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="exercise-search-results">
+                            <div class="text-center p-3">
+                                운동을 검색하거나 부위를 선택하세요.
+                            </div>
+                        </div>
+
+                        <div
+                            id="exercise-search-loading"
+                            class="text-center p-3"
+                            style="display: none">
+                            <div
+                                class="spinner-border text-primary"
+                                role="status">
+                                <span class="visually-hidden">로딩 중...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/main.js"></script>
+    </body>
+</html>
