@@ -11,7 +11,7 @@ const ExerciseSchema = new mongoose.Schema({
   name: String,
   key: String,
   restTime: String,
-  Sets: [SetSchema]
+  sets: [SetSchema]
 }, { _id: false });
 
 const TemplateSchema = new mongoose.Schema({
@@ -30,7 +30,7 @@ const TemplateSchema = new mongoose.Schema({
   },
   scheduledDays: [String],
   exercises: [ExerciseSchema],
-  Notes: String,
+  notes: String,
   isPremium: {
     type: Boolean,
     default: false

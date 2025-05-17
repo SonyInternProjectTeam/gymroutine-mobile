@@ -87,7 +87,7 @@ npm run dev
       "name": "benchpress",
       "key": "benchpress",
       "restTime": "90",
-      "Sets": [
+      "sets": [
         { "reps": 8, "weight": 60 },
         { "reps": 6, "weight": 65 },
         { "reps": 4, "weight": 70 }
@@ -95,7 +95,7 @@ npm run dev
     },
     // その他のエクササイズ...
   ],
-  "Notes": "中級者向け上半身強化ルーティン",
+  "notes": "中級者向け上半身強化ルーティン",
   "isPremium": false,
   "level": "Intermediate",
   "duration": "6 weeks"

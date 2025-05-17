@@ -245,7 +245,7 @@ async function showTemplateDetails(templateId) {
           </span>
           <span class="badge bg-info">${currentTemplate.level}</span>
         </h3>
-        <p>${currentTemplate.Notes}</p>
+        <p>${currentTemplate.notes}</p>
         <div class="row">
           <div class="col-md-6">
             <strong>루틴 타입:</strong> ${currentTemplate.isRoutine ? '루틴' : '단일 운동'}
@@ -293,11 +293,11 @@ function renderExercises(exercises) {
               <th>세트</th>
               <th>반복 횟수</th>
               <th>무게 (kg)</th>
-              ${exercise.Sets.some(set => set.duration) ? '<th>시간</th>' : ''}
+              ${exercise.sets.some(set => set.duration) ? '<th>시간</th>' : ''}
             </tr>
           </thead>
           <tbody>
-            ${exercise.Sets.map((set, setIndex) => `
+            ${exercise.sets.map((set, setIndex) => `
               <tr>
                 <td>${setIndex + 1}</td>
                 <td>${set.reps}</td>
@@ -370,7 +370,7 @@ function renderTemplateForm() {
     isRoutine: true,
     scheduledDays: [],
     exercises: [],
-    Notes: '',
+    notes: '',
     isPremium: false,
     level: 'Beginner',
     duration: ''
@@ -450,7 +450,7 @@ function renderTemplateForm() {
       
       <div class="form-group">
         <label for="template-notes">메모</label>
-        <textarea class="form-control" id="template-notes" rows="3">${template.Notes}</textarea>
+        <textarea class="form-control" id="template-notes" rows="3">${template.notes}</textarea>
       </div>
       
       <h4 class="mt-4">운동 목록</h4>
@@ -488,7 +488,7 @@ function renderExerciseForm(exercise = {}, index) {
     name: '',
     key: '',
     restTime: '60',
-    Sets: [{ reps: 10, weight: 0 }],
+    sets: [{ reps: 10, weight: 0 }],
     ...exercise
   };
   
@@ -539,7 +539,7 @@ function renderExerciseForm(exercise = {}, index) {
         
         <h6 class="mt-3">세트</h6>
         <div class="sets-container">
-          ${defaultExercise.Sets.map((set, setIndex) => renderSetForm(exerciseId, set, setIndex)).join('')}
+          ${defaultExercise.sets.map((set, setIndex) => renderSetForm(exerciseId, set, setIndex)).join('')}
         </div>
         
         <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addSetForm(${exerciseId})">
@@ -657,7 +657,7 @@ async function saveTemplate(event) {
     level: document.getElementById('template-level').value,
     duration: document.getElementById('template-duration').value,
     isPremium: document.getElementById('template-premium').checked,
-    Notes: document.getElementById('template-notes').value,
+    notes: document.getElementById('template-notes').value,
     scheduledDays: Array.from(document.querySelectorAll('input[type="checkbox"][id^="day-"]:checked')).map(el => el.value),
     exercises: []
   };
@@ -669,7 +669,7 @@ async function saveTemplate(event) {
       name: exerciseEl.querySelector('.exercise-name').value,
       key: exerciseEl.querySelector('.exercise-key').value,
       restTime: exerciseEl.querySelector('.exercise-rest').value,
-      Sets: []
+      sets: []
     };
     
     // 세트 데이터 수집
@@ -684,7 +684,7 @@ async function saveTemplate(event) {
         set.duration = duration;
       }
       
-      exercise.Sets.push(set);
+      exercise.sets.push(set);
     });
     
     formData.exercises.push(exercise);
