@@ -214,28 +214,28 @@ final class UserService {
         }
     }
     
-    /// ユーザーを報告する
+    /// ユーザーを警告する
     /// - Parameters:
     ///   - currentUserID: 現在ログイン中のユーザーID
-    ///   - reportedUserID: 報告対象のユーザーID
-    /// - Throws: 報告処理中にエラーが発生した場合
+    ///   - reportedUserID: 警告対象のユーザーID
+    /// - Throws: 警告処理中にエラーが発生した場合
     func reportUser(currentUserID: String, reportedUserID: String) async throws {
         do {
-            // 報告を Reports コレクションに追加
+            // 警告を Reports コレクションに追加
             try await db.collection("Reports")
                 .addDocument(data: [
                     "reporterID": currentUserID,
                     "reportedUserID": reportedUserID,
                     "reportedAt": FieldValue.serverTimestamp(),
-                    // 報告のステータス　後ほど修正
+                    // TODO: 警告のステータス　後ほど修正
                     "status": "pending",
-                    // 報告の種類　後ほど修正
+                    // TODO: 警告の種類　後ほど修正
                     "type": "user"
                 ])
             
-            print("✅ ユーザー \(reportedUserID) を報告しました")
+            print("✅ ユーザー \(reportedUserID) を警告しました")
         } catch {
-            print("🔥 ユーザーの報告中にエラーが発生しました: \(error.localizedDescription)")
+            print("🔥 ユーザーの警告中にエラーが発生しました: \(error.localizedDescription)")
             throw error
         }
     }
