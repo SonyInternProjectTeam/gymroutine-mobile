@@ -18,11 +18,13 @@ final class ProfileViewModel: ObservableObject {
     @Published var isFollowing: Bool = false  // 現在ログイン中のユーザーがこのプロフィールをフォロー中かどうか
     @Published var selectedTab: ProfileTab = .analysis
     @Published var workouts: [Workout] = []   // 追加: ワークアウトリスト
+    @Published var isBlocked: Bool = false    // 追加: ユーザーがブロックされているかどうか
     
     private let userManager = UserManager.shared
     private let userService = UserService()
     private let followService = FollowService()
     private let workoutRepository = WorkoutRepository()  // Repository インスタンス
+    private let analyticsService = AnalyticsService.shared
     
     enum ProfileTab: String, CaseIterable {
         case analysis = "分析"
@@ -48,6 +50,7 @@ final class ProfileViewModel: ObservableObject {
             loadFollowerAndFollowingCounts(userId: user.uid)
             if !isCurrentUser {
                 updateFollowingStatus()
+                checkBlockedStatus()  // 追加: ブロック状態を確認
             }
             // ワークアウトデータの読み込み
             Task {
@@ -179,6 +182,124 @@ final class ProfileViewModel: ObservableObject {
             }
         } catch {
             print("ERROR: ワークアウトのロードに失敗: \(error)")
+        }
+    }
+    
+    /// ユーザーがブロックされているか確認する
+    private func checkBlockedStatus() {
+        guard let currentUserID = userManager.currentUser?.uid,
+              let targetUserID = user?.uid else { return }
+        
+        Task {
+            let blocked = await userService.isUserBlocked(currentUserID: currentUserID, targetUserID: targetUserID)
+            DispatchQueue.main.async {
+                self.isBlocked = blocked
+            }
+        }
+    }
+    
+    // MARK: - User Blocking and Reporting
+    
+    /// ユーザーをブロックする
+    func blockUser() {
+        guard let currentUserID = userManager.currentUser?.uid,
+              let blockedUserID = user?.uid,
+              currentUserID != blockedUserID else { return }
+        
+        Task {
+            UIApplication.showLoading()
+            do {
+                // ブロック処理を実行
+                try await userService.blockUser(currentUserID: currentUserID, blockedUserID: blockedUserID)
+                
+                // 成功メッセージを表示
+                UIApplication.showBanner(type: .success, message: "ユーザーをブロックしました")
+                
+                // アナリティクスにイベントを記録
+                analyticsService.logUserAction(
+                    action: "block_user",
+                    itemId: blockedUserID,
+                    contentType: "profile"
+                )
+                
+                // ブロック状態を更新
+                DispatchQueue.main.async {
+                    self.isBlocked = true
+                }
+                
+                // 必要に応じて画面を閉じるなどの処理
+                // 例: NotificationCenter.default.post(name: .userBlocked, object: nil)
+            } catch {
+                print("ERROR: ユーザーのブロックに失敗: \(error)")
+                UIApplication.showBanner(type: .error, message: "ユーザーのブロックに失敗しました")
+            }
+            UIApplication.hideLoading()
+        }
+    }
+    
+    /// ユーザーのブロックを解除する
+    func unblockUser() {
+        guard let currentUserID = userManager.currentUser?.uid,
+              let blockedUserID = user?.uid,
+              currentUserID != blockedUserID else { return }
+        
+        Task {
+            UIApplication.showLoading()
+            do {
+                // ブロック解除処理を実行
+                try await userService.unblockUser(currentUserID: currentUserID, blockedUserID: blockedUserID)
+                
+                // 成功メッセージを表示
+                UIApplication.showBanner(type: .success, message: "ユーザーのブロックを解除しました")
+                
+                // アナリティクスにイベントを記録
+                analyticsService.logUserAction(
+                    action: "unblock_user",
+                    itemId: blockedUserID,
+                    contentType: "profile"
+                )
+                
+                // ブロック状態を更新
+                DispatchQueue.main.async {
+                    self.isBlocked = false
+                }
+                
+                // フォロー状態を再確認
+                updateFollowingStatus()
+            } catch {
+                print("ERROR: ユーザーのブロック解除に失敗: \(error)")
+                UIApplication.showBanner(type: .error, message: "ユーザーのブロック解除に失敗しました")
+            }
+            UIApplication.hideLoading()
+        }
+    }
+    
+    /// ユーザーを報告する
+    func reportUser() {
+        guard let currentUserID = userManager.currentUser?.uid,
+              let reportedUserID = user?.uid,
+              currentUserID != reportedUserID else { return }
+        
+        Task {
+            UIApplication.showLoading()
+            do {
+                // 報告処理を実行
+                try await userService.reportUser(currentUserID: currentUserID, reportedUserID: reportedUserID)
+                
+                // 成功メッセージを表示
+                UIApplication.showBanner(type: .success, message: "ユーザーを報告しました")
+                
+                // アナリティクスにイベントを記録
+                analyticsService.logUserAction(
+                    action: "report_user",
+                    itemId: reportedUserID,
+                    contentType: "profile"
+                )
+            } catch {
+                print("ERROR: ユーザーの報告に失敗: \(error)")
+                UIApplication.showBanner(type: .error, message: "ユーザーの報告に失敗しました")
+            }
+            UIApplication.hideLoading()
         }
     }
 }
