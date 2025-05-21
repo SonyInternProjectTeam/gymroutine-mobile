@@ -183,4 +183,101 @@ final class UserService {
         // Use the new WeightHistoryService instead
         return await WeightHistoryService.shared.updateWeight(userId: userId, newWeight: newWeight)
     }
+    
+    /// ユーザーをブロックする
+    /// - Parameters:
+    ///   - currentUserID: 現在ログイン中のユーザーID
+    ///   - blockedUserID: ブロック対象のユーザーID
+    /// - Throws: ブロック処理中にエラーが発生した場合
+    func blockUser(currentUserID: String, blockedUserID: String) async throws {
+        do {
+            // 現在のユーザーの Blocked コレクションに対象ユーザーを追加
+            try await db.collection("Users")
+                .document(currentUserID)
+                .collection("Blocked")
+                .document(blockedUserID)
+                .setData([
+                    "blockedAt": FieldValue.serverTimestamp(),
+                    "reason": "User initiated block"
+                ])
+            
+            // フォロー関係がある場合は解除
+            let isFollowing = await checkFollowingStatus(currentUserID: currentUserID, profileUserID: blockedUserID)
+            if isFollowing {
+                _ = await unfollowUser(currentUserID: currentUserID, profileUserID: blockedUserID)
+            }
+            
+            print("✅ ユーザー \(blockedUserID) をブロックしました")
+        } catch {
+            print("🔥 ユーザーのブロック中にエラーが発生しました: \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+    /// ユーザーを報告する
+    /// - Parameters:
+    ///   - currentUserID: 現在ログイン中のユーザーID
+    ///   - reportedUserID: 報告対象のユーザーID
+    /// - Throws: 報告処理中にエラーが発生した場合
+    func reportUser(currentUserID: String, reportedUserID: String) async throws {
+        do {
+            // 報告を Reports コレクションに追加
+            try await db.collection("Reports")
+                .addDocument(data: [
+                    "reporterID": currentUserID,
+                    "reportedUserID": reportedUserID,
+                    "reportedAt": FieldValue.serverTimestamp(),
+                    // 報告のステータス　後ほど修正
+                    "status": "pending",
+                    // 報告の種類　後ほど修正
+                    "type": "user"
+                ])
+            
+            print("✅ ユーザー \(reportedUserID) を報告しました")
+        } catch {
+            print("🔥 ユーザーの報告中にエラーが発生しました: \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+    /// ユーザーがブロックされているか確認する
+    /// - Parameters:
+    ///   - currentUserID: 現在ログイン中のユーザーID
+    ///   - targetUserID: 確認対象のユーザーID
+    /// - Returns: ブロックされている場合 true、されていない場合 false
+    func isUserBlocked(currentUserID: String, targetUserID: String) async -> Bool {
+        do {
+            let doc = try await db.collection("Users")
+                .document(currentUserID)
+                .collection("Blocked")
+                .document(targetUserID)
+                .getDocument()
+            
+            return doc.exists
+        } catch {
+            print("🔥 ブロック状態の確認中にエラーが発生しました: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
+    /// ユーザーのブロックを解除する
+    /// - Parameters:
+    ///   - currentUserID: 現在ログイン中のユーザーID
+    ///   - blockedUserID: ブロック解除対象のユーザーID
+    /// - Throws: ブロック解除処理中にエラーが発生した場合
+    func unblockUser(currentUserID: String, blockedUserID: String) async throws {
+        do {
+            // 現在のユーザーの Blocked コレクションから対象ユーザーを削除
+            try await db.collection("Users")
+                .document(currentUserID)
+                .collection("Blocked")
+                .document(blockedUserID)
+                .delete()
+            
+            print("✅ ユーザー \(blockedUserID) のブロックを解除しました")
+        } catch {
+            print("🔥 ユーザーのブロック解除中にエラーが発生しました: \(error.localizedDescription)")
+            throw error
+        }
+    }
 }

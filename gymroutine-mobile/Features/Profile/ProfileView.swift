@@ -42,6 +42,29 @@ struct ProfileView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            // Show menu button only for other users' profiles
+            if let user = viewModel.user, !viewModel.isCurrentUser {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(role: .destructive) {
+                            viewModel.blockUser()
+                        } label: {
+                            Label("ユーザーをブロック", systemImage: "person.fill.xmark")
+                        }
+                        
+                        Button(role: .destructive) {
+                            viewModel.reportUser()
+                        } label: {
+                            Label("ユーザーを報告", systemImage: "exclamationmark.triangle")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .foregroundColor(.primary)
+                    }
+                }
+            }
+        }
         // iOS 17 이상 대응 onChange 수정
         .onChange(of: viewModel.selectedPhotoItem) {
             viewModel.handleSelectedPhotoItemChange(viewModel.selectedPhotoItem)
@@ -103,8 +126,37 @@ struct ProfileView: View {
 
                 VStack(spacing: 24) {
                     profileHeader(user: user)
-                    profileTabBar()
-                    profileDetailView()
+                    
+                    // ブロックされたユーザーの場合、メッセージを表示
+                    if viewModel.isBlocked {
+                        VStack(spacing: 8) {
+                            Image(systemName: "person.fill.xmark")
+                                .font(.system(size: 40))
+                                .foregroundColor(.gray)
+                            
+                            Text("ブロックしたユーザーです")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                            
+                            Button(action: {
+                                viewModel.unblockUser()
+                            }) {
+                                Text("ブロックを解除")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 10)
+                                    .background(Color.main)
+                                    .cornerRadius(20)
+                            }
+                            .padding(.top, 16)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 40)
+                    } else {
+                        profileTabBar()
+                        profileDetailView()
+                    }
                 }
             }
         }
