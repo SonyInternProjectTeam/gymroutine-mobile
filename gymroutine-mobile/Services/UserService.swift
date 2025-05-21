@@ -227,7 +227,9 @@ final class UserService {
                     "reporterID": currentUserID,
                     "reportedUserID": reportedUserID,
                     "reportedAt": FieldValue.serverTimestamp(),
+                    // 報告のステータス　後ほど修正
                     "status": "pending",
+                    // 報告の種類　後ほど修正
                     "type": "user"
                 ])
             
