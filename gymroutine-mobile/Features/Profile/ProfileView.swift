@@ -56,7 +56,7 @@ struct ProfileView: View {
                         Button(role: .destructive) {
                             viewModel.reportUser()
                         } label: {
-                            Label("ユーザーを報告", systemImage: "exclamationmark.triangle")
+                            Label("ユーザーを警告", systemImage: "exclamationmark.triangle")
                         }
                     } label: {
                         Image(systemName: "ellipsis")

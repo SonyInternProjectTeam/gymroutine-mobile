@@ -274,7 +274,7 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    /// ユーザーを報告する
+    /// ユーザーを警告する
     func reportUser() {
         guard let currentUserID = userManager.currentUser?.uid,
               let reportedUserID = user?.uid,
@@ -283,11 +283,11 @@ final class ProfileViewModel: ObservableObject {
         Task {
             UIApplication.showLoading()
             do {
-                // 報告処理を実行
+                // 警告処理を実行
                 try await userService.reportUser(currentUserID: currentUserID, reportedUserID: reportedUserID)
                 
                 // 成功メッセージを表示
-                UIApplication.showBanner(type: .success, message: "ユーザーを報告しました")
+                UIApplication.showBanner(type: .success, message: "ユーザーを警告しました")
                 
                 // アナリティクスにイベントを記録
                 analyticsService.logUserAction(
@@ -296,8 +296,8 @@ final class ProfileViewModel: ObservableObject {
                     contentType: "profile"
                 )
             } catch {
-                print("ERROR: ユーザーの報告に失敗: \(error)")
-                UIApplication.showBanner(type: .error, message: "ユーザーの報告に失敗しました")
+                print("ERROR: ユーザーの警告に失敗: \(error)")
+                UIApplication.showBanner(type: .error, message: "ユーザーの警告に失敗しました")
             }
             UIApplication.hideLoading()
         }
