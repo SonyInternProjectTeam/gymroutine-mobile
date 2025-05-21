@@ -96,6 +96,11 @@ extension InitProfileSetupView {
                 }
                 .bold()
                 .fieldBackground()
+                
+                Text("年齢に合った運動推薦、個人に合わせた運動分析、補助支援機能など必須アプリ機能を提供するためにユーザーの生年月日が必要です。 ユーザーの年齢は、アプリで提供する運動ルーチンとフィットネスのアドバイスが、各ユーザーに安全で関連性があり、効果的かどうかを確認する上で重要な要素です")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 8) // Add some padding for spacing
             }
         }
     }
