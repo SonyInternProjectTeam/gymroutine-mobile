@@ -26,12 +26,18 @@ final class ProfileEditViewModel: ObservableObject {
         self.router = router
     }
     
-    func updateUser(newVisibility: Int?,newName: String?) {
+    func updateUser(newVisibility: Int?, newName: String?, newBirthday: Date? = nil, shouldDeleteBirthday: Bool = false) {
         Task {
             isUpdating = true
             UIApplication.showLoading()
             guard let userID = userManager.currentUser?.uid else { return }
-            let updateSuccess = await userService.updateUserProfile(userID:userID, newVisibility: newVisibility, newName: newName)
+            let updateSuccess = await userService.updateUserProfile(
+                userID: userID, 
+                newVisibility: newVisibility, 
+                newName: newName, 
+                newBirthday: newBirthday,
+                shouldDeleteBirthday: shouldDeleteBirthday
+            )
             print("Profile更新%s", updateSuccess ? "成功" : "失敗")
             if updateSuccess {
                 DispatchQueue.main.async {
@@ -42,6 +48,14 @@ final class ProfileEditViewModel: ObservableObject {
                     if let name = newName {
                         self.user?.name = name
                         self.userManager.currentUser?.name = name
+                    }
+                    // Handle birthday update or deletion
+                    if shouldDeleteBirthday {
+                        self.user?.birthday = nil
+                        self.userManager.currentUser?.birthday = nil
+                    } else if let birthday = newBirthday {
+                        self.user?.birthday = birthday
+                        self.userManager.currentUser?.birthday = birthday
                     }
                     self.updateSuccess = true
                     self.showMessage = true

@@ -144,18 +144,32 @@ final class UserService {
     /// ユーザー設定をFireStoreのユーザープロフィールを更新する処理
     /// - Parameters:
     ///     - `userID`: ユーザーID
-    ///     - `user`:ユーザー名
-    ///     - `newVisibility`:公開範囲
+    ///     - `newName`: ユーザー名
+    ///     - `newVisibility`: 公開範囲
+    ///     - `newBirthday`: 誕生日（nilの場合は削除）
+    ///     - `shouldDeleteBirthday`: 誕生日を削除するかどうか
     /// - Returns: 更新成功時はtrue、失敗時はfalseを返す
-    func updateUserProfile(userID: String, newVisibility: Int?, newName: String?) async -> Bool {
+    func updateUserProfile(userID: String, newVisibility: Int?, newName: String?, newBirthday: Date? = nil, shouldDeleteBirthday: Bool = false) async -> Bool {
         
         var newprofileData: [String: Any] = [:]
         
-        //nilを除外した配列を作成
-        let updates: [String: Any] = [
-            "visibility": newVisibility,
-            "name": newName
-        ].compactMapValues { $0 }
+        // Build updates dictionary
+        var updates: [String: Any] = [:]
+        
+        if let newVisibility = newVisibility {
+            updates["visibility"] = newVisibility
+        }
+        
+        if let newName = newName {
+            updates["name"] = newName
+        }
+        
+        // Handle birthday update or deletion
+        if shouldDeleteBirthday {
+            updates["birthday"] = FieldValue.delete()
+        } else if let newBirthday = newBirthday {
+            updates["birthday"] = newBirthday
+        }
         
         if updates.isEmpty {
             print("更新データが空のため、処理をスキップします。")
@@ -169,7 +183,7 @@ final class UserService {
             print("ユーザードキュメントの更新に成功しました。")
             return true
         } catch {
-            print("更新時にエラーが発生しました。")
+            print("更新時にエラーが発生しました: \(error.localizedDescription)")
             return false
         }
     }
