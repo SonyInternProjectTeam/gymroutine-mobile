@@ -35,20 +35,6 @@ struct PasswordResetView: View {
 
                 EmailAddressField(text: $viewModel.email)
             }
-
-            VStack(alignment: .leading, spacing: 12) {
-                Text("生年月日を選択してください")
-                    .fontWeight(.semibold)
-
-                DateInputField(date: $viewModel.birthday) { date in
-                    let formatter = DateFormatter()
-                    formatter.locale = Locale(identifier: "ja_JP") // 日本語ロケール
-                    formatter.dateStyle = .long
-                    return formatter.string(from: date)
-                }
-                .bold()
-                .fieldBackground()
-            }
         }
     }
 
