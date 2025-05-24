@@ -107,20 +107,11 @@ class AuthService {
                 if let error = error {
                     promise(.failure(error))
                 } else if let _ = authResult {
-                    Task {
-                        // initializeUserは@MainActor関数なのでawaitが必要
-                        await UserManager.shared.initializeUser()
-                        
-                        // initializeUser呼び出し後の状態確認（@MainActor）
-                        let user = await UserManager.shared.currentUser
-                        if let user = user {
-                            promise(.success(user))
-                        } else {
-                            // initializeUserが成功したがuserがnilの場合（稀だが処理）
-                            promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User initialization failed."])))
-                        }
-                        // initializeUser自体で発生するエラーは内部で処理されるため、ここでcatchは不要
-                    }
+                    // UserManager has an Auth state listener that will automatically handle authentication changes
+                    // No need to manually call initializeUser() here as it causes infinite loops
+                    
+                    // Return success immediately - the UserManager will handle user data loading via its listener
+                    promise(.success(nil)) // Return nil to indicate successful login but data loading in progress
                 } else {
                     promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Login failed."])))
                 }
@@ -142,32 +133,12 @@ class AuthService {
         }
     }
     
-    func sendPasswordReset(email: String, birthday: Date, completion: @escaping (Result<Void, Error>) -> Void) {
-        self.db.collection("Users").whereField("email", isEqualTo: email).getDocuments { (snapshot, error) in
+    func sendPasswordReset(email: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        Auth.auth().sendPasswordReset(withEmail: email) { error in
             if let error = error {
                 completion(.failure(error))
-                return
-            }
-            
-            guard let documents = snapshot?.documents, documents.count == 1,
-                  let data = documents.first?.data(),
-                  let storedBirthday = (data["birthday"] as? Timestamp)?.dateValue() else {
-                completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))
-                return
-            }
-            
-            let calendar = Calendar.current
-            if !calendar.isDate(storedBirthday, inSameDayAs: birthday) {
-                completion(.failure(NSError(domain: "VerificationError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Verification failed."])))
-                return
-            }
-            
-            Auth.auth().sendPasswordReset(withEmail: email) { error in
-                if let error = error {
-                    completion(.failure(error))
-                } else {
-                    completion(.success(()))
-                }
+            } else {
+                completion(.success(()))
             }
         }
     }

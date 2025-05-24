@@ -53,7 +53,7 @@ final class InitProfileSetupViewModel: ObservableObject {
             profilePhoto: "",
             visibility: 2,
             isActive: false,
-            birthday: self.birthday,
+            birthday: nil,
             gender: self.gender?.rawValue ?? Gender.noAnswer.rawValue,
             createdAt: Date(),
             totalWorkoutDays: 0,
@@ -90,8 +90,6 @@ final class InitProfileSetupViewModel: ObservableObject {
             return name.isEmpty
         case .gender:
             return gender == nil
-        case .birthday:
-            return false
         }
     }
 
@@ -105,7 +103,6 @@ extension InitProfileSetupViewModel {
     enum SetupStep: CaseIterable {
         case nickname
         case gender
-        case birthday
 
         var nextStep: SetupStep? {
             guard let currentIndex = Self.allCases.firstIndex(of: self),

@@ -24,8 +24,6 @@ struct InitProfileSetupView: View {
                         nicknameView
                     case .gender:
                         genderView
-                    case .birthday:
-                        birthdayView
                     }
                 }
                 .padding(.horizontal, 24)
@@ -81,29 +79,29 @@ extension InitProfileSetupView {
         .sensoryFeedback(.selection, trigger: viewModel.gender)
     }
 
-    private var birthdayView: some View {
-        VStack(alignment: .leading, spacing: 32) {
-            Text("生年月日を教えてください")
-                .font(.title)
-                .bold()
+    // private var birthdayView: some View {
+    //     VStack(alignment: .leading, spacing: 32) {
+    //         Text("生年月日を教えてください")
+    //             .font(.title)
+    //             .bold()
 
-            VStack(alignment: .leading, spacing: 16) {
-                DateInputField(date: $viewModel.birthday) { date in
-                    let formatter = DateFormatter()
-                    formatter.locale = Locale(identifier: "ja_JP") // 日本語ロケール
-                    formatter.dateStyle = .long
-                    return formatter.string(from: date)
-                }
-                .bold()
-                .fieldBackground()
+    //         VStack(alignment: .leading, spacing: 16) {
+    //             DateInputField(date: $viewModel.birthday) { date in
+    //                 let formatter = DateFormatter()
+    //                 formatter.locale = Locale(identifier: "ja_JP") // 日本語ロケール
+    //                 formatter.dateStyle = .long
+    //                 return formatter.string(from: date)
+    //             }
+    //             .bold()
+    //             .fieldBackground()
                 
-                Text("年齢に合った運動推薦、個人に合わせた運動分析、補助支援機能など必須アプリ機能を提供するためにユーザーの生年月日が必要です。 ユーザーの年齢は、アプリで提供する運動ルーチンとフィットネスのアドバイスが、各ユーザーに安全で関連性があり、効果的かどうかを確認する上で重要な要素です")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.top, 8) // Add some padding for spacing
-            }
-        }
-    }
+    //             Text("年齢に合った運動推薦、個人に合わせた運動分析、補助支援機能など必須アプリ機能を提供するためにユーザーの生年月日が必要です。 ユーザーの年齢は、アプリで提供する運動ルーチンとフィットネスのアドバイスが、各ユーザーに安全で関連性があり、効果的かどうかを確認する上で重要な要素です")
+    //                 .font(.caption)
+    //                 .foregroundColor(.secondary)
+    //                 .padding(.top, 8) // Add some padding for spacing
+    //         }
+    //     }
+    // }
 
     private var actionButton: some View {
         HStack(spacing: 0) {

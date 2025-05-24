@@ -12,6 +12,8 @@ struct ProfileEditView: View {
     @StateObject var viewModel: ProfileEditViewModel
     @State private var name: String
     @State private var visibility: Int
+    @State private var birthday: Date
+    @State private var hasBirthday: Bool
     private let analyticsService = AnalyticsService.shared
     
     //アラートに関する変数
@@ -30,11 +32,36 @@ struct ProfileEditView: View {
         3: "非公開"
     ]
     
+    var isUnchanged: Bool {
+        let nameUnchanged = name == user.name
+        let visibilityUnchanged = visibility == user.visibility
+        
+        // Check birthday changes more carefully
+        let birthdayUnchanged: Bool
+        if hasBirthday {
+            // User wants to have a birthday
+            if let userBirthday = user.birthday {
+                // User currently has a birthday - check if it's the same date
+                birthdayUnchanged = Calendar.current.isDate(birthday, inSameDayAs: userBirthday)
+            } else {
+                // User currently doesn't have a birthday but wants to set one - this is a change
+                birthdayUnchanged = false
+            }
+        } else {
+            // User doesn't want to have a birthday
+            birthdayUnchanged = user.birthday == nil
+        }
+        
+        return nameUnchanged && visibilityUnchanged && birthdayUnchanged
+    }
+    
     init (user: User, router: Router) {
         self.user = user
         self._viewModel = StateObject(wrappedValue: .init(user: user, router: router))
         self._name = State(initialValue: user.name)
         self._visibility = State(initialValue: user.visibility)
+        self._birthday = State(initialValue: user.birthday ?? Date())
+        self._hasBirthday = State(initialValue: user.birthday != nil)
     }
     
     var body: some View {
@@ -64,13 +91,48 @@ struct ProfileEditView: View {
                     .pickerStyle(SegmentedPickerStyle())
                 }
                 
+                VStack(alignment: .leading) {
+                    Label("誕生日", systemImage: "calendar")
+                        .font(.headline)
+                    
+                    Toggle("誕生日を設定", isOn: $hasBirthday)
+                        .font(.subheadline)
+                        .padding(.bottom, 8)
+                        .onChange(of: hasBirthday) { oldValue, newValue in
+                            if !newValue && user.birthday != nil {
+                                // User turned off birthday toggle and currently has a birthday set
+                                // This will be handled in the save action
+                                print("誕生日の削除が予定されています")
+                            }
+                        }
+                    
+                    if hasBirthday {
+                        DatePicker(
+                            "誕生日を選択",
+                            selection: $birthday,
+                            displayedComponents: .date
+                        )
+                        .datePickerStyle(CompactDatePickerStyle())
+                        .labelsHidden()
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color(UIColor.systemGray6))
+                        .cornerRadius(8)
+                    } else if user.birthday != nil {
+                        Text("誕生日が削除されます")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                            .padding(.horizontal)
+                    }
+                }
+                
                 Button {
                     alertType = .confirmUpdate
                 } label: {
                     Text("変更を保存")
                         .font(.headline)
                 }
-                .disabled(name == user.name && visibility == user.visibility)
+                .disabled(isUnchanged)
                 .buttonStyle(CapsuleButtonStyle(color: .main))
                 .padding(.horizontal)
                 .padding(.top, 24)
@@ -110,6 +172,14 @@ struct ProfileEditView: View {
             // Log screen view
             analyticsService.logScreenView(screenName: "ProfileEdit")
         }
+        .onChange(of: viewModel.user) { _, newUser in
+            if let user = newUser {
+                name = user.name
+                visibility = user.visibility
+                birthday = user.birthday ?? Date()
+                hasBirthday = user.birthday != nil
+            }
+        }
         .onChange(of: viewModel.showMessage) { _, newValue in
             if newValue {
                 // Show success or failure message
@@ -124,11 +194,23 @@ struct ProfileEditView: View {
         .alert(item: $alertType) { type in
             switch type {
             case .confirmUpdate:
+                let shouldDeleteBirthday = !hasBirthday && user.birthday != nil
+                let message = shouldDeleteBirthday ? 
+                    "変更を保存すると誕生日が削除されます。よろしいですか？" : 
+                    "変更してよろしいですか？"
+                
                 return Alert(
                     title: Text("確認"),
-                    message: Text("変更してよろしいですか？"),
+                    message: Text(message),
                     primaryButton: .default(Text("はい"), action: {
-                        viewModel.updateUser(newVisibility: visibility, newName: name)
+                        let birthdayToUpdate = hasBirthday ? birthday : nil
+                        
+                        viewModel.updateUser(
+                            newVisibility: visibility,
+                            newName: name,
+                            newBirthday: birthdayToUpdate,
+                            shouldDeleteBirthday: shouldDeleteBirthday
+                        )
                     }),
                     secondaryButton: .cancel(Text("いいえ"))
                 )
