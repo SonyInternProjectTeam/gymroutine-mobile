@@ -58,16 +58,23 @@ final class InitProfileSetupViewModel: ObservableObject {
             createdAt: Date(),
             totalWorkoutDays: 0,
             currentWeight: nil,
-            consecutiveWorkoutDays: 0
+            consecutiveWorkoutDays: 0,
+            lastWorkoutDate: nil,
+            hasAgreedToTerms: true
         )
+        
+        print("📋 Creating User object with hasAgreedToTerms: \(user.hasAgreedToTerms ?? false)")
+        print("📋 User object: name=\(user.name), gender=\(user.gender), hasAgreedToTerms=\(user.hasAgreedToTerms ?? false)")
         
         Task {
             UIApplication.showLoading()
             let saveResult = await authService.saveUserInfo(user: user)
             switch saveResult {
             case .success(_):
+                print("✅ User saved successfully, navigating to main view")
                 router.switchRootView(to: .main(user: user))
             case .failure(let error):
+                print("🔥 Failed to save user: \(error.localizedDescription)")
                 UIApplication.showBanner(type: .error, message: error.localizedDescription)
             }
             UIApplication.hideLoading()

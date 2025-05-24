@@ -16,6 +16,7 @@ final class UserManager: ObservableObject { // Make final
     @Published var currentUser: User?
     @Published var isLoggedIn: Bool = false // Restore isLoggedIn
     @Published var isLoading: Bool = true // Add loading state
+    @Published var hasAgreedToTerms: Bool = false // Track terms agreement
     
     private var userListener: ListenerRegistration? // Firestore listener
     private var cancellables = Set<AnyCancellable>() // For Combine subscriptions
@@ -114,7 +115,8 @@ final class UserManager: ObservableObject { // Make final
                     // Only update if the decoded user is different from the current one
                     if self.currentUser != user { // Requires User to be Equatable
                          self.currentUser = user
-                         print("DEBUG: User data UPDATED via listener: Name=\(user.name ?? "N/A"), Total=\(user.totalWorkoutDays ?? -1), Consec=\(user.consecutiveWorkoutDays ?? -1)")
+                         self.hasAgreedToTerms = user.hasAgreedToTerms ?? false
+                         print("DEBUG: User data UPDATED via listener: Name=\(user.name ?? "N/A"), Total=\(user.totalWorkoutDays ?? -1), Consec=\(user.consecutiveWorkoutDays ?? -1), HasAgreedToTerms=\(user.hasAgreedToTerms ?? false)")
                          
                          // 로그인 알림 전송
                          NotificationCenter.default.post(name: NSNotification.Name("UserLoggedIn"), object: user)

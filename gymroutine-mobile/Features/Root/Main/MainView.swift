@@ -10,7 +10,9 @@ import SwiftUI
 struct MainView: View {
     
     @ObservedObject var workoutManager = AppWorkoutManager.shared
+    @ObservedObject private var userManager = UserManager.shared
     @State private var selectedTab = 0
+    @State private var showingTermsForExistingUser = false
     let router: Router
     
     var body: some View {
@@ -65,6 +67,39 @@ struct MainView: View {
 
             // Add GlobalWorkoutSessionView to manage session and result modals
             GlobalWorkoutSessionView()
+        }
+        .sheet(isPresented: $showingTermsForExistingUser) {
+            TermsOfServiceView {
+                // Terms agreed, update user's agreement status
+                Task {
+                    let success = await UserService.shared.updateTermsAgreement()
+                    if success {
+                        await MainActor.run {
+                            userManager.hasAgreedToTerms = true
+                            UIApplication.showBanner(type: .success, message: "利用規約への同意が完了しました")
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear {
+            // Check if existing user hasn't agreed to terms
+            checkTermsAgreement()
+        }
+        .onChange(of: userManager.currentUser) { _, _ in
+            // Check terms agreement when user changes
+            checkTermsAgreement()
+        }
+    }
+    
+    private func checkTermsAgreement() {
+        guard let user = userManager.currentUser else { return }
+        
+        // If user hasn't agreed to terms, show terms modal
+        if user.hasAgreedToTerms != true && !showingTermsForExistingUser {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                showingTermsForExistingUser = true
+            }
         }
     }
 }

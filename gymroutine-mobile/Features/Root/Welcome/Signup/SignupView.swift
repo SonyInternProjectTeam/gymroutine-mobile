@@ -10,6 +10,7 @@ import SwiftUI
 struct SignupView: View {
     @ObservedObject var viewModel: SignupViewModel
     private let analyticsService = AnalyticsService.shared
+    @State private var showingTermsOfService = false
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -18,11 +19,7 @@ struct SignupView: View {
             Spacer()
 
             Button(action: {
-                viewModel.signupWithEmailAndPassword { success in
-                    if success {
-                        viewModel.router.switchRootView(to: .initProfileSetup)
-                    }
-                }
+                showingTermsOfService = true
             }) {
                 Image(systemName: "chevron.forward")
             }
@@ -33,6 +30,16 @@ struct SignupView: View {
         .padding([.top, .horizontal], 24)
         .navigationTitle("新規登録")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showingTermsOfService) {
+            TermsOfServiceView {
+                // Terms agreed, proceed with signup
+                viewModel.signupWithEmailAndPassword { success in
+                    if success {
+                        viewModel.router.switchRootView(to: .initProfileSetup)
+                    }
+                }
+            }
+        }
         .onAppear {
             // Log screen view
             analyticsService.logScreenView(screenName: "Signup")

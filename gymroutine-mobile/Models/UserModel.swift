@@ -31,8 +31,9 @@ struct User: Decodable, Identifiable, Equatable { // Add Equatable conformance
     var currentWeight: Double? = nil // Already Optional
     var consecutiveWorkoutDays: Int? = 0 // Changed to Optional Int
     var lastWorkoutDate: String? // Add lastWorkoutDate field (String)
+    var hasAgreedToTerms: Bool? = nil // Terms of service agreement
 
-    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date(), totalWorkoutDays: Int? = 0, currentWeight: Double? = nil, consecutiveWorkoutDays: Int? = 0, lastWorkoutDate: String? = nil) {
+    init(uid: String, email: String, name: String = "", profilePhoto: String = "", visibility: Int = 2, isActive: Bool = false, birthday: Date? = nil, gender: String = "", createdAt: Date = Date(), totalWorkoutDays: Int? = 0, currentWeight: Double? = nil, consecutiveWorkoutDays: Int? = 0, lastWorkoutDate: String? = nil, hasAgreedToTerms: Bool? = nil) {
         self.uid = uid
         self.email = email
         self.name = name
@@ -47,6 +48,7 @@ struct User: Decodable, Identifiable, Equatable { // Add Equatable conformance
         self.currentWeight = currentWeight
         self.consecutiveWorkoutDays = consecutiveWorkoutDays
         self.lastWorkoutDate = lastWorkoutDate // Initialize lastWorkoutDate
+        self.hasAgreedToTerms = hasAgreedToTerms // Initialize terms agreement
     }
     
     // Implement Equatable: Compare users based on all relevant fields
@@ -63,6 +65,7 @@ struct User: Decodable, Identifiable, Equatable { // Add Equatable conformance
                lhs.totalWorkoutDays == rhs.totalWorkoutDays &&
                lhs.currentWeight == rhs.currentWeight &&
                lhs.consecutiveWorkoutDays == rhs.consecutiveWorkoutDays &&
-               lhs.lastWorkoutDate == rhs.lastWorkoutDate // Compare lastWorkoutDate
+               lhs.lastWorkoutDate == rhs.lastWorkoutDate && // Compare lastWorkoutDate
+               lhs.hasAgreedToTerms == rhs.hasAgreedToTerms // Compare terms agreement
     }
 }
