@@ -89,12 +89,41 @@ class AuthService {
             if let consecutiveDays = user.consecutiveWorkoutDays {
                 userData["consecutiveWorkoutDays"] = consecutiveDays
             }
+            if let lastWorkoutDate = user.lastWorkoutDate {
+                userData["lastWorkoutDate"] = lastWorkoutDate
+            }
+            
+            // Always set hasAgreedToTerms if it's not nil, default to false if nil
+            if let hasAgreedToTerms = user.hasAgreedToTerms {
+                userData["hasAgreedToTerms"] = hasAgreedToTerms
+                print("✅ Adding hasAgreedToTerms to userData: \(hasAgreedToTerms)")
+            } else {
+                userData["hasAgreedToTerms"] = false
+                print("⚠️ hasAgreedToTerms is nil, setting to false")
+            }
+            
+            print("📊 Final userData before saving: \(userData)")
             
             // Set data (merge is true, so existing fields won't be overwritten unnecessarily)
             try await documentRef.setData(userData, merge: true)
             
+            print("✅ Successfully saved user data to Firestore")
+            print("🔍 Verifying hasAgreedToTerms was saved...")
+            
+            // Verify the data was actually saved by reading it back
+            let savedDoc = try await documentRef.getDocument()
+            if let savedData = savedDoc.data() {
+                print("📖 Saved document data: \(savedData)")
+                if let savedTermsAgreement = savedData["hasAgreedToTerms"] as? Bool {
+                    print("✅ hasAgreedToTerms successfully saved as: \(savedTermsAgreement)")
+                } else {
+                    print("❌ hasAgreedToTerms NOT found in saved document!")
+                }
+            }
+            
             return .success(())
         } catch {
+            print("🔥 Failed to save user data: \(error.localizedDescription)")
             return .failure((NSError(domain: "SaveUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User saved failed"])))
         }
     }

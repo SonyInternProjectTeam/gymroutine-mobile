@@ -133,6 +133,15 @@ class AnalyticsService {
         ])
     }
     
+    /// 콘텐츠 신고 이벤트 로깅
+    func logContentReported(contentId: String, contentType: String, reportType: String) {
+        Analytics.logEvent("content_reported", parameters: [
+            "content_id": contentId,
+            "content_type": contentType,
+            "report_type": reportType
+        ])
+    }
+    
     /// 사용자 팔로우 이벤트 로깅
     /*
     func logUserFollowed(followedUserId: String, fromScreen: String) {

@@ -148,8 +148,9 @@ final class UserService {
     ///     - `newVisibility`: 公開範囲
     ///     - `newBirthday`: 誕生日（nilの場合は削除）
     ///     - `shouldDeleteBirthday`: 誕生日を削除するかどうか
+    ///     - `hasAgreedToTerms`: 利用規約同意状態
     /// - Returns: 更新成功時はtrue、失敗時はfalseを返す
-    func updateUserProfile(userID: String, newVisibility: Int?, newName: String?, newBirthday: Date? = nil, shouldDeleteBirthday: Bool = false) async -> Bool {
+    func updateUserProfile(userID: String, newVisibility: Int?, newName: String?, newBirthday: Date? = nil, shouldDeleteBirthday: Bool = false, hasAgreedToTerms: Bool? = nil) async -> Bool {
         
         var newprofileData: [String: Any] = [:]
         
@@ -169,6 +170,11 @@ final class UserService {
             updates["birthday"] = FieldValue.delete()
         } else if let newBirthday = newBirthday {
             updates["birthday"] = newBirthday
+        }
+        
+        // Handle terms agreement update
+        if let hasAgreedToTerms = hasAgreedToTerms {
+            updates["hasAgreedToTerms"] = hasAgreedToTerms
         }
         
         if updates.isEmpty {
@@ -254,6 +260,49 @@ final class UserService {
         }
     }
     
+    /// コンテンツを報告する
+    /// - Parameters:
+    ///   - contentId: 報告するコンテンツのID
+    ///   - contentType: コンテンツの種類 ("workout", "story", "comment", "user")
+    ///   - reportedUserId: 報告対象のユーザーID
+    ///   - reportType: 報告の種類
+    ///   - details: 追加の詳細（任意）
+    /// - Throws: 報告処理中にエラーが発生した場合
+    func reportContent(
+        contentId: String,
+        contentType: String,
+        reportedUserId: String,
+        reportType: String,
+        details: String? = nil
+    ) async throws {
+        guard let currentUserID = UserManager.shared.currentUser?.uid else {
+            throw NSError(domain: "ReportError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Current user not found"])
+        }
+        
+        do {
+            var reportData: [String: Any] = [
+                "reporterID": currentUserID,
+                "contentId": contentId,
+                "contentType": contentType,
+                "reportedUserId": reportedUserId,
+                "reportType": reportType,
+                "reportedAt": FieldValue.serverTimestamp(),
+                "status": "pending"
+            ]
+            
+            if let details = details, !details.isEmpty {
+                reportData["details"] = details
+            }
+            
+            try await db.collection("ContentReports").addDocument(data: reportData)
+            
+            print("✅ コンテンツ \(contentId) を報告しました")
+        } catch {
+            print("🔥 コンテンツの報告中にエラーが発生しました: \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
     /// ユーザーがブロックされているか確認する
     /// - Parameters:
     ///   - currentUserID: 現在ログイン中のユーザーID
@@ -293,5 +342,21 @@ final class UserService {
             print("🔥 ユーザーのブロック解除中にエラーが発生しました: \(error.localizedDescription)")
             throw error
         }
+    }
+    
+    /// 現在のユーザーの利用規約同意状態を更新する
+    /// - Returns: 更新成功時はtrue、失敗時はfalseを返す
+    func updateTermsAgreement() async -> Bool {
+        guard let currentUserID = UserManager.shared.currentUser?.uid else {
+            print("🔥 Current user not found")
+            return false
+        }
+        
+        return await updateUserProfile(
+            userID: currentUserID,
+            newVisibility: nil,
+            newName: nil,
+            hasAgreedToTerms: true
+        )
     }
 }
