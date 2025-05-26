@@ -256,11 +256,17 @@ struct WorkoutDetailView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle()) 
                 } else {
-                    // 다른 사용자의 워크아웃인 경우 메시지 표시
-                    Text("他のユーザーのワークアウトは編集できません")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity)
+                    Button {
+                        viewModel.saveWorkoutDataToMyWorkouts()
+                    } label: {
+                        if viewModel.isLoadingSaveWorkout {
+                            ProgressView()
+                        } else {
+                            Label("ワークアウトを保存する", systemImage: "square.and.arrow.down")
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(viewModel.isLoadingSaveWorkout)
                 }
             }
             .padding()
