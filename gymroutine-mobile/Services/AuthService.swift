@@ -10,13 +10,34 @@ import FirebaseAuth
 import FirebaseFirestore
 import Combine
 
-class AuthService {
+class AuthService: ObservableObject {
     private let db = Firestore.firestore()
     // userManagerは@MainActorクラスなので、アクセス時に注意が必要
     // private let userManager = UserManager.shared // 直接アクセスの代わりに必要な場合は関数引数として渡すか、@MainActorコンテキストで使用
     
+    @Published var currentUser: FirebaseAuth.User?
+
+    private var authStateHandler: AuthStateDidChangeListenerHandle?
+    
     /// Checks if the user is currently logged in and returns their user ID.
-    func getCurrentUser() -> FirebaseAuth.User? {
+    // func getCurrentUser() -> FirebaseAuth.User? { // Replaced by @Published currentUser
+    //     return Auth.auth().currentUser
+    // }
+
+    init() {
+        self.currentUser = Auth.auth().currentUser
+        authStateHandler = Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
+            self?.currentUser = user
+        }
+    }
+
+    deinit {
+        if let handle = authStateHandler {
+            Auth.auth().removeStateDidChangeListener(handle)
+        }
+    }
+    
+    func getCurrentUser() -> FirebaseAuth.User? { // Keep this for existing sync calls if needed, or refactor them
         return Auth.auth().currentUser
     }
     
@@ -39,6 +60,27 @@ class AuthService {
                 print("   Decoding Error Details: \(decodingError)")
             }
             return .failure(NSError(domain: "FetchUserError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User not found or failed to decode."]))
+        }
+    }
+    
+    /// 현재 사용자의 이름을 가져오는 함수
+    func getCurrentUserName() async -> String {
+        guard let currentUser = getCurrentUser() else {
+            return "Unknown"
+        }
+        
+        // 먼저 Firebase Auth의 displayName 확인
+        if let displayName = currentUser.displayName, !displayName.isEmpty {
+            return displayName
+        }
+        
+        // Firestore에서 사용자 정보 가져오기
+        let result = await fetchUser(uid: currentUser.uid)
+        switch result {
+        case .success(let user):
+            return user.name
+        case .failure(_):
+            return "Unknown"
         }
     }
     
@@ -132,16 +174,26 @@ class AuthService {
     /// Firebase Authentication - login
     func login(email: String, password: String) -> AnyPublisher<User?, Error> {
         return Future<User?, Error> { promise in
+            print("[AuthService] Attempting to sign in user: \(email)") // Log attempt
             Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
-                if let error = error {
+                // Detailed logging of authResult and error
+                print("[AuthService] Firebase signIn completed.")
+                if let error = error { // Case 1: Error exists
+                    print("  [AuthService] Error: \(error.localizedDescription)")
+                    print("  [AuthService] Error details: \(error)")
                     promise(.failure(error))
-                } else if let _ = authResult {
+                } else if let firebaseUser = authResult?.user { // Case 2: No error, and authResult.user exists (Success)
+                    print("  [AuthService] Success: User UID: \(firebaseUser.uid)")
                     // UserManager has an Auth state listener that will automatically handle authentication changes
                     // No need to manually call initializeUser() here as it causes infinite loops
                     
                     // Return success immediately - the UserManager will handle user data loading via its listener
                     promise(.success(nil)) // Return nil to indicate successful login but data loading in progress
-                } else {
+                } else { // Case 3: No error, BUT authResult.user is nil (Unexpected)
+                    print("  [AuthService] Error: signIn completed with nil error AND nil authResult/user.")
+                    print("  [AuthService] authResult: \(String(describing: authResult))")
+                    print("  [AuthService] authResult.user: \(String(describing: authResult?.user))")
+                    print("  [AuthService] error object: nil")
                     promise(.failure(NSError(domain: "LoginError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Login failed."])))
                 }
             }

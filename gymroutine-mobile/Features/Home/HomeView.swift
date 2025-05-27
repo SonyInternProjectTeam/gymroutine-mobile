@@ -18,6 +18,8 @@ struct HomeView: View {
     @State private var createWorkoutFlg = false
     @State private var showingUpdateWeightSheet = false
     @State private var isShowingOnboarding = false
+    @State private var showingNotifications = false
+    @StateObject private var notificationsViewModel = NotificationsViewModel()
     
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
@@ -46,6 +48,40 @@ struct HomeView: View {
         .background(Color.gray.opacity(0.1))
         .contentMargins(.top, 16)
         .contentMargins(.bottom, 80)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    showingNotifications = true
+                    // Log notification button tap
+                    analyticsService.logUserAction(
+                        action: "notifications_button_tapped",
+                        contentType: "home_view"
+                    )
+                }) {
+                    ZStack(alignment: .topTrailing) {
+                        Image(systemName: "bell")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        // 읽지 않은 알림 개수 표시
+                        if notificationsViewModel.unreadNotificationsCount > 0 {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 16, height: 16)
+                                
+                                Text("\(min(notificationsViewModel.unreadNotificationsCount, 99))")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                            }
+                            .offset(x: 6, y: -6)
+                        }
+                    }
+                }
+            }
+        }
         .refreshable {
             // 스크롤 당겨서 새로고침 시 스토리 데이터 업데이트
             viewModel.refreshStories()
@@ -54,6 +90,8 @@ struct HomeView: View {
             viewModel.loadTodaysWorkouts()
             // 히트맵 데이터도 업데이트
             viewModel.loadHeatmapData()
+            // 알림 데이터도 업데이트
+            notificationsViewModel.loadAllNotifications()
         }
         .sheet(isPresented: $showingUpdateWeightSheet) {
             UpdateWeightView()
@@ -61,6 +99,13 @@ struct HomeView: View {
         }
         .sheet(item: $viewModel.selectedUserForStory) { user in
             StoryView(viewModel: StoryViewModel(user: user, stories: viewModel.storiesForSelectedUser))
+        }
+        .sheet(isPresented: $showingNotifications) {
+            NotificationsView()
+                .onDisappear {
+                    // 알림 화면이 닫힐 때 알림 데이터 새로고침
+                    notificationsViewModel.loadAllNotifications()
+                }
         }
         .fullScreenCover(isPresented: $createWorkoutFlg) {
             CreateWorkoutView()
@@ -77,6 +122,8 @@ struct HomeView: View {
         .onAppear {
             // Log screen view event
             analyticsService.logScreenView(screenName: "Home")
+            // 알림 데이터 로드
+            notificationsViewModel.loadAllNotifications()
         }
     }
     

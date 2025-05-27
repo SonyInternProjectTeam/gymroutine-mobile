@@ -44,6 +44,25 @@ final class UserService {
         }
     }
     
+    /// Firestoreから特定のユーザーIDのユーザー情報を取得する
+    /// - Parameter userId: 取得するユーザーのID
+    /// - Returns: ユーザー情報またはエラーをResultで返す
+    func getUser(userId: String) async -> Result<User, Error> {
+        do {
+            let documentSnapshot = try await db.collection("Users").document(userId).getDocument()
+            
+            // Explicitly define the type here to help the compiler
+            let optionalUser: User? = try documentSnapshot.data(as: User.self)
+            
+            guard let user = optionalUser else {
+                 return .failure(NSError(domain: "UserService", code: 404, userInfo: [NSLocalizedDescriptionKey: "User document with ID \\(userId) not found or failed to decode."]))
+            }
+            return .success(user)
+        } catch {
+            return .failure(error)
+        }
+    }
+    
     /// プロフィール写真をアップロードし、Firestoreのユーザードキュメントを更新する処理
     /// - Parameters:
     ///   - userID: ユーザーID
