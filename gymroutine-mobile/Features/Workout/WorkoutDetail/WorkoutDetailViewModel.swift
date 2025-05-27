@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
 @MainActor
 final class WorkoutDetailViewModel: WorkoutExercisesManager {
@@ -24,11 +25,14 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
     
     // 편집 화면 표시 플래그
     @Published var showEditView = false
-    
+
+    @Published var isLoadingSaveWorkout: Bool = false
+
     private let service = WorkoutService()
+    private let authService = AuthService()
     private let workoutManager = AppWorkoutManager.shared
     private let userManager = UserManager.shared
-    
+
     /// 현재 사용자가 워크아웃의 소유자인지 확인하는 속성
     var isCurrentUser: Bool {
         guard let currentUser = userManager.currentUser else {
@@ -275,5 +279,42 @@ final class WorkoutDetailViewModel: WorkoutExercisesManager {
             throw error
         }
         UIApplication.hideLoading()
+    }
+
+    func saveWorkoutDataToMyWorkouts() {
+        guard let currentUser = authService.getCurrentUser() else {
+            UIApplication.showBanner(type: .error, message: "エラーが発生しました")
+            return
+        }
+
+        isLoadingSaveWorkout = true
+
+        // 템플릿에서 워크아웃 생성
+        let workout = Workout(
+            id: UUID().uuidString,
+            userId: currentUser.uid,
+            name: workout.name,
+            createdAt: Timestamp(date: Date()).dateValue(),
+            notes: "",
+            isRoutine: true,  // 템플릿은 항상 루틴으로 설정
+            scheduledDays: [],
+            exercises: workout.exercises
+        )
+
+        // 워크아웃 저장
+        Task {
+            let result = await service.createWorkout(workout: workout)
+
+            await MainActor.run {
+                isLoadingSaveWorkout = false
+
+                switch result {
+                case .success:
+                    UIApplication.showBanner(type: .success, message: "あなたのワークアウトとして保存されました")
+                case .failure(let error):
+                    UIApplication.showBanner(type: .error, message: "ワークアウトの保存に失敗しました")
+                }
+            }
+        }
     }
 }
