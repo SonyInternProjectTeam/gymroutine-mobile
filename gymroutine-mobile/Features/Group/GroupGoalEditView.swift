@@ -166,26 +166,3 @@ struct GroupGoalEditView: View {
         }
     }
 }
-
-#Preview {
-    GroupGoalEditView(
-        goal: GroupGoal(
-            id: "1",
-            title: "週3回運動",
-            description: "健康のために週3回運動する",
-            goalType: .workoutCount,
-            targetValue: 3,
-            unit: "回",
-            startDate: Date(),
-            endDate: Calendar.current.date(byAdding: .day, value: 7, to: Date()) ?? Date(),
-            createdBy: "user1",
-            createdAt: Date(),
-            isActive: true,
-            repeatType: "weekly",
-            repeatCount: 4,
-            originalEndDate: Date(),
-            currentProgress: [:]
-        ),
-        groupId: "group1"
-    )
-} 

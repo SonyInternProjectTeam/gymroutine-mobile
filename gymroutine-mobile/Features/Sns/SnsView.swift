@@ -11,6 +11,7 @@ struct SnsView: View {
     @StateObject private var viewModel = SnsViewModel()
     @FocusState private var isFocused: Bool
     @State private var searchMode: Bool = false
+    @State private var showingNotifications = false
     private let analyticsService = AnalyticsService.shared
 
     var body: some View {
@@ -29,6 +30,11 @@ struct SnsView: View {
                     Divider()
                         .padding(.vertical, 16)
                     
+                    groupsView
+                    
+                    Divider()
+                        .padding(.vertical, 16)
+                    
                     workoutTemplatesView
                 }
             }
@@ -42,9 +48,15 @@ struct SnsView: View {
         .navigationTitle("SNS")
         // Large Title을 쓰지 않고 상단 여백을 줄이려면 Inline Title
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showingNotifications) {
+            NotificationsView()
+        }
         .onAppear {
-            // 画面表示時におすすめユーザーを生成して取得
+            // 画面表示時におすすめユーザーを생성하고 취득
             viewModel.initializeRecommendations()
+            
+            // 그룹 목록 조회
+            viewModel.fetchUserGroups()
             
             // Log screen view
             analyticsService.logScreenView(screenName: "Sns")
@@ -163,6 +175,73 @@ struct SnsView: View {
                     .padding(.leading, 16)
                     .padding(.trailing, 8)
                     .padding(.vertical,8)
+                }
+            }
+        }
+        .padding(.top, 16)
+    }
+    
+    private var groupsView: some View {
+        // 그룹 영역
+        VStack(spacing: 10) {
+            HStack {
+                Image(systemName: "person.3")
+                Text("グループ")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Spacer()
+                
+                HStack(spacing: 12) {
+                    NavigationLink(destination: GroupSearchView()) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.headline)
+                    }
+                    
+                    NavigationLink(destination: GroupManagementView()) {
+                        Image(systemName: "plus.circle")
+                            .font(.headline)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            
+            if viewModel.isLoadingGroups {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                        .padding()
+                    Spacer()
+                }
+            } else if let error = viewModel.groupsError {
+                Text(error)
+                    .hAlign(.center)
+                    .foregroundColor(.red)
+                    .font(.subheadline)
+                    .padding(.horizontal, 16)
+            } else if viewModel.userGroups.isEmpty {
+                VStack(alignment: .center) {
+                    Text("参加しているグループがありません")
+                        .foregroundColor(.gray)
+                        .padding()
+                    
+                    NavigationLink("グループを探す", destination: GroupSearchView())
+                        .buttonStyle(.bordered)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 30)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(viewModel.userGroups) { group in
+                            NavigationLink(destination: GroupDetailView(group: group)) {
+                                GroupCell(groupCell: group)
+                            }
+                        }
+                    }
+                    .padding(.leading, 16)
+                    .padding(.trailing, 8)
+                    .padding(.vertical, 8)
                 }
             }
         }
