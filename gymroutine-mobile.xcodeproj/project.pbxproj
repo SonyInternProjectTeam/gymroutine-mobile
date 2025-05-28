@@ -394,6 +394,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		001F029A2DE680EB00A516C8 /* TemplateDetail */ = {
+			isa = PBXGroup;
+			children = (
+				275B06352DD5FF6200D626C4 /* TemplateDetailView.swift */,
+				275B06372DD8B8F600D626C4 /* TemplateDetailViewModel.swift */,
+			);
+			path = TemplateDetail;
+			sourceTree = "<group>";
+		};
 		0041BDBB2DC3155E007748B8 /* CompletedWorkoutDetail */ = {
 			isa = PBXGroup;
 			children = (
@@ -736,6 +745,7 @@
 		00CDC47D2D85C1FB003B18EB /* Workout */ = {
 			isa = PBXGroup;
 			children = (
+				001F029A2DE680EB00A516C8 /* TemplateDetail */,
 				0041BDBB2DC3155E007748B8 /* CompletedWorkoutDetail */,
 				00D3E1BD2DBDCBBB00590F92 /* WorkoutEdit */,
 				00D3E1BC2DBDCA7300590F92 /* WorkoutDetail */,
@@ -743,9 +753,7 @@
 				276F87762DB2957000E8435E /* EditSetView.swift */,
 				276F87742DB28EBF00E8435E /* RestTimeSettingsView.swift */,
 				275C71602DAD432300579962 /* GlobalWorkoutSessionView.swift */,
-				275B06372DD8B8F600D626C4 /* TemplateDetailViewModel.swift */,
 				275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */,
-				275B06352DD5FF6200D626C4 /* TemplateDetailView.swift */,
 				277739FB2DA5EF4D0006397D /* WorkoutResultView.swift */,
 				27D6A86C2D9D9ABE004D3F2B /* MiniWorkoutView.swift */,
 				27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */,

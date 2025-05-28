@@ -57,7 +57,6 @@ struct WorkoutExerciseCell: View {
             Divider()
             
             VStack(spacing: 16) {
-                
                 HStack {
                     ForEach(exerciseDetailOptions, id: \.self) { name in
                         Text(name)
@@ -67,22 +66,25 @@ struct WorkoutExerciseCell: View {
                     }
                 }
                 
-                ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { index, set in
-                    HStack {
-                        Text("\(index + 1)").hAlign(.center)
-                        
-                        Text("\(set.reps)").hAlign(.center)
-                        
-                        Text(String(format: "%.1f", set.weight)).hAlign(.center)
+                VStack(spacing: 8) {
+                    ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { index, set in
+                        HStack {
+                            Text("\(index + 1)").hAlign(.center)
+                            
+                            Text("\(set.reps)").hAlign(.center)
+                            
+                            Text(String(format: "%.1f", set.weight)).hAlign(.center)
+                        }
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
                     }
-                    .font(.subheadline)
                 }
             }
         }
         .padding()
-        .background(Color(UIColor.systemGray6))
+        .background(.white)
         .clipShape(.rect(cornerRadius: 8))
-        .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)
+        .shadow(color: Color.black.opacity(0.1), radius: 2, y: 1.5)
     }
 }
 
