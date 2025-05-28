@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @ObservedObject var viewModel: ProfileViewModel
+    @StateObject private var viewModel: ProfileViewModel
     @Namespace var namespace
     private let analyticsService = AnalyticsService.shared
     
@@ -20,31 +20,41 @@ struct ProfileView: View {
     @State private var isShowSafeAreaBackground: Bool = false
 
     let router: Router?
+    // バッテリー・時間が表示されているステータスバーの高さを取得
+    private let statusBarHeight = UIApplication.shared
+        .connectedScenes
+        .compactMap { $0 as? UIWindowScene }
+        .first?
+        .statusBarManager?
+        .statusBarFrame.height ?? 0
+    
+    init(user: User? = nil, router: Router? = nil) {
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(user: user))
+        self.router = router
+    }
 
     var body: some View {
-        ZStack(alignment: .top) {
-            Group {
-                if let user = viewModel.user {
-                    profileContentView(user: user)
-                } else {
-                    Text("プロフィール情報がありません")
-                        .font(.headline)
+        Group {
+            if let user = viewModel.user {
+                ScrollView(showsIndicators: false) {
+                    ZStack(alignment: .top) {
+                        profileContentView2(user: user)
+                        
+                        statusBarBackground()
+                    }
                 }
-            }
-
-            // セーフエリアの背景色
-            if isShowSafeAreaBackground {
-                GeometryReader { reader in
-                    Color.mainBackground
-                        .frame(height: reader.safeAreaInsets.top)
-                        .ignoresSafeArea(edges: [.top])
-                }
+                .coordinateSpace(name: "SCROLL")
+                .background(Color.mainBackground)
+                .ignoresSafeArea(edges: .top)
+            } else {
+                Text("ユーザーが存在しません")
+                    .font(.headline)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             // Show menu button only for other users' profiles
-            if let user = viewModel.user, !viewModel.isCurrentUser {
+            if viewModel.user != nil, !viewModel.isCurrentUser {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button(role: .destructive) {
@@ -74,125 +84,97 @@ struct ProfileView: View {
                 ProfileEditView(user: user, router: router)
             }
         }
-        .onAppear {
-            // Only load user data if the viewModel's user is not already set
-            // This prevents overwriting the profile when navigating from followers/following list
-            if viewModel.user == nil {
-                viewModel.loadUserData()
-            } else {
-                // Always refresh workouts when view appears
-                Task {
-                    await viewModel.fetchWorkouts()
-                }
-            }
-
-            // Add observer for workout deletion notification
-            NotificationCenter.default.addObserver(
-                forName: .workoutDeleted,
-                object: nil,
-                queue: .main
-            ) { _ in
-                // Refresh workouts when notification is received
-                Task {
-                    await viewModel.fetchWorkouts()
-                }
-            }
-
-            // Log screen view
-            analyticsService.logScreenView(screenName: "Profile")
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
+    }
+    
+    @ViewBuilder
+    private func statusBarBackground() -> some View {
+        GeometryReader { proxy in
+            let minY = proxy.frame(in: .named("SCROLL")).minY
+            let opacity = min(max(-minY / (statusBarHeight * 2), 0), 1)
+            
+            Color.mainBackground
+                .opacity(opacity)
+                .offset(y: -minY)
         }
-        .onDisappear {
-            // Remove the observer when the view disappears
-            NotificationCenter.default.removeObserver(self, name: .workoutDeleted, object: nil)
-        }
+        .frame(height: statusBarHeight)
     }
     
     // MARK: - Private Helper Views
-    private func profileContentView(user: User) -> some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 0) {
-                // スクロール検知用のView
-                Rectangle()
-                    .fill(Color.clear)
-                    .frame(height: 0)
-                    .overlay(
-                        GeometryReader { geo -> AnyView in
-                            DispatchQueue.main.async {
-                                isShowSafeAreaBackground = geo.frame(in: .global).minY < CGFloat.zero
-                            }
-                            return AnyView(EmptyView())
-                        }
-                    )
-
-                VStack(spacing: 24) {
-                    profileHeader(user: user)
+    private func profileContentView2(user: User) -> some View {
+        VStack(spacing: 24) {
+            profileHeader(user: user)
+            
+            // ブロックされたユーザーの場合、メッセージを表示
+            if viewModel.isBlocked {
+                VStack(spacing: 8) {
+                    Image(systemName: "person.fill.xmark")
+                        .font(.system(size: 40))
+                        .foregroundColor(.gray)
                     
-                    // ブロックされたユーザーの場合、メッセージを表示
-                    if viewModel.isBlocked {
-                        VStack(spacing: 8) {
-                            Image(systemName: "person.fill.xmark")
-                                .font(.system(size: 40))
-                                .foregroundColor(.gray)
-                            
-                            Text("ブロックしたユーザーです")
-                                .font(.headline)
-                                .foregroundColor(.gray)
-                            
-                            Button(action: {
-                                viewModel.unblockUser()
-                            }) {
-                                Text("ブロックを解除")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 20)
-                                    .padding(.vertical, 10)
-                                    .background(Color.main)
-                                    .cornerRadius(20)
-                            }
-                            .padding(.top, 16)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
-                    } else {
-                        profileTabBar()
-                        profileDetailView()
+                    Text("ブロックしたユーザーです")
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                    
+                    Button(action: {
+                        viewModel.unblockUser()
+                    }) {
+                        Text("ブロックを解除")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(Color.main)
+                            .cornerRadius(20)
                     }
+                    .padding(.top, 16)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+            } else {
+                profileTabBar()
+                profileDetailView()
             }
         }
-        .ignoresSafeArea(edges: [.top])
-        .background(Color.mainBackground)
+        .offset(y: -256)
     }
     
     private func profileHeader(user: User) -> some View {
-        VStack(spacing: 16) {
-            // 上段：プロフィールアイコンとフォロースタッツ
-            HStack(alignment: .bottom, spacing: 10) {
-                profileIcon(profileUrl: user.profilePhoto)
-                    .padding(.vertical, 6)
-                followStatsView(user: user)
-            }
-            .padding(.horizontal, 8)
-            // 上段の空白の高さを調整
-            .frame(height: 220, alignment: .bottom)
-            .background(
-                LinearGradient(
-                    gradient: Gradient(stops: [
-                        .init(color: .gray, location: 0.0),
-                        .init(color: .mainBackground, location: 0.75),
-                        .init(color: .mainBackground, location: 1.0)
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(.gray)
+                .frame(height: 256)
             
-            // 下段：ユーザー基本情報とアクションボタン
-            HStack(alignment: .top, spacing: 10) {
-                userBasicInfoView(user: user)
-                profileActionButton()
+            VStack(spacing: 16) {
+                // 上段：プロフィールアイコンとフォロースタッツ
+                HStack(alignment: .bottom, spacing: 10) {
+                    profileIcon(profileUrl: user.profilePhoto)
+                        .padding(.vertical, 6)
+                    followStatsView(user: user)
+                }
+                .padding(.horizontal, 8)
+                // 上段の空白の高さを調整
+                .frame(height: 220, alignment: .bottom)
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: .gray, location: 0.0),
+                            .init(color: .mainBackground, location: 0.75),
+                            .init(color: .mainBackground, location: 1.0)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                
+                // 下段：ユーザー基本情報とアクションボタン
+                HStack(alignment: .top, spacing: 10) {
+                    userBasicInfoView(user: user)
+                    profileActionButton()
+                }
+                .padding(.horizontal, 16)
             }
-            .padding(.horizontal, 16)
         }
     }
     
@@ -366,7 +348,10 @@ extension ProfileView {
 
 #Preview {
     NavigationStack {
-        ProfileView(viewModel: ProfileViewModel(user: User(uid: "previewUser1", email: "preview@example.com", name: "Preview Useraaaaa")), router: Router())
+        ProfileView(
+            user: User(uid: "previewUser1", email: "preview@example.com", name: "Preview Useraaaaa"),
+            router: Router()
+        )
     }
 }
 

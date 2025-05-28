@@ -39,6 +39,17 @@ final class SnsViewModel: ObservableObject {
     private let authService = AuthService()
     private let templateService = TemplateService()
     private let groupService = GroupService()
+    private let analyticsService = AnalyticsService.shared
+    
+    init() {
+        initializeRecommendations()
+        
+        fetchUserGroups()
+    }
+    
+    func onAppear() {
+        analyticsService.logScreenView(screenName: "Sns")
+    }
     
     /// ユーザー名でユーザー検索を行い、結果を userDetails に設定する
     func fetchUsers() {
