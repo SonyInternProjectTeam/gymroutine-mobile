@@ -105,7 +105,7 @@ struct SnsView: View {
                     LazyVStack {
                         ForEach(viewModel.userDetails, id: \.uid) { user in
                             NavigationLink {
-                                ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
+                                ProfileView(user: user, router: nil)
                             } label: {
                                 UserCell(user: user)
                             }

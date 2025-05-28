@@ -46,7 +46,7 @@ struct MainView: View {
                 .tag(2)
                 
                 NavigationStack {
-                    ProfileView(viewModel: ProfileViewModel(), router: router)
+                    ProfileView(router: router)
                 }
                 .tabItem {
                     Image(systemName: "person.circle.fill")

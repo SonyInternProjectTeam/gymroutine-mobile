@@ -122,7 +122,7 @@ struct StoryView: View {
     private var userHeaderBox: some View {
         HStack(spacing: 12) {
             NavigationLink(
-                destination: ProfileView(viewModel: ProfileViewModel(user: viewModel.user), router: nil)
+                destination: ProfileView(user: viewModel.user, router: nil)
                 , label: {
                     HStack {
                         ProfileIcon(profileUrl: viewModel.user.profilePhoto, size: .small)
