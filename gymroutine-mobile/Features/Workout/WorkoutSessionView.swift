@@ -33,7 +33,6 @@ struct WorkoutSessionView: View {
 
     // 탭 애니메이션을 위한 상태 변수 추가
     @State private var tappedProgress = false
-    @State private var isTimerPaused = false // 타이머 일시정지 상태
     var onEndWorkout: (() -> Void)? = nil // 워크아웃 종료 콜백
     
     init(viewModel: WorkoutSessionViewModel, onEndWorkout: (() -> Void)? = nil) {
@@ -126,7 +125,7 @@ struct WorkoutSessionView: View {
         // 워크아웃 종료 알림 추가
         .alert("ワークアウトを終了", isPresented: $showEndWorkoutAlert) {
             Button("キャンセル", role: .cancel) { }
-            Button("破棄", role: .destructive) {
+            Button("終了のみ", role: .destructive) {
                 // 그냥 종료
                 onEndWorkout?()
                 dismiss()
@@ -239,23 +238,6 @@ struct WorkoutSessionView: View {
                 }
 
                 Spacer()
-
-                // 타이머 일시정지/재생 버튼
-                Button {
-                    isTimerPaused.toggle()
-                    if isTimerPaused {
-                        viewModel.pauseTimer()
-                    } else {
-                        viewModel.resumeTimer()
-                    }
-                } label: {
-                    Image(systemName: isTimerPaused ? "play.circle.fill" : "pause.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 36, height: 36)
-                        .foregroundStyle(.black)
-                }
-                .padding(.trailing, 8)
 
                 Button {
                     viewModel.toggleViewMode()
@@ -587,9 +569,6 @@ struct WorkoutSessionView: View {
                             },
                             isSetCompleted: { setIndex in
                                 viewModel.isSetCompleted(exerciseIndex: index, setIndex: setIndex)
-                            },
-                            onEditSet: { setIndex in
-                                viewModel.showEditSetInfo(exerciseIndex: index, setIndex: setIndex)
                             }
                         )
                         .id(index)
@@ -841,7 +820,6 @@ struct WorkoutExerciseCard: View {
     var onAddClicked: (() -> Void)
     var onToggleSetCompletion: ((Int) -> Void)
     var isSetCompleted: ((Int) -> Bool)
-    var onEditSet: ((Int) -> Void) // Callback for editing a set
 
     var body: some View {
         HStack {
@@ -938,42 +916,32 @@ struct WorkoutExerciseCard: View {
                                     .hAlign(.center)
                                 Text("レップ数")
                                     .hAlign(.center)
-                                Text("状況・編集") // Updated header for the combined column
+                                Text("状況")
                                     .hAlign(.center)
                             }
                             .font(.caption)
 
                             VStack(spacing: 0) {
                                 ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { setIndex, set in
-                                    let isSetRowCompleted = isSetCompleted(setIndex)
+                                    let isCompleted = isSetCompleted(setIndex)
                                     HStack(spacing: 0) {
                                         Text("\(setIndex + 1)").hAlign(.center)
+
                                         Text(String(format: "%.1f", set.weight)).hAlign(.center)
+
                                         Text("\(set.reps)").hAlign(.center)
 
-                                        // Combined status (checkmark) and edit (pencil) buttons
-                                        HStack(spacing: 12) { // Spacing between checkmark and pencil
-                                            Button(action: {
-                                                onToggleSetCompletion(setIndex)
-                                            }) {
-                                                Image(systemName: isSetRowCompleted ? "checkmark.circle.fill" : "circle")
-                                                    .foregroundStyle(isSetRowCompleted ? .green : .secondary)
-                                            }
-                                            .buttonStyle(.plain)
-
-                                            Button(action: {
-                                                onEditSet(setIndex) // Call the edit action
-                                            }) {
-                                                Image(systemName: "pencil.circle.fill")
-                                                    .foregroundColor(.blue)
-                                            }
-                                            .buttonStyle(.plain)
+                                        Button(action: {
+                                            onToggleSetCompletion(setIndex)
+                                        }) {
+                                            Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
+                                                .foregroundStyle(isCompleted ? .green : .secondary)
                                         }
-                                        .frame(maxWidth: .infinity, alignment: .center) // Center the HStack of buttons
+                                        .hAlign(.center)
                                     }
                                     .font(.subheadline)
                                     .padding(.vertical, 8)
-                                    .background(isCurrentExercise && currentSetIndex == setIndex ? Color.blue.opacity(0.1) : Color.clear)
+                                    .background(isCurrentExercise && setIndex == currentSetIndex ? Color.blue.opacity(0.1) : Color.clear)
                                 }
                             }
                         }

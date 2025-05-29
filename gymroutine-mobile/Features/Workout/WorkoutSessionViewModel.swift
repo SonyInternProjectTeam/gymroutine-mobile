@@ -42,8 +42,6 @@ final class WorkoutSessionViewModel: ObservableObject {
     private var timer: Timer?
     var startTime: Date
     private let workoutService = WorkoutService()
-    private var isTimerManuallyPaused: Bool = false // 수동으로 타이머가 중지되었는지 여부
-    private var accumulatedElapsedTime: TimeInterval = 0 // 일시정지를 고려한 총 경과 시간
     
     // MARK: - Initialization
     init(workout: Workout, startTime: Date = Date()) {
@@ -82,42 +80,17 @@ final class WorkoutSessionViewModel: ObservableObject {
     private func startTimer() {
         timer?.invalidate() // 기존 타이머 중지
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            // 메인 액터에서 updateTimer 호출
             Task { @MainActor [weak self] in
-                guard let self = self, !self.isTimerManuallyPaused else { return }
-                self.updateTimer()
+                self?.updateTimer()
             }
         }
     }
     
     private func updateTimer() {
-        let currentSegmentElapsedTime = Date().timeIntervalSince(startTime)
-        let totalElapsed = Int(accumulatedElapsedTime + currentSegmentElapsedTime)
-        minutes = totalElapsed / 60
-        seconds = totalElapsed % 60
-    }
-    
-    // MARK: - Manual Timer Control
-    func pauseTimer() {
-        guard !isTimerManuallyPaused else { return } // 이미 일시정지 상태이면 아무것도 안함
-        isTimerManuallyPaused = true
-        
-        // 현재까지 경과된 시간 추가
-        accumulatedElapsedTime += Date().timeIntervalSince(startTime)
-        
-        timer?.invalidate()
-        timer = nil
-        print("⏸️ 메인 타이머 일시 중지됨. 누적 시간: \(accumulatedElapsedTime)")
-    }
-
-    func resumeTimer() {
-        guard isTimerManuallyPaused else { return } // 일시정지 상태가 아니면 아무것도 안함
-        isTimerManuallyPaused = false
-        
-        // 새로운 시작 시간 설정
-        startTime = Date()
-        
-        startTimer() // 타이머 다시 시작
-        print("▶️ 메인 타이머 재개됨. 새로운 startTime: \(startTime)")
+        let elapsed = Int(Date().timeIntervalSince(startTime))
+        minutes = elapsed / 60
+        seconds = elapsed % 60
     }
     
     // MARK: - View Mode
