@@ -49,6 +49,9 @@ class GroupManagementViewModel: ObservableObject {
             case .success(_):
                 showSuccessAlert = true
                 
+                // Send notification that a group was created
+                NotificationCenter.default.post(name: AppConstants.NotificationNames.didJoinGroup, object: nil)
+                
             case .failure(let error):
                 errorMessage = error.localizedDescription
             }
