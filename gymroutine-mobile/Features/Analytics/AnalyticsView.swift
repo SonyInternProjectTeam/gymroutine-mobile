@@ -76,7 +76,8 @@ struct AnalyticsView: View {
                             FavoriteExercisesView(exercises: analytics.favoriteExercises)
                             
                             // フォロー中比較 - Current user only
-                            FollowingComparisonChartView(comparison: analytics.followingComparison)
+                            // TODO: フォロー中比較のデータがないため、一旦コメントアウト
+                            // FollowingComparisonChartView(comparison: analytics.followingComparison)
                             
                             // 1RM情報 - Current user only
                             OneRepMaxBarChartView(oneRepMax: analytics.oneRepMax)
