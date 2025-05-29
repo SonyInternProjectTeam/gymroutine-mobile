@@ -587,6 +587,9 @@ struct WorkoutSessionView: View {
                             },
                             isSetCompleted: { setIndex in
                                 viewModel.isSetCompleted(exerciseIndex: index, setIndex: setIndex)
+                            },
+                            onEditSet: { setIndex in
+                                viewModel.showEditSetInfo(exerciseIndex: index, setIndex: setIndex)
                             }
                         )
                         .id(index)
@@ -838,6 +841,7 @@ struct WorkoutExerciseCard: View {
     var onAddClicked: (() -> Void)
     var onToggleSetCompletion: ((Int) -> Void)
     var isSetCompleted: ((Int) -> Bool)
+    var onEditSet: ((Int) -> Void) // Callback for editing a set
 
     var body: some View {
         HStack {
@@ -934,32 +938,42 @@ struct WorkoutExerciseCard: View {
                                     .hAlign(.center)
                                 Text("レップ数")
                                     .hAlign(.center)
-                                Text("状況")
+                                Text("状況・編集") // Updated header for the combined column
                                     .hAlign(.center)
                             }
                             .font(.caption)
 
                             VStack(spacing: 0) {
                                 ForEach(Array(workoutExercise.sets.enumerated()), id: \.element.id) { setIndex, set in
-                                    let isCompleted = isSetCompleted(setIndex)
+                                    let isSetRowCompleted = isSetCompleted(setIndex)
                                     HStack(spacing: 0) {
                                         Text("\(setIndex + 1)").hAlign(.center)
-
                                         Text(String(format: "%.1f", set.weight)).hAlign(.center)
-
                                         Text("\(set.reps)").hAlign(.center)
 
-                                        Button(action: {
-                                            onToggleSetCompletion(setIndex)
-                                        }) {
-                                            Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                                                .foregroundStyle(isCompleted ? .green : .secondary)
+                                        // Combined status (checkmark) and edit (pencil) buttons
+                                        HStack(spacing: 12) { // Spacing between checkmark and pencil
+                                            Button(action: {
+                                                onToggleSetCompletion(setIndex)
+                                            }) {
+                                                Image(systemName: isSetRowCompleted ? "checkmark.circle.fill" : "circle")
+                                                    .foregroundStyle(isSetRowCompleted ? .green : .secondary)
+                                            }
+                                            .buttonStyle(.plain)
+
+                                            Button(action: {
+                                                onEditSet(setIndex) // Call the edit action
+                                            }) {
+                                                Image(systemName: "pencil.circle.fill")
+                                                    .foregroundColor(.blue)
+                                            }
+                                            .buttonStyle(.plain)
                                         }
-                                        .hAlign(.center)
+                                        .frame(maxWidth: .infinity, alignment: .center) // Center the HStack of buttons
                                     }
                                     .font(.subheadline)
                                     .padding(.vertical, 8)
-                                    .background(isCurrentExercise && setIndex == currentSetIndex ? Color.blue.opacity(0.1) : Color.clear)
+                                    .background(isCurrentExercise && currentSetIndex == setIndex ? Color.blue.opacity(0.1) : Color.clear)
                                 }
                             }
                         }
