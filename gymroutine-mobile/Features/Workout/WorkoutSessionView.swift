@@ -126,7 +126,7 @@ struct WorkoutSessionView: View {
         // 워크아웃 종료 알림 추가
         .alert("ワークアウトを終了", isPresented: $showEndWorkoutAlert) {
             Button("キャンセル", role: .cancel) { }
-            Button("終了のみ", role: .destructive) {
+            Button("破棄", role: .destructive) {
                 // 그냥 종료
                 onEndWorkout?()
                 dismiss()
