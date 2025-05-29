@@ -15,6 +15,7 @@
 		007407602D9BC75000808964 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0074075F2D9BC74A00808964 /* Array+Extensions.swift */; };
 		008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008769DE2D8BD5C400965C26 /* LoadingView.swift */; };
 		009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */; };
+		00B107862DE8537D000E7BC9 /* ExerciseSetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B107852DE8537D000E7BC9 /* ExerciseSetCell.swift */; };
 		00CDC4252D845E8E003B18EB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC3DB2D845E8E003B18EB /* Preview Assets.xcassets */; };
 		00CDC4262D845E8E003B18EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC4222D845E8E003B18EB /* Assets.xcassets */; };
 		00CDC4272D845E8E003B18EB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC4232D845E8E003B18EB /* GoogleService-Info.plist */; };
@@ -197,6 +198,7 @@
 		0074075F2D9BC74A00808964 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		008769DE2D8BD5C400965C26 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseSetView.swift; sourceTree = "<group>"; };
+		00B107852DE8537D000E7BC9 /* ExerciseSetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSetCell.swift; sourceTree = "<group>"; };
 		00CDC3D02D845E8E003B18EB /* gymroutine_mobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gymroutine_mobileApp.swift; sourceTree = "<group>"; };
 		00CDC3D12D845E8E003B18EB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		00CDC3D32D845E8E003B18EB /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
@@ -557,6 +559,7 @@
 				274B05172DE43F7000F063CC /* GroupMemberEditCell.swift */,
 				00D3E1C22DBE334300590F92 /* ExerciseResultCell.swift */,
 				274B04E62DE2C61C00F063CC /* GroupCell.swift */,
+				00B107852DE8537D000E7BC9 /* ExerciseSetCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1158,6 +1161,7 @@
 				274B050D2DE43F6300F063CC /* GroupGoalCreateViewModel.swift in Sources */,
 				274B050E2DE43F6300F063CC /* GroupGoalCreateView.swift in Sources */,
 				274B050F2DE43F6300F063CC /* GroupDetailView.swift in Sources */,
+				00B107862DE8537D000E7BC9 /* ExerciseSetCell.swift in Sources */,
 				274B05102DE43F6300F063CC /* GroupInviteViewModel.swift in Sources */,
 				274B05112DE43F6300F063CC /* GroupDetailViewModel.swift in Sources */,
 				274B05122DE43F6300F063CC /* GroupEditViewModel.swift in Sources */,
