@@ -33,6 +33,7 @@ struct WorkoutSessionView: View {
 
     // 탭 애니메이션을 위한 상태 변수 추가
     @State private var tappedProgress = false
+    @State private var isTimerPaused = false // 타이머 일시정지 상태
     var onEndWorkout: (() -> Void)? = nil // 워크아웃 종료 콜백
     
     init(viewModel: WorkoutSessionViewModel, onEndWorkout: (() -> Void)? = nil) {
@@ -238,6 +239,23 @@ struct WorkoutSessionView: View {
                 }
 
                 Spacer()
+
+                // 타이머 일시정지/재생 버튼
+                Button {
+                    isTimerPaused.toggle()
+                    if isTimerPaused {
+                        viewModel.pauseTimer()
+                    } else {
+                        viewModel.resumeTimer()
+                    }
+                } label: {
+                    Image(systemName: isTimerPaused ? "play.circle.fill" : "pause.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 36, height: 36)
+                        .foregroundStyle(.black)
+                }
+                .padding(.trailing, 8)
 
                 Button {
                     viewModel.toggleViewMode()
