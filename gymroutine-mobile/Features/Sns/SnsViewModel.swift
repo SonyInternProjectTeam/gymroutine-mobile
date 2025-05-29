@@ -26,6 +26,11 @@ final class SnsViewModel: ObservableObject {
     @Published var isLoadingTemplates: Bool = false
     @Published var templatesError: String? = nil
     
+    // 그룹 관련 상태
+    @Published var userGroups: [GroupModel] = []
+    @Published var isLoadingGroups: Bool = false
+    @Published var groupsError: String? = nil
+    
     // 추천 초기화 상태 (앱 실행 후 첫 번째 로드인지 확인)
     private var hasInitializedRecommendations = false
     
@@ -33,6 +38,18 @@ final class SnsViewModel: ObservableObject {
     private let snsService = SnsService()
     private let authService = AuthService()
     private let templateService = TemplateService()
+    private let groupService = GroupService()
+    private let analyticsService = AnalyticsService.shared
+    
+    init() {
+        initializeRecommendations()
+        
+        fetchUserGroups()
+    }
+    
+    func onAppear() {
+        analyticsService.logScreenView(screenName: "Sns")
+    }
     
     /// ユーザー名でユーザー検索を行い、結果を userDetails に設定する
     func fetchUsers() {
@@ -251,5 +268,37 @@ final class SnsViewModel: ObservableObject {
         
         // 템플릿 로드
         fetchWorkoutTemplates()
+    }
+    
+    /// 사용자가 속한 그룹 목록 조회
+    func fetchUserGroups() {
+        Task {
+            guard let currentUser = authService.getCurrentUser() else {
+                print("⛔️ [fetchUserGroups] authService.getCurrentUser() returned nil")
+                groupsError = "ユーザーがログインしていません"
+                return
+            }
+            
+            let userId = currentUser.uid
+            print("✅ [fetchUserGroups] 현재 유저 ID: \(userId)")
+            
+            isLoadingGroups = true
+            groupsError = nil
+            
+            let result = await groupService.getUserGroups(userId: userId)
+            
+            isLoadingGroups = false
+            
+            switch result {
+            case .success(let groups):
+                print("✅ [fetchUserGroups] 성공 - 그룹 \(groups.count)개 가져옴")
+                userGroups = groups
+                
+            case .failure(let error):
+                print("⛔️ [fetchUserGroups] 오류 발생: \(error.localizedDescription)")
+                groupsError = "グループの取得に失敗しました: \(error.localizedDescription)"
+                userGroups = []
+            }
+        }
     }
 }

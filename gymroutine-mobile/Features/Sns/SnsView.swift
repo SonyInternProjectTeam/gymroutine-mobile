@@ -11,7 +11,7 @@ struct SnsView: View {
     @StateObject private var viewModel = SnsViewModel()
     @FocusState private var isFocused: Bool
     @State private var searchMode: Bool = false
-    private let analyticsService = AnalyticsService.shared
+    @State private var showingNotifications = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,15 +24,23 @@ struct SnsView: View {
             }
             else {
                 ScrollView {
-                    recommendedUsersView
-                    
-                    Divider()
-                        .padding(.vertical, 16)
-                    
-                    workoutTemplatesView
+                    VStack(spacing: 8) {
+                        
+                        recommendedUsersBox
+                        
+                        Divider()
+                        
+                        groupsBox
+                        
+                        Divider()
+                        
+                        workoutTemplatesBox
+                    }
                 }
+                .contentMargins(.bottom, 24)
             }
         }
+        .background(.gray.opacity(0.05))
         .onChange(of: isFocused) {
             // サーチモードOFFのときにフォーカスON → サーチモードON
             withAnimation {
@@ -42,13 +50,10 @@ struct SnsView: View {
         .navigationTitle("SNS")
         // Large Title을 쓰지 않고 상단 여백을 줄이려면 Inline Title
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            // 画面表示時におすすめユーザーを生成して取得
-            viewModel.initializeRecommendations()
-            
-            // Log screen view
-            analyticsService.logScreenView(screenName: "Sns")
+        .sheet(isPresented: $showingNotifications) {
+            NotificationsView()
         }
+        .onAppear(perform: viewModel.onAppear)
     }
 
     private var searchBarView: some View {
@@ -73,6 +78,7 @@ struct SnsView: View {
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 16)
+        .background()
     }
 
     private var searchResultsView: some View {
@@ -93,7 +99,7 @@ struct SnsView: View {
                     LazyVStack {
                         ForEach(viewModel.userDetails, id: \.uid) { user in
                             NavigationLink {
-                                ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
+                                ProfileView(user: user, router: nil)
                             } label: {
                                 UserCell(user: user)
                             }
@@ -104,20 +110,16 @@ struct SnsView: View {
         }
         .contentMargins(.top, 16)
     }
-
-    private var recommendedUsersView: some View {
-        // 추천 사용자 영역
-        VStack(spacing: 10) {
+    
+    private var recommendedUsersBox: some View {
+        VStack(spacing: 0) {
             HStack {
-                Image(systemName: "person.2")
-                Text("おすすめユーザー")
-                    .font(.title2)
-                    .fontWeight(.bold)
+                Label("おすすめユーザー", systemImage: "person.2")
+                    .font(.title2.bold())
                 
                 Spacer()
                 
                 Button(action: {
-                    // おすすめリストを更新
                     viewModel.refreshRecommendations()
                 }) {
                     Image(systemName: "arrow.clockwise")
@@ -125,34 +127,26 @@ struct SnsView: View {
                 }
                 .disabled(viewModel.isLoadingRecommendations)
             }
-            .padding(.horizontal, 16)
+            .padding()
             
             if viewModel.isLoadingRecommendations {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                        .padding()
-                    Spacer()
-                }
+                skeletonCells
             } else if let error = viewModel.recommendationsError {
                 Text(error)
-                    .hAlign(.center)
+                    .font(.headline)
                     .foregroundColor(.red)
-                    .font(.subheadline)
-                    .padding(.horizontal, 16)
+                    .padding(24)
             } else if viewModel.recommendedUsers.isEmpty {
-                VStack(alignment: .center) {
+                VStack(alignment: .center, spacing: 16) {
                     Text("おすすめユーザーが見つかりませんでした")
-                        .foregroundColor(.gray)
-                        .padding()
+                        .foregroundColor(.secondary)
                     
                     Button("再取得") {
                         viewModel.refreshRecommendations()
                     }
                     .buttonStyle(.bordered)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 30)
+                .padding(24)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
@@ -160,23 +154,88 @@ struct SnsView: View {
                             RecommendedUserCell(user: recommendedUser.user)
                         }
                     }
-                    .padding(.leading, 16)
-                    .padding(.trailing, 8)
-                    .padding(.vertical,8)
+                }
+                .contentMargins(.vertical, 4)
+                .contentMargins(.horizontal, 12)
+            }
+        }
+    }
+    
+    private var groupsBox: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Label("グループ", systemImage: "person.3")
+                    .font(.title2.bold())
+                
+                Spacer()
+                
+                HStack(spacing: 12) {
+                    NavigationLink(destination: GroupSearchView()) {
+                        Image(systemName: "magnifyingglass")
+                            
+                    }
+                    
+                    NavigationLink(destination: GroupManagementView()) {
+                        Image(systemName: "plus.circle")
+                    }
+                }
+                .font(.headline)
+            }
+            .padding()
+            
+            if viewModel.isLoadingGroups {
+                skeletonCells
+            } else if let error = viewModel.groupsError {
+                Text(error)
+                    .font(.headline)
+                    .foregroundColor(.red)
+                    .padding(24)
+            } else if viewModel.userGroups.isEmpty {
+                VStack(alignment: .center, spacing: 16) {
+                    Text("参加しているグループがありません")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    
+                    NavigationLink("グループを探す", destination: GroupSearchView())
+                        .buttonStyle(.bordered)
+                }
+                .padding(24)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(viewModel.userGroups) { group in
+                            NavigationLink(destination: GroupDetailView(group: group)) {
+                                GroupCell(groupCell: group)
+                            }
+                        }
+                    }
+                }
+                .contentMargins(.vertical, 4)
+                .contentMargins(.horizontal, 12)
+            }
+        }
+    }
+    
+    private var skeletonCells: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 16) {
+                ForEach(0..<3) { _ in
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(.init(gray: 0.8, alpha: 1.0)))
+                        .frame(width: 140, height: 160)
+                        .blinking(duration: 0.75)
                 }
             }
         }
-        .padding(.top, 16)
+        .contentMargins(.vertical, 4)
+        .contentMargins(.horizontal, 12)
     }
     
-    private var workoutTemplatesView: some View {
-        // 워크아웃 템플릿 영역
-        VStack(spacing: 10) {
+    private var workoutTemplatesBox: some View {
+        VStack(spacing: 0) {
             HStack {
-                Image(systemName: "figure.run")
-                Text("おすすめトレーニング")
-                    .font(.title2)
-                    .fontWeight(.bold)
+                Label("テンプレート", systemImage: "figure.run")
+                    .font(.title2.bold())
                 
                 Spacer()
                 
@@ -189,34 +248,32 @@ struct SnsView: View {
                 }
                 .disabled(viewModel.isLoadingTemplates)
             }
-            .padding(.horizontal, 16)
+            .padding()
             
             if viewModel.isLoadingTemplates {
-                HStack {
-                    Spacer()
-                    ProgressView()
-                        .padding()
-                    Spacer()
-                }
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color(.init(gray: 0.8, alpha: 1.0)))
+                    .aspectRatio(16/9, contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+                    .blinking(duration: 0.75)
+                    .padding()
             } else if let error = viewModel.templatesError {
                 Text(error)
-                    .hAlign(.center)
+                    .font(.headline)
                     .foregroundColor(.red)
-                    .font(.subheadline)
-                    .padding(.horizontal, 16)
+                    .padding(24)
             } else if viewModel.workoutTemplates.isEmpty {
-                VStack(alignment: .center) {
+                VStack(alignment: .center, spacing: 16) {
                     Text("おすすめトレーニングが見つかりませんでした")
-                        .foregroundColor(.gray)
-                        .padding()
+                        .font(.headline)
+                        .foregroundColor(.secondary)
                     
                     Button("再取得") {
                         viewModel.refreshTemplates()
                     }
                     .buttonStyle(.bordered)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 30)
+                .padding(24)
             } else {
                 VStack(spacing: 12) {
                     ForEach(viewModel.workoutTemplates) { template in
@@ -226,28 +283,7 @@ struct SnsView: View {
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
-                .padding(.horizontal, 16)
-            }
-        }
-    }
-
-    /// 프로필 이미지 뷰
-    private func profileImageView(for user: User) -> some View {
-        Group {
-            if !user.profilePhoto.isEmpty, let url = URL(string: user.profilePhoto) {
-                AsyncImage(url: url) { image in
-                    image.resizable()
-                        .scaledToFill()
-                } placeholder: {
-                    ProgressView()
-                }
-                .clipShape(Circle())
-            } else {
-                Image(systemName: "person.circle")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundColor(.gray)
-                    .clipShape(Circle())
+                .padding(.horizontal)
             }
         }
     }

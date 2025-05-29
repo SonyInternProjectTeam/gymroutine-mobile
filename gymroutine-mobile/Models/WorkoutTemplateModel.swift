@@ -147,4 +147,41 @@ struct WorkoutTemplate: Identifiable, Codable {
             isRoutine: true
         )
     }
-} 
+    
+    static var premiumMock: WorkoutTemplate {
+        WorkoutTemplate(
+            id: "template_001",
+            name: "Beginner Full-Body",
+            scheduledDays: ["Monday", "Wednesday", "Friday"],
+            exercises: [
+                WorkoutExercise(
+                    name: "Bench Press",
+                    part: "chest",
+                    key: "benchpress",
+                    sets: [
+                        ExerciseSet(reps: 12, weight: 50.0),
+                        ExerciseSet(reps: 10, weight: 52.5),
+                        ExerciseSet(reps: 8, weight: 55.0)
+                    ],
+                    restTime: 60
+                ),
+                WorkoutExercise(
+                    name: "Pull-Up",
+                    part: "back",
+                    key: "pull-up",
+                    sets: [
+                        ExerciseSet(reps: 10, weight: 0.0),
+                        ExerciseSet(reps: 8, weight: 0.0)
+                    ],
+                    restTime: 45
+                )
+            ],
+            notes: "Ideal for beginners",
+            isPremium: true,
+            level: "Beginner",
+            duration: "4 weeks",
+            templateId: "template_1",
+            isRoutine: true
+        )
+    }
+}

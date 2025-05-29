@@ -13,7 +13,7 @@ struct RecommendedUserCell: View {
 
     var body: some View {
         NavigationLink {
-            ProfileView(viewModel: ProfileViewModel(user: user), router: nil)
+            ProfileView(user: user)
         } label: {
             VStack(spacing: 12) {
                 ProfileIcon(profileUrl: user.profilePhoto, size: .medium1)

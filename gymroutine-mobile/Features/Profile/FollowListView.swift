@@ -96,7 +96,7 @@ struct FollowListView: View {
 
     private var usersListView: some View {
         ForEach(users, id: \.uid) { user in
-            NavigationLink(destination: ProfileView(viewModel: ProfileViewModel(user: user), router: nil)) {
+            NavigationLink(destination: ProfileView(user: user)) {
                 UserCell(user: user)
             }
         }

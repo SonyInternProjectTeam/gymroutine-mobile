@@ -29,6 +29,7 @@ const apiHandler = require("./handlers/apiHandler");
 const userHandler = require("./handlers/userHandler");
 const analyticsScheduler = require('./handlers/analyticsScheduler');
 const analyticsHandler = require('./handlers/analyticsHandler');
+const groupHandler = require('./handlers/groupHandler');
 
 // Export heatmap update function
 exports.updateWorkoutHeatmap = onDocumentCreated({
@@ -67,11 +68,19 @@ exports.dailyRecommendationUpdate = onSchedule({
   region: region
 }, recommendationScheduler.dailyRecommendationUpdate);
 
+// Export analytics scheduled function
 exports.dailyAnalyticsUpdate = onSchedule({
-  schedule: "0 3 * * *",
+  schedule: "0 3 * * *", // 매일 오전 3시 (일본 시간)
   timeZone: "Asia/Tokyo",
   region: region
 }, analyticsScheduler.dailyAnalyticsUpdate);
+
+// Export repeating goals renewal scheduler
+exports.renewRepeatingGoals = onSchedule({
+  schedule: "0 0 * * *", // 매일 00:00 (일본 시간)
+  timeZone: "Asia/Tokyo",
+  region: region
+}, groupHandler.renewRepeatingGoals);
 
 // Export API endpoints
 exports.getUserRecommendations = onCall({ region: region }, apiHandler.getUserRecommendations);
@@ -113,5 +122,25 @@ exports.updateUserAnalytics = onCall({
     }
   }
 }, analyticsScheduler.manualUserAnalyticsUpdate);
+
+// Export manual analytics update function
+exports.manualUserAnalyticsUpdate = onCall({
+  region: region
+}, analyticsScheduler.manualUserAnalyticsUpdate);
+
+// Export manual repeating goals renewal function (for testing)
+exports.manualRenewRepeatingGoals = onCall({
+  region: region
+}, groupHandler.renewRepeatingGoals);
+
+// Group management functions (only complex logic that requires backend)
+exports.searchUsers = onCall({ region: region }, groupHandler.searchUsers);
+exports.inviteUserToGroup = onCall({ region: region }, groupHandler.inviteUserToGroup);
+exports.respondToInvitation = onCall({ region: region }, groupHandler.respondToInvitation);
+exports.getGroupStatistics = onCall({ region: region }, groupHandler.getGroupStatistics);
+
+// Goal management functions
+exports.updateGoalProgress = onCall({ region: region }, groupHandler.updateGoalProgress);
+exports.checkGoalCompletion = onCall({ region: region }, groupHandler.checkGoalCompletion);
 
 // TODO: Add other function triggers and handlers as needed

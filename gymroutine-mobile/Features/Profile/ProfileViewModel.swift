@@ -80,6 +80,38 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
+    func onAppear() {
+        // Only load user data if the viewModel's user is not already set
+        // This prevents overwriting the profile when navigating from followers/following list
+        if user == nil {
+            loadUserData()
+        } else {
+            // Always refresh workouts when view appears
+            Task {
+                await self.fetchWorkouts()
+            }
+        }
+
+        // Add observer for workout deletion notification
+        NotificationCenter.default.addObserver(
+            forName: .workoutDeleted,
+            object: nil,
+            queue: .main
+        ) { _ in
+            // Refresh workouts when notification is received
+            Task {
+                await self.fetchWorkouts()
+            }
+        }
+
+        // Log screen view
+        analyticsService.logScreenView(screenName: "Profile")
+    }
+    
+    func onDisappear() {
+        NotificationCenter.default.removeObserver(self, name: .workoutDeleted, object: nil)
+    }
+    
     private func loadFollowerAndFollowingCounts(userId: String) {
         Task {
             UIApplication.showLoading()

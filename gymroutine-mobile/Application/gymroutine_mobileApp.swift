@@ -13,6 +13,7 @@ import FirebaseCore
 @main
 struct gymroutine_mobileApp: App {
     @StateObject private var userManager = UserManager.shared
+    @StateObject private var authService = AuthService()
     private let analyticsService = AnalyticsService.shared
     
     init() {
@@ -31,6 +32,7 @@ struct gymroutine_mobileApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environmentObject(authService)
                 .onAppear {
                     // app opened event logging
                     analyticsService.logEvent("app_opened", parameters: [
