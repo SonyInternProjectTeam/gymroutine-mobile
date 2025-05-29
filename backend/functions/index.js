@@ -30,6 +30,7 @@ const userHandler = require("./handlers/userHandler");
 const analyticsScheduler = require('./handlers/analyticsScheduler');
 const analyticsHandler = require('./handlers/analyticsHandler');
 const groupHandler = require('./handlers/groupHandler');
+const notificationHandler = require('./handlers/notificationHandler');
 
 // Export heatmap update function
 exports.updateWorkoutHeatmap = onDocumentCreated({
@@ -142,5 +143,10 @@ exports.getGroupStatistics = onCall({ region: region }, groupHandler.getGroupSta
 // Goal management functions
 exports.updateGoalProgress = onCall({ region: region }, groupHandler.updateGoalProgress);
 exports.checkGoalCompletion = onCall({ region: region }, groupHandler.checkGoalCompletion);
+// Notification functions
+exports.getUserNotifications = onCall({ region: region }, notificationHandler.getUserNotifications);
+exports.markNotificationAsRead = onCall({ region: region }, notificationHandler.markNotificationAsRead);
+exports.followUserWithNotification = onCall({ region: region }, notificationHandler.followUserWithNotification);
+exports.sendGroupGoalNotifications = onCall({ region: region }, notificationHandler.sendGroupGoalNotifications);
 
 // TODO: Add other function triggers and handlers as needed

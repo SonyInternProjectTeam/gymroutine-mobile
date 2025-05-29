@@ -56,7 +56,22 @@ struct NotificationsView: View {
                         if !viewModel.otherNotifications.isEmpty {
                             Section("その他の通知") {
                                 ForEach(viewModel.otherNotifications, id: \.id) { notification in
-                                    GeneralNotificationRow(notification: notification)
+                                    GeneralNotificationRow(
+                                        notification: notification,
+                                        onTap: {
+                                            if !notification.isRead {
+                                                viewModel.markNotificationAsRead(notificationId: notification.id)
+                                            }
+                                        }
+                                    )
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        if !notification.isRead {
+                                            Button("既読にする") {
+                                                viewModel.markNotificationAsRead(notificationId: notification.id)
+                                            }
+                                            .tint(.blue)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -73,7 +88,17 @@ struct NotificationsView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    // 모든 알림 읽음 처리 버튼
+                    if viewModel.unreadNotificationsCount > 0 {
+                        Button("すべて既読") {
+                            viewModel.markAllAsRead()
+                        }
+                        .font(.caption)
+                        .disabled(viewModel.isLoading)
+                    }
+                    
+                    // 새로고침 버튼
                     Button(action: {
                         viewModel.loadAllNotifications()
                     }) {
@@ -168,6 +193,7 @@ struct GroupInvitationNotificationRow: View {
 // 일반 알림 행 (향후 확장용)
 struct GeneralNotificationRow: View {
     let notification: GeneralNotification
+    let onTap: () -> Void
     
     var body: some View {
         HStack {
@@ -178,7 +204,7 @@ struct GeneralNotificationRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(notification.title)
                     .font(.headline)
-                    .fontWeight(.semibold)
+                    .fontWeight(notification.isRead ? .medium : .semibold)
                 
                 Text(notification.message)
                     .font(.subheadline)
@@ -198,8 +224,11 @@ struct GeneralNotificationRow: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color(.systemGray6).opacity(notification.isRead ? 0.5 : 1.0))
         .cornerRadius(12)
+        .onTapGesture {
+            onTap()
+        }
     }
     
     private var dateFormatter: DateFormatter {
@@ -224,6 +253,8 @@ struct GeneralNotification: Identifiable {
 
 enum NotificationType: String, CaseIterable {
     case groupInvitation = "group_invitation"
+    case newFollower = "new_follower"
+    case groupGoalCreated = "group_goal_created"
     case followRequest = "follow_request"
     case like = "like"
     case comment = "comment"
