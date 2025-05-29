@@ -66,7 +66,7 @@ struct NotificationsView: View {
                                     )
                                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                         if !notification.isRead {
-                                            Button("既読にする") {
+                                            Button("既読") {
                                                 viewModel.markNotificationAsRead(notificationId: notification.id)
                                             }
                                             .tint(.blue)

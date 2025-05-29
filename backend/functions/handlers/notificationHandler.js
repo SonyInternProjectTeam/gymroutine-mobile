@@ -141,51 +141,6 @@ exports.getUserNotifications = async (request) => {
 };
 
 /**
- * 알림을 읽음으로 표시
- * @param {Object} request - Firebase Functions 요청 객체
- * @param {string} request.data.notificationId - 알림 ID
- * @param {string} request.auth.uid - 인증된 사용자 ID
- * @returns {Object} 업데이트 결과
- */
-exports.markNotificationAsRead = async (request) => {
-    try {
-        const { notificationId } = request.data;
-        const userId = request.auth?.uid;
-
-        if (!userId) {
-            throw new Error('User not authenticated');
-        }
-
-        if (!notificationId) {
-            throw new Error('Notification ID is required');
-        }
-
-        const notificationRef = db.collection('Notifications').doc(notificationId);
-        const notificationDoc = await notificationRef.get();
-
-        if (!notificationDoc.exists) {
-            throw new Error('Notification not found');
-        }
-
-        const notificationData = notificationDoc.data();
-        if (notificationData.userId !== userId) {
-            throw new Error('Access denied');
-        }
-
-        await notificationRef.update({
-            isRead: true,
-            readAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-
-        return { success: true, message: 'Notification marked as read' };
-
-    } catch (error) {
-        logger.error('Error marking notification as read:', error);
-        throw new Error(`Failed to mark notification as read: ${error.message}`);
-    }
-};
-
-/**
  * 사용자 팔로우 (알림 포함)
  * @param {Object} request - Firebase Functions 요청 객체
  * @param {string} request.data.followedUserId - 팔로우 당할 사용자 ID

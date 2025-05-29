@@ -208,28 +208,46 @@ class NotificationsViewModel: ObservableObject {
     /// 알림을 읽음으로 표시
     /// - Parameter notificationId: 알림 ID
     func markNotificationAsRead(notificationId: String) {
-        Task {
-            let result = await notificationService.markNotificationAsRead(notificationId: notificationId)
-            
-            switch result {
-            case .success(_):
-                // 로컬에서 해당 알림을 읽음으로 표시
-                if let index = otherNotifications.firstIndex(where: { $0.id == notificationId }) {
-                    otherNotifications[index] = GeneralNotification(
-                        id: otherNotifications[index].id,
-                        title: otherNotifications[index].title,
-                        message: otherNotifications[index].message,
-                        iconName: otherNotifications[index].iconName,
-                        iconColor: otherNotifications[index].iconColor,
-                        createdAt: otherNotifications[index].createdAt,
-                        isRead: true,
-                        type: otherNotifications[index].type
-                    )
-                }
-                print("✅ [NotificationsViewModel] Successfully marked notification as read: \(notificationId)")
+        // 먼저 로컬에서 즉시 업데이트 (UI 반응성 향상)
+        if let index = otherNotifications.firstIndex(where: { $0.id == notificationId }) {
+            let notification = otherNotifications[index]
+            if !notification.isRead {
+                otherNotifications[index] = GeneralNotification(
+                    id: notification.id,
+                    title: notification.title,
+                    message: notification.message,
+                    iconName: notification.iconName,
+                    iconColor: notification.iconColor,
+                    createdAt: notification.createdAt,
+                    isRead: true,
+                    type: notification.type
+                )
                 
-            case .failure(let error):
-                print("⛔️ [NotificationsViewModel] Error marking notification as read: \(error)")
+                // 백그라운드에서 서버 업데이트
+                Task {
+                    let result = await notificationService.markNotificationAsRead(notificationId: notificationId)
+                    
+                    switch result {
+                    case .success(_):
+                        print("✅ [NotificationsViewModel] Successfully marked notification as read: \(notificationId)")
+                        
+                    case .failure(let error):
+                        print("⛔️ [NotificationsViewModel] Error marking notification as read: \(error)")
+                        // 실패 시 로컬 상태를 다시 되돌림
+                        if let index = self.otherNotifications.firstIndex(where: { $0.id == notificationId }) {
+                            self.otherNotifications[index] = GeneralNotification(
+                                id: notification.id,
+                                title: notification.title,
+                                message: notification.message,
+                                iconName: notification.iconName,
+                                iconColor: notification.iconColor,
+                                createdAt: notification.createdAt,
+                                isRead: false,
+                                type: notification.type
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -261,37 +279,66 @@ class NotificationsViewModel: ObservableObject {
         // 향후 구현 예정
     }
     
-    /// 모든 알림을 읽음으로 표시 (향후 구현)
+    /// 모든 알림을 읽음으로 표시
     func markAllAsRead() {
+        let unreadNotifications = otherNotifications.filter { !$0.isRead }
+        
+        if unreadNotifications.isEmpty {
+            return
+        }
+        
+        // 먼저 로컬에서 모든 알림을 읽음으로 표시 (UI 반응성 향상)
+        for (index, notification) in otherNotifications.enumerated() {
+            if !notification.isRead {
+                otherNotifications[index] = GeneralNotification(
+                    id: notification.id,
+                    title: notification.title,
+                    message: notification.message,
+                    iconName: notification.iconName,
+                    iconColor: notification.iconColor,
+                    createdAt: notification.createdAt,
+                    isRead: true,
+                    type: notification.type
+                )
+            }
+        }
+        
+        // 백그라운드에서 서버 업데이트
         Task {
-            let unreadNotifications = otherNotifications.filter { !$0.isRead }
+            var failedUpdates: [GeneralNotification] = []
             
             for notification in unreadNotifications {
                 let result = await notificationService.markNotificationAsRead(notificationId: notification.id)
                 
                 switch result {
                 case .success(_):
-                    // 로컬에서 해당 알림을 읽음으로 표시
-                    if let index = otherNotifications.firstIndex(where: { $0.id == notification.id }) {
-                        otherNotifications[index] = GeneralNotification(
-                            id: otherNotifications[index].id,
-                            title: otherNotifications[index].title,
-                            message: otherNotifications[index].message,
-                            iconName: otherNotifications[index].iconName,
-                            iconColor: otherNotifications[index].iconColor,
-                            createdAt: otherNotifications[index].createdAt,
-                            isRead: true,
-                            type: otherNotifications[index].type
-                        )
-                    }
+                    print("✅ [NotificationsViewModel] Successfully marked notification as read: \(notification.id)")
                     
                 case .failure(let error):
                     print("⛔️ [NotificationsViewModel] Error marking notification as read: \(error)")
+                    failedUpdates.append(notification)
                 }
             }
             
-            if !unreadNotifications.isEmpty {
-                print("✅ [NotificationsViewModel] Marked \(unreadNotifications.count) notifications as read")
+            // 실패한 업데이트가 있으면 해당 알림들을 다시 읽지 않음으로 되돌림
+            if !failedUpdates.isEmpty {
+                for failedNotification in failedUpdates {
+                    if let index = self.otherNotifications.firstIndex(where: { $0.id == failedNotification.id }) {
+                        self.otherNotifications[index] = GeneralNotification(
+                            id: failedNotification.id,
+                            title: failedNotification.title,
+                            message: failedNotification.message,
+                            iconName: failedNotification.iconName,
+                            iconColor: failedNotification.iconColor,
+                            createdAt: failedNotification.createdAt,
+                            isRead: false,
+                            type: failedNotification.type
+                        )
+                    }
+                }
+                print("⚠️ [NotificationsViewModel] Failed to mark \(failedUpdates.count) notifications as read")
+            } else {
+                print("✅ [NotificationsViewModel] Successfully marked all \(unreadNotifications.count) notifications as read")
             }
         }
     }

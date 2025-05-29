@@ -145,7 +145,6 @@ exports.updateGoalProgress = onCall({ region: region }, groupHandler.updateGoalP
 exports.checkGoalCompletion = onCall({ region: region }, groupHandler.checkGoalCompletion);
 // Notification functions
 exports.getUserNotifications = onCall({ region: region }, notificationHandler.getUserNotifications);
-exports.markNotificationAsRead = onCall({ region: region }, notificationHandler.markNotificationAsRead);
 exports.followUserWithNotification = onCall({ region: region }, notificationHandler.followUserWithNotification);
 exports.sendGroupGoalNotifications = onCall({ region: region }, notificationHandler.sendGroupGoalNotifications);
 
