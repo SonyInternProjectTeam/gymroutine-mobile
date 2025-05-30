@@ -54,6 +54,10 @@ struct SnsView: View {
             NotificationsView()
         }
         .onAppear(perform: viewModel.onAppear)
+        .onReceive(NotificationCenter.default.publisher(for: AppConstants.NotificationNames.didJoinGroup)) { _ in
+            // 그룹 가입 성공 시 그룹 목록 새로고침
+            viewModel.fetchUserGroups()
+        }
     }
 
     private var searchBarView: some View {

@@ -151,13 +151,23 @@ class GroupService {
         }
         
         do {
-            // 사용자가 그룹 멤버인지 확인
-            let userMemberSnapshot = try await db.collection("Groups").document(groupId).collection("members")
-                .whereField("userId", isEqualTo: currentUser.uid)
-                .getDocuments()
+            // 그룹 정보 조회
+            let groupSnapshot = try await db.collection("Groups").document(groupId).getDocument()
+            guard let groupData = groupSnapshot.data() else {
+                return .failure(NSError(domain: "GroupService", code: 404, userInfo: [NSLocalizedDescriptionKey: "그룹을 찾을 수 없습니다."]))
+            }
             
-            if userMemberSnapshot.documents.isEmpty {
-                return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "그룹 멤버만 접근할 수 있습니다."]))
+            let isPrivateGroup = groupData["isPrivate"] as? Bool ?? false
+            
+            // 비공개 그룹인 경우 멤버인지 확인
+            if isPrivateGroup {
+                let userMemberSnapshot = try await db.collection("Groups").document(groupId).collection("members")
+                    .whereField("userId", isEqualTo: currentUser.uid)
+                    .getDocuments()
+                
+                if userMemberSnapshot.documents.isEmpty {
+                    return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "비공개 그룹 멤버만 접근할 수 있습니다."]))
+                }
             }
             
             let memberSnapshot = try await db.collection("Groups").document(groupId).collection("members")
@@ -177,7 +187,21 @@ class GroupService {
     ///   - groupId: 조회할 그룹 ID
     /// - Returns: 그룹 초대 목록 또는 에러
     func getGroupInvitations(groupId: String) async -> Result<[GroupInvitation], Error> {
+        guard let currentUser = authService.getCurrentUser() else {
+            return .failure(NSError(domain: "GroupService", code: 401, userInfo: [NSLocalizedDescriptionKey: "사용자가 로그인되어 있지 않습니다."]))
+        }
+        
         do {
+            // 사용자가 그룹 관리자인지 확인 (초대 목록은 관리자만 조회 가능)
+            let adminSnapshot = try await db.collection("Groups").document(groupId).collection("members")
+                .whereField("userId", isEqualTo: currentUser.uid)
+                .whereField("role", isEqualTo: "admin")
+                .getDocuments()
+            
+            if adminSnapshot.documents.isEmpty {
+                return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "그룹 관리자만 초대 목록을 조회할 수 있습니다."]))
+            }
+            
             let invitationSnapshot = try await db.collection("GroupInvitations")
                 .whereField("groupId", isEqualTo: groupId)
                 .order(by: "invitedAt", descending: true) // 최신 초대가 위로 오도록 정렬
@@ -243,25 +267,6 @@ class GroupService {
         }
     }
     
-    /// 사용자의 그룹 초대 목록 조회 (클라이언트에서 직접 처리)
-    /// - Parameters:
-    ///   - userId: 조회할 사용자 ID
-    /// - Returns: 사용자의 초대 목록 또는 에러
-    func getUserInvitations(userId: String) async -> Result<[GroupInvitation], Error> {
-        do {
-            let snapshot = try await db.collection("GroupInvitations")
-                .whereField("invitedUser", isEqualTo: userId)
-                .whereField("status", isEqualTo: "pending")
-                .order(by: "invitedAt", descending: true)
-                .getDocuments()
-            
-            let invitations = try snapshot.documents.map { try $0.data(as: GroupInvitation.self) }
-            return .success(invitations)
-        } catch {
-            return .failure(error)
-        }
-    }
-    
     /// 그룹 초대 응답 (수락/거절) - 백엔드 API 사용
     /// - Parameters:
     ///   - invitationId: 응답할 초대 ID
@@ -288,49 +293,41 @@ class GroupService {
     
     // MARK: - Group Goals (클라이언트에서 직접 처리)
     
-    /// 그룹 목표 생성
+    /// 그룹 목표 생성 (알림 포함) - 클라이언트에서 직접 생성 후 알림만 백엔드 API 사용
     /// - Parameters:
-    ///   - groupId: 목표를 생성할 그룹 ID
+    ///   - groupId: 그룹 ID
     ///   - title: 목표 제목
-    ///   - description: 목표 설명 (선택사항)
-    ///   - goalType: 목표 유형
+    ///   - description: 목표 설명
+    ///   - goalType: 목표 타입
     ///   - targetValue: 목표 수치
     ///   - startDate: 시작 날짜
     ///   - endDate: 종료 날짜
-    ///   - repeatType: 반복 유형 (선택사항)
-    ///   - repeatCount: 반복 횟수 (선택사항)
-    /// - Returns: 생성된 그룹 목표 또는 에러
-    func createGroupGoal(
+    ///   - repeatType: 반복 타입 (옵션)
+    ///   - repeatCount: 반복 횟수 (옵션)
+    /// - Returns: 생성 결과 또는 에러
+    func createGroupGoalWithNotifications(
         groupId: String,
         title: String,
-        description: String?,
-        goalType: GroupGoalType,
+        description: String? = nil,
+        goalType: String,
         targetValue: Double,
         startDate: Date,
         endDate: Date,
         repeatType: String? = nil,
         repeatCount: Int? = nil
-    ) async -> Result<GroupGoal, Error> {
+    ) async -> Result<[String: Any], Error> {
         guard let currentUser = authService.getCurrentUser() else {
             return .failure(NSError(domain: "GroupService", code: 401, userInfo: [NSLocalizedDescriptionKey: "사용자가 로그인되어 있지 않습니다."]))
         }
         
         do {
-            // 사용자가 그룹 멤버인지 확인
-            let memberSnapshot = try await db.collection("Groups").document(groupId).collection("members")
-                .whereField("userId", isEqualTo: currentUser.uid)
-                .getDocuments()
-            
-            if memberSnapshot.documents.isEmpty {
-                return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "그룹 멤버만 목표를 생성할 수 있습니다."]))
-            }
-            
+            // 1. 먼저 클라이언트에서 직접 목표 생성
             var goalData: [String: Any] = [
                 "title": title.trimmingCharacters(in: .whitespacesAndNewlines),
                 "description": description?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "",
-                "goalType": goalType.rawValue,
+                "goalType": goalType,
                 "targetValue": targetValue,
-                "unit": goalType.defaultUnit,
+                "unit": getUnitForGoalType(goalType),
                 "startDate": Timestamp(date: startDate),
                 "endDate": Timestamp(date: endDate),
                 "createdBy": currentUser.uid,
@@ -341,25 +338,60 @@ class GroupService {
             ]
             
             // 반복 정보 추가
-            if let repeatType = repeatType {
+            if let repeatType = repeatType, repeatType != "none" {
                 goalData["repeatType"] = repeatType
             }
-            if let repeatCount = repeatCount {
+            if let repeatCount = repeatCount, repeatCount > 0 {
                 goalData["repeatCount"] = repeatCount
-            }
-            
-            // 반복 목표인 경우 currentRepeatCycle을 1로 설정
-            if repeatType != nil && repeatType != "none" {
                 goalData["currentRepeatCycle"] = 1
             }
             
+            print("🔄 [GroupService] Creating goal directly in Firestore with data: \(goalData)")
+            
             let goalRef = try await db.collection("Groups").document(groupId).collection("goals").addDocument(data: goalData)
-            let snapshot = try await goalRef.getDocument()
-            let goal = try snapshot.data(as: GroupGoal.self)
-            return .success(goal)
+            
+            print("✅ [GroupService] Goal created successfully with ID: \(goalRef.documentID)")
+            
+            // 2. 백엔드 API를 통해 알림 발송
+            do {
+                let functions = Functions.functions(region: "asia-northeast1")
+                let notificationData: [String: Any] = [
+                    "groupId": groupId,
+                    "goalTitle": title,
+                    "createdByUserId": currentUser.uid
+                ]
+                
+                let _ = try await functions.httpsCallable("sendGroupGoalNotifications").call(notificationData)
+                
+                print("📧 [GroupService] Notifications sent successfully")
+            } catch {
+                print("⚠️ [GroupService] Failed to send notifications, but goal was created: \(error)")
+                // 알림 실패는 목표 생성 성공에 영향을 주지 않음
+            }
+            
+            return .success([
+                "success": true,
+                "goalId": goalRef.documentID,
+                "message": "Goal created successfully"
+            ])
             
         } catch {
+            print("❌ [GroupService] Error creating goal: \(error)")
             return .failure(error)
+        }
+    }
+    
+    /// 목표 타입에 따른 단위 반환
+    private func getUnitForGoalType(_ goalType: String) -> String {
+        switch goalType {
+        case "workoutCount":
+            return "回"
+        case "workoutDuration":
+            return "分"
+        case "weightLifted":
+            return "kg"
+        default:
+            return ""
         }
     }
     
@@ -373,13 +405,23 @@ class GroupService {
         }
         
         do {
-            // 사용자가 그룹 멤버인지 확인
-            let memberSnapshot = try await db.collection("Groups").document(groupId).collection("members")
-                .whereField("userId", isEqualTo: currentUser.uid)
-                .getDocuments()
+            // 그룹 정보 조회
+            let groupSnapshot = try await db.collection("Groups").document(groupId).getDocument()
+            guard let groupData = groupSnapshot.data() else {
+                return .failure(NSError(domain: "GroupService", code: 404, userInfo: [NSLocalizedDescriptionKey: "그룹을 찾을 수 없습니다."]))
+            }
             
-            if memberSnapshot.documents.isEmpty {
-                return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "그룹 멤버만 접근할 수 있습니다."]))
+            let isPrivateGroup = groupData["isPrivate"] as? Bool ?? false
+            
+            // 비공개 그룹인 경우 멤버인지 확인
+            if isPrivateGroup {
+                let memberSnapshot = try await db.collection("Groups").document(groupId).collection("members")
+                    .whereField("userId", isEqualTo: currentUser.uid)
+                    .getDocuments()
+                
+                if memberSnapshot.documents.isEmpty {
+                    return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "비공개 그룹 멤버만 접근할 수 있습니다."]))
+                }
             }
             
             // 활성 목표와 완료된 목표 모두 가져오기
@@ -804,13 +846,23 @@ class GroupService {
         }
         
         do {
-            // 사용자가 그룹 멤버인지 확인
-            let memberSnapshot = try await db.collection("Groups").document(groupId).collection("members")
-                .whereField("userId", isEqualTo: currentUser.uid)
-                .getDocuments()
+            // 그룹 정보 조회
+            let groupSnapshot = try await db.collection("Groups").document(groupId).getDocument()
+            guard let groupData = groupSnapshot.data() else {
+                return .failure(NSError(domain: "GroupService", code: 404, userInfo: [NSLocalizedDescriptionKey: "그룹을 찾을 수 없습니다."]))
+            }
             
-            if memberSnapshot.documents.isEmpty {
-                return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "그룹 멤버만 접근할 수 있습니다."]))
+            let isPrivateGroup = groupData["isPrivate"] as? Bool ?? false
+            
+            // 비공개 그룹인 경우 멤버인지 확인
+            if isPrivateGroup {
+                let memberSnapshot = try await db.collection("Groups").document(groupId).collection("members")
+                    .whereField("userId", isEqualTo: currentUser.uid)
+                    .getDocuments()
+                
+                if memberSnapshot.documents.isEmpty {
+                    return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "비공개 그룹 멤버만 접근할 수 있습니다."]))
+                }
             }
             
             let goalSnapshot = try await db.collection("Groups").document(groupId).collection("goals")
@@ -821,6 +873,178 @@ class GroupService {
             let goals = try goalSnapshot.documents.map { try $0.data(as: GroupGoal.self) }
             return .success(goals)
             
+        } catch {
+            return .failure(error)
+        }
+    }
+
+    // MARK: - Member Management (백엔드 API 또는 직접 처리)
+
+    /// 그룹에서 사용자 제거 (관리자 권한 필요)
+    /// - Parameters:
+    ///   - userId: 제거할 사용자 ID
+    ///   - groupId: 대상 그룹 ID
+    /// - Returns: 성공 또는 에러
+    func removeUserFromGroup(userId: String, groupId: String) async -> Result<Void, Error> {
+        guard let adminUser = authService.getCurrentUser() else {
+            return .failure(NSError(domain: "GroupService", code: 401, userInfo: [NSLocalizedDescriptionKey: "관리자 권한을 확인하려면 로그인이 필요합니다."])) // Login required to verify admin rights.
+        }
+
+        let groupRef = db.collection("Groups").document(groupId)
+        let membersRef = groupRef.collection("members")
+
+        do {
+            // 1. 현재 사용자가 관리자인지 확인
+            let adminMemberDoc = try await membersRef.whereField("userId", isEqualTo: adminUser.uid).getDocuments()
+            guard let adminData = adminMemberDoc.documents.first?.data(), 
+                  let adminRole = adminData["role"] as? String, 
+                  adminRole == GroupMemberRole.admin.rawValue else {
+                return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "그룹 멤버를 제거할 권한이 없습니다."])) // No permission to remove group members.
+            }
+            
+            // 2. 제거할 사용자가 관리자인 경우, 본인이 아닌 다른 관리자를 제거할 수 없음 (또는 그룹에 관리자가 1명만 남는 경우 방지)
+            // 이 부분은 정책에 따라 추가/수정 가능
+            if userId == adminUser.uid {
+                 let allAdminsSnapshot = try await membersRef.whereField("role", isEqualTo: GroupMemberRole.admin.rawValue).getDocuments()
+                 if allAdminsSnapshot.documents.count <= 1 {
+                     return .failure(NSError(domain: "GroupService", code: 400, userInfo: [NSLocalizedDescriptionKey: "그룹의 마지막 관리자는 자신을 제거할 수 없습니다."])) // Last admin cannot remove themselves.
+                 }
+            } else {
+                // 다른 사용자를 제거하는 경우, 그 사용자가 관리자인지 확인
+                 let targetUserMemberDoc = try await membersRef.whereField("userId", isEqualTo: userId).limit(to: 1).getDocuments()
+                 if let targetUserData = targetUserMemberDoc.documents.first?.data(),
+                    let targetUserRole = targetUserData["role"] as? String,
+                    targetUserRole == GroupMemberRole.admin.rawValue {
+                        // 여기서 다른 관리자를 제거하는 것에 대한 추가 정책을 넣을 수 있습니다.
+                        // 예: 그룹 소유자만 다른 관리자를 제거할 수 있도록 하거나, 경고를 표시합니다.
+                        // 현재는 관리자면 다른 (본인이 아닌) 관리자도 제거 가능하게 둡니다.
+                        print("ℹ️ 관리자가 다른 관리자를 제거하려고 합니다: \(userId)")
+                    }
+            }
+
+            // 3. 사용자 멤버십 문서 찾기 및 삭제
+            let memberQuerySnapshot = try await membersRef.whereField("userId", isEqualTo: userId).getDocuments()
+            
+            guard let memberDocToRemove = memberQuerySnapshot.documents.first else {
+                // 사용자가 이미 그룹 멤버가 아닐 수 있음 (예: 동시 요청)
+                print("ℹ️ 제거할 사용자가 그룹 멤버가 아닙니다: \(userId)")
+                return .success(()) // 이미 없는 경우 성공으로 처리
+            }
+            
+            try await membersRef.document(memberDocToRemove.documentID).delete()
+            
+            // 4. 그룹 문서의 memberCount 업데이트 (트랜잭션 사용 권장)
+            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+                let groupDocument: DocumentSnapshot
+                do {
+                    try groupDocument = transaction.getDocument(groupRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil
+                }
+
+                guard groupDocument.exists else {
+                    let err = NSError(domain: "GroupService", code: 404, userInfo: [NSLocalizedDescriptionKey: "그룹을 찾을 수 없습니다."])
+                    errorPointer?.pointee = err
+                    return nil
+                }
+                
+                // memberCount 감소
+                transaction.updateData(["memberCount": FieldValue.increment(Int64(-1))], forDocument: groupRef)
+                transaction.updateData(["updatedAt": Timestamp(date: Date())], forDocument: groupRef) // updatedAt 갱신
+                return nil
+            }
+            
+            print("✅ Successfully removed user \(userId) from group \(groupId)")
+            return .success(())
+            
+        } catch {
+            print("⛔️ Error removing user from group: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+
+    /// 공개 그룹에 사용자 가입 (클라이언트에서 직접 처리)
+    /// - Parameters:
+    ///   - groupId: 가입할 그룹 ID
+    ///   - userId: 가입할 사용자 ID (일반적으로 현재 로그인한 사용자)
+    /// - Returns: 성공 또는 에러
+    func joinPublicGroup(groupId: String, userId: String) async -> Result<Void, Error> {
+        guard let currentUser = authService.getCurrentUser(), currentUser.uid == userId else {
+            return .failure(NSError(domain: "GroupService", code: 401, userInfo: [NSLocalizedDescriptionKey: "사용자가 로그인되어 있지 않거나 ID가 일치하지 않습니다."])) // User not logged in or ID mismatch.
+        }
+
+        let groupRef = db.collection("Groups").document(groupId)
+        let membersRef = groupRef.collection("members")
+
+        do {
+            // 0. 그룹이 공개 그룹인지 먼저 확인 (선택적이지만 좋은 방어 로직)
+            let groupDoc = try await groupRef.getDocument()
+            guard let groupData = groupDoc.data(), let isPrivate = groupData["isPrivate"] as? Bool, !isPrivate else {
+                return .failure(NSError(domain: "GroupService", code: 403, userInfo: [NSLocalizedDescriptionKey: "비공개 그룹에는 직접 가입할 수 없습니다."])) // Cannot directly join a private group.
+            }
+
+            // 1. 이미 멤버인지 확인
+            let existingMemberSnapshot = try await membersRef.whereField("userId", isEqualTo: userId).getDocuments()
+            if !existingMemberSnapshot.documents.isEmpty {
+                print("ℹ️ 사용자는 이미 그룹의 멤버입니다: \(userId)") // User is already a member of the group.
+                return .success(()) // 이미 멤버인 경우 성공으로 처리
+            }
+
+            // 2. 새로운 멤버로 추가
+            let userName = await authService.getCurrentUserName() // AuthService에서 사용자 이름 가져오기
+            let memberData: [String: Any] = [
+                "userId": userId,
+                "userName": userName, // 실제 사용자 이름으로 대체해야 함
+                "joinedAt": Timestamp(date: Date()),
+                "role": GroupMemberRole.member.rawValue // 일반 멤버로 추가
+            ]
+            try await membersRef.addDocument(data: memberData)
+
+            // 3. 그룹 문서의 memberCount 업데이트 (트랜잭션 사용)
+            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+                let groupDocument: DocumentSnapshot
+                do {
+                    try groupDocument = transaction.getDocument(groupRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil
+                }
+
+                guard groupDocument.exists else {
+                    let err = NSError(domain: "GroupService", code: 404, userInfo: [NSLocalizedDescriptionKey: "그룹을 찾을 수 없습니다."])
+                    errorPointer?.pointee = err
+                    return nil
+                }
+                
+                transaction.updateData(["memberCount": FieldValue.increment(Int64(1))], forDocument: groupRef)
+                transaction.updateData(["updatedAt": Timestamp(date: Date())], forDocument: groupRef) // updatedAt 갱신
+                return nil
+            }
+            
+            print("✅ Successfully joined user \(userId) to public group \(groupId)")
+            return .success(())
+            
+        } catch {
+            print("⛔️ Error joining public group: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+
+    /// 사용자의 그룹 초대 목록 조회 (클라이언트에서 직접 처리)
+    /// - Parameters:
+    ///   - userId: 조회할 사용자 ID
+    /// - Returns: 사용자의 초대 목록 또는 에러
+    func getUserInvitations(userId: String) async -> Result<[GroupInvitation], Error> {
+        do {
+            let snapshot = try await db.collection("GroupInvitations")
+                .whereField("invitedUser", isEqualTo: userId)
+                .whereField("status", isEqualTo: "pending")
+                .order(by: "invitedAt", descending: true)
+                .getDocuments()
+            
+            let invitations = try snapshot.documents.map { try $0.data(as: GroupInvitation.self) }
+            return .success(invitations)
         } catch {
             return .failure(error)
         }

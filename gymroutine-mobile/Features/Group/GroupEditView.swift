@@ -230,15 +230,21 @@ struct GroupEditView: View {
                 }
             }
         } message: {
-            Text(viewModel.isGroupDeleted ? "グループが正常に削�除されました！" : "グループが正常に更新されました！")
+            Text(viewModel.isGroupDeleted ? "グループが正常に削除されました！" : "グループが正常に更新されました！")
         }
         .sheet(isPresented: $viewModel.showInviteSheet) {
             GroupInviteView(groupId: group.id ?? "")
         }
+        .alert("メンバーを削除しますか？", isPresented: $viewModel.showRemoveMemberAlert, presenting: viewModel.memberToRemove) { member in
+            Button("削除", role: .destructive) {
+                viewModel.confirmRemoveMember()
+            }
+            Button("キャンセル", role: .cancel) { }
+        } message: { member in
+            Text("「\(member.userName)」さんをグループから削除します。この操作は取り消せません。")
+        }
     }
 }
-
-
 
 #Preview {
     NavigationView {

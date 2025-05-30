@@ -160,6 +160,7 @@
 		27E5E5512CCECA57003E3E70 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5502CCECA57003E3E70 /* FirebaseAnalytics */; };
 		27E5E5532CCECA57003E3E70 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5522CCECA57003E3E70 /* FirebaseCore */; };
 		27E5E5632CCECB2A003E3E70 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5622CCECB2A003E3E70 /* FirebaseAuth */; };
+		27E6118B2DE87294008EE7E8 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E6118A2DE87294008EE7E8 /* NotificationService.swift */; };
 		27EAD6692DD4D56E001C601F /* WorkoutTemplateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAD6682DD4D56E001C601F /* WorkoutTemplateCell.swift */; };
 		27EAD66B2DD4D579001C601F /* WorkoutTemplateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAD66A2DD4D579001C601F /* WorkoutTemplateModel.swift */; };
 		27EAD66D2DD4D591001C601F /* TemplateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAD66C2DD4D591001C601F /* TemplateService.swift */; };
@@ -332,6 +333,7 @@
 		27E5E5222CCEC9E9003E3E70 /* gymroutine-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gymroutine-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E5322CCEC9EA003E3E70 /* gymroutine-mobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		27E6118A2DE87294008EE7E8 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		27EAD6682DD4D56E001C601F /* WorkoutTemplateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateCell.swift; sourceTree = "<group>"; };
 		27EAD66A2DD4D579001C601F /* WorkoutTemplateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateModel.swift; sourceTree = "<group>"; };
 		27EAD66C2DD4D591001C601F /* TemplateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateService.swift; sourceTree = "<group>"; };
@@ -502,6 +504,7 @@
 		00CDC3E62D845E8E003B18EB /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				27E6118A2DE87294008EE7E8 /* NotificationService.swift */,
 				274B04DC2DE2C5D500F063CC /* GroupService.swift */,
 				27EAD66C2DD4D591001C601F /* TemplateService.swift */,
 				27CCD73C2DD0B9CE0036EB8A /* WeightHistoryService.swift */,
@@ -1098,6 +1101,7 @@
 				79A0A13C2DBE1BCD00DF56F6 /* FollowListView.swift in Sources */,
 				276F873D2DB1EE1A00E8435E /* CompletedWorkoutCell.swift in Sources */,
 				276F872D2DB1D98E00E8435E /* ResultService.swift in Sources */,
+				27E6118B2DE87294008EE7E8 /* NotificationService.swift in Sources */,
 				00CDC4322D845E8E003B18EB /* ExerciseService.swift in Sources */,
 				27D6A8652D9D9319004D3F2B /* WorkoutSessionView.swift in Sources */,
 				00CDC4332D845E8E003B18EB /* FollowService.swift in Sources */,

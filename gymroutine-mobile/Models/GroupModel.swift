@@ -14,6 +14,24 @@ struct GroupModel: Identifiable, Codable {
     // var imageUrl: String?
     var tags: [String] // 그룹 태그 (예: "근력", "유산소", "다이어트" 등)
     
+    // Equatable conformance
+    static func == (lhs: GroupModel, rhs: GroupModel) -> Bool {
+        lhs.id == rhs.id // Primarily rely on ID for equality
+    }
+    
+    // Placeholder for previews and navigation
+    static var placeholder: GroupModel {
+        GroupModel(id: "placeholder", 
+                   name: "Loading Group...", 
+                   description: "This is a placeholder group.", 
+                   createdBy: "system", 
+                   createdAt: Date(), 
+                   updatedAt: Date(), 
+                   memberCount: 0, 
+                   isPrivate: false, 
+                   tags: ["placeholder"])
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id
         case name

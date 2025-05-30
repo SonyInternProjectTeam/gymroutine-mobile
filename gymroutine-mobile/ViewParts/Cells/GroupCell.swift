@@ -42,8 +42,9 @@ struct GroupCell: View {
                     }
                 }
                 
-                if !groupCell.tags.isEmpty {
-                    HStack {
+                // 태그 영역 - 태그가 없어도 동일한 높이를 유지하기 위해 항상 표시
+                HStack {
+                    if !groupCell.tags.isEmpty {
                         ForEach(groupCell.tags.prefix(2), id: \.self) { tag in
                             Text("#\(tag)")
                                 .font(.caption2)
@@ -59,8 +60,15 @@ struct GroupCell: View {
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
+                    } else {
+                        // 태그가 없을 때 빈 공간을 유지하여 일관된 높이 보장
+                        Text("")
+                            .font(.caption2)
+                            .frame(height: 16) // 태그와 동일한 높이
                     }
+                    Spacer()
                 }
+                .frame(height: 20) // 태그 영역의 고정 높이
             }
         }
         .frame(width: 120)
