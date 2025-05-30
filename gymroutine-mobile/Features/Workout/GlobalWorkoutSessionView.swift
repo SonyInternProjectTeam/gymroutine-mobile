@@ -10,7 +10,7 @@ struct GlobalWorkoutSessionView: View {
             .frame(width: 0, height: 0) // 화면에 영향을 주지 않도록 크기 최소화
 
             // 워크아웃 세션 모달 (기존 로직)
-            .sheet(isPresented: $workoutManager.isWorkoutSessionMaximized) {
+            .fullScreenCover(isPresented: $workoutManager.isWorkoutSessionMaximized) {
                 if let viewModel = workoutManager.workoutSessionViewModel {
                     // NavigationStack을 추가하여 WorkoutSessionView 내 타이틀 등이 표시되도록 함
                     NavigationStack {

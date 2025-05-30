@@ -213,19 +213,14 @@ struct WorkoutSessionView: View {
     private var timerBox: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("タイム")
-                        .font(.system(size: 16, weight: .semibold))
-
-                    HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text("\(viewModel.minutes)")
-                            .contentTransition(.numericText())
-                        Text(":")
-                        Text("\(String(format: "%02d", viewModel.seconds))")
-                            .contentTransition(.numericText())
-                    }
-                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 48, weight: .semibold)))
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text("\(viewModel.minutes)")
+                        .contentTransition(.numericText())
+                    Text(":")
+                    Text("\(String(format: "%02d", viewModel.seconds))")
+                        .contentTransition(.numericText())
                 }
+                .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 48, weight: .semibold)))
 
                 Spacer()
 
@@ -241,9 +236,7 @@ struct WorkoutSessionView: View {
             }
             .padding(.top, 16)
 
-            Rectangle()
-                .frame(height: 2)
-                .foregroundStyle(.secondary)
+            CustomDivider()
         }
         .padding(.horizontal, 16)
         .animation(.default, value: viewModel.minutes)
@@ -307,7 +300,7 @@ struct WorkoutSessionView: View {
 
     // MARK: - [Section3]: bottomNavigationBox
     private var bottomNavigationBox: some View {
-        HStack {
+        HStack(spacing: 36) {
             Button(action: {
                 if viewModel.isDetailView {
                     viewModel.moveToPreviousSet()
@@ -316,24 +309,17 @@ struct WorkoutSessionView: View {
                 }
             }) {
                 Image(systemName: "chevron.left")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                    .font(.title2.bold())
             }
-            
-            Spacer()
+            .foregroundStyle(.secondary)
             
             Button(action: {
                 viewModel.addExercise()
             }) {
                 Image(systemName: "plus")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .padding(16)
-                    .background(.blue)
-                    .clipShape(Circle())
+                    .font(.title2.bold())
             }
-            
-            Spacer()
+            .buttonStyle(CapsuleButtonStyle(color: .main))
             
             Button(action: {
                 if viewModel.isDetailView {
@@ -343,12 +329,15 @@ struct WorkoutSessionView: View {
                 }
             }) {
                 Image(systemName: "chevron.right")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
+                    .font(.title2.bold())
             }
+            .foregroundStyle(.secondary)
         }
-        .padding()
+        .padding(24)
         .background(Color(UIColor.systemBackground))
+        .overlay(alignment: .top) {
+            CustomDivider()
+        }
     }
 
     // MARK: - [Section4]: restTimerOverlay
