@@ -443,6 +443,7 @@
 				27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */,
 				00B107832DE8445C000E7BC9 /* DetailExercisesView.swift */,
 				00B107872DE94766000E7BC9 /* ListExercisesView.swift */,
+				276F87762DB2957000E8435E /* EditSetView.swift */,
 			);
 			path = WorkoutSession;
 			sourceTree = "<group>";
@@ -769,7 +770,6 @@
 				00D3E1BD2DBDCBBB00590F92 /* WorkoutEdit */,
 				00D3E1BC2DBDCA7300590F92 /* WorkoutDetail */,
 				00D3E1BB2DBDCA5B00590F92 /* CreateWorkout */,
-				276F87762DB2957000E8435E /* EditSetView.swift */,
 				276F87742DB28EBF00E8435E /* RestTimeSettingsView.swift */,
 				275C71602DAD432300579962 /* GlobalWorkoutSessionView.swift */,
 				275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */,
