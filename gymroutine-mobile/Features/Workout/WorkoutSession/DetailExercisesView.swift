@@ -10,6 +10,7 @@ import SwiftUI
 
 struct DetailExercisesView: View {
     
+    let exercise: WorkoutExercise
     @EnvironmentObject var viewModel: WorkoutSessionViewModel
     private let circularSize = UIScreen.main.bounds.width * 0.5
     
@@ -17,19 +18,6 @@ struct DetailExercisesView: View {
     @State private var tappedProgress = false
     
     var body: some View {
-        Group {
-            if let exercise = viewModel.currentExercise {
-                contentView(exercise: exercise)
-            } else {
-                nothingExerciseView
-            }
-        }
-        .vAlign(.center)
-    }
-}
-
-extension DetailExercisesView {
-    private func contentView(exercise: WorkoutExercise) -> some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 16) {
                 GeometryReader { proxy in
@@ -37,21 +25,25 @@ extension DetailExercisesView {
                     
                     VStack(spacing: 0) {
                         exerciseProgressIndicator
-                        exerciseTitleBox(exercise: exercise)
-                        exerciseProgressCircle(exercise: exercise)
+                        exerciseTitleBox
+                        exerciseProgressCircle
                             .padding(.top)
                     }
                     .offset(y: minY)
                 }
                 .frame(height: UIScreen.main.bounds.height * 0.35)
 
-                exerciseSetsBox(for: exercise)
+                exerciseSetsBox
             }
         }
         .coordinateSpace(name: "SCROLL")
+        .vAlign(.center)
     }
+}
+
+extension DetailExercisesView {
     
-    private func exerciseSetsBox(for exercise: WorkoutExercise) -> some View {
+    private var exerciseSetsBox: some View {
         VStack(spacing: 0) {
             VStack {
                 HStack {
@@ -139,23 +131,6 @@ extension DetailExercisesView {
         )
     }
     
-    private var nothingExerciseView: some View {
-        VStack(spacing: 16) {
-            Image("Side Plank")
-                .resizable()
-                .scaledToFit()
-                .frame(width: circularSize)
-            
-            Text("エクササイズを追加しましょう")
-                .font(.title2.bold())
-            
-            Image(systemName: "arrowshape.down.fill")
-                .font(.title.bold())
-        }
-        .opacity(0.4)
-        .padding(24)
-    }
-    
     // 운동 진행 표시기 - 진행 바와 체크 표시
     private var exerciseProgressIndicator: some View {
         ScrollViewReader { proxy in
@@ -210,7 +185,7 @@ extension DetailExercisesView {
         }
     }
 
-    private func exerciseTitleBox(exercise: WorkoutExercise) -> some View {
+    private var exerciseTitleBox: some View {
         HStack(spacing: 16) {
             Rectangle()
                 .cornerRadius(4)
@@ -222,13 +197,13 @@ extension DetailExercisesView {
 
             Spacer()
 
-            restTimeSettingView(exercise: exercise)
+            restTimeSettingView
         }
         .padding(.horizontal, 24)
     }
 
     // 詳細画面のエクササイズ画像と進行円形インジケーター
-    private func exerciseProgressCircle(exercise: WorkoutExercise) -> some View {
+    private var exerciseProgressCircle: some View {
         ZStack {
             // 背景の円
             Circle()
@@ -287,7 +262,7 @@ extension DetailExercisesView {
     }
     
     // 休憩モーダルの表示
-    private func restTimeSettingView(exercise: WorkoutExercise) -> some View {
+    private var restTimeSettingView: some View {
             Button(action: {
                 viewModel.restTimeTargetIndex = viewModel.currentExerciseIndex
             }) {
