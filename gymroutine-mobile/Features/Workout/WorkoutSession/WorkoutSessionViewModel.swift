@@ -25,6 +25,7 @@ final class WorkoutSessionViewModel: ObservableObject {
     @Published var isRestTimerActive = false
     @Published var restSeconds = 90  // 기본 휴식 시간 90초
     @Published var remainingRestSeconds = 90
+    @Published var isTimerPaused = false
     private var restTimer: Timer?
     private var player: AVAudioPlayer?
     // 총 휴식 시간 추적을 위한 변수
@@ -92,6 +93,26 @@ final class WorkoutSessionViewModel: ObservableObject {
         let elapsed = Int(Date().timeIntervalSince(startTime))
         minutes = elapsed / 60
         seconds = elapsed % 60
+    }
+
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+        print("⏱️ 메인 워크아웃 타이머 중지")
+    }
+    
+    private func resumeTimer() {
+        startTime = Date().addingTimeInterval(-TimeInterval(minutes * 60 + seconds))
+        startTimer()
+    }
+    
+    func toggleTimer() {
+        isTimerPaused.toggle()
+        if isTimerPaused {
+            stopTimer()
+        } else {
+            resumeTimer()
+        }
     }
     
     // MARK: - View Mode
@@ -436,13 +457,6 @@ final class WorkoutSessionViewModel: ObservableObject {
         
         stopTimer()
         stopRestTimer()
-    }
-    
-    // Helper to stop the main workout timer
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-        print("⏱️ 메인 워크아웃 타이머 중지")
     }
     
     func updateRestTime(for index: Int) {

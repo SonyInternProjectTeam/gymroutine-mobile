@@ -216,7 +216,7 @@ struct WorkoutSessionView: View {
     // MARK: - [Section1]: TimerBox
     private var timerBox: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
+            HStack(spacing: 24) {
                 HStack(alignment: .firstTextBaseline, spacing: 2) {
                     Text("\(viewModel.minutes)")
                         .contentTransition(.numericText())
@@ -229,6 +229,17 @@ struct WorkoutSessionView: View {
                 Spacer()
                 
                 Button {
+                    viewModel.toggleTimer()
+                } label: {
+                    Image(systemName: viewModel.isTimerPaused ?
+                          "play.circle" : "pause.circle")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 48, height: 48)
+                        .foregroundStyle(.black)
+                }
+                
+                Button {
                     viewModel.toggleViewMode()
                 } label: {
                     Image(systemName: "list.bullet.circle.fill")
@@ -238,6 +249,7 @@ struct WorkoutSessionView: View {
                         .foregroundStyle(.black, .main.opacity(viewModel.isDetailView ? 0 : 1.0))
                 }
             }
+            .buttonStyle(.plain)
             .padding(.top, 16)
             
             CustomDivider()
