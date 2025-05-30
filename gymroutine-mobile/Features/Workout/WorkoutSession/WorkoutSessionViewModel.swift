@@ -34,6 +34,7 @@ final class WorkoutSessionViewModel: ObservableObject {
     // 추가된 UI 관련 속성
     @Published var showAddExerciseSheet = false
     @Published var showEditSetSheet = false
+    @Published var restTimeTargetIndex: Int? = nil
     @Published var editingSetInfo: (exerciseIndex: Int, setIndex: Int, weight: Double, reps: Int)? = nil
     
     // WorkoutExercisesManager 인스턴스 (합성 패턴)
@@ -442,6 +443,26 @@ final class WorkoutSessionViewModel: ObservableObject {
         timer?.invalidate()
         timer = nil
         print("⏱️ 메인 워크아웃 타이머 중지")
+    }
+    
+    func updateRestTime(for index: Int) {
+        guard index < exercisesManager.exercises.count else { return }
+        
+        let updatedExercise = exercisesManager.exercises[index]
+        print("休憩時間更新: \(updatedExercise.name) - \(updatedExercise.restTime ?? 90)秒")
+
+        saveWorkoutExercises()
+        
+        AnalyticsService.shared.logUserAction(
+            action: "update_rest_time",
+            itemId: updatedExercise.id,
+            itemName: updatedExercise.name,
+            contentType: "exercise_rest_time"
+        )
+
+        if index == currentExerciseIndex {
+            updateRestTimeFromCurrentExercise()
+        }
     }
     
     // MARK: - Cleanup

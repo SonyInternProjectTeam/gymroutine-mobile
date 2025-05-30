@@ -19,8 +19,6 @@ struct WorkoutSessionView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel: WorkoutSessionViewModel
     @Namespace private var scrollNamespace
-    @State private var showRestTimeSettingsSheet = false
-    @State private var selectedExerciseIndex = 0
     @State private var showEndWorkoutAlert = false // 종료 알림을 위해 필요
     @State private var showEditSetSheet = false
     
@@ -48,14 +46,16 @@ struct WorkoutSessionView: View {
             
             // 운동 영역 (상세 보기 또는 리스트 보기)
             if viewModel.isDetailView {
-                detailExerciseView
+                DetailExercisesView()
+                    .environmentObject(viewModel)
                     .transition(.opacity)
             } else {
                 listExercisesView
                     .transition(.opacity)
             }
-
-            // 하단 네비게이션
+        }
+        .ignoresSafeArea(edges: .bottom)
+        .safeAreaInset(edge: .bottom) {
             bottomNavigationBox
         }
         .background(.mainBackground)
@@ -173,31 +173,21 @@ struct WorkoutSessionView: View {
                 .presentationDragIndicator(.visible)
             }
         }
-        .sheet(isPresented: $showRestTimeSettingsSheet) {
-            if selectedExerciseIndex < viewModel.exercisesManager.exercises.count {
+        .sheet(isPresented: Binding<Bool>(
+            get: { viewModel.restTimeTargetIndex != nil },
+            set: { isPresented in
+                if !isPresented {
+                    viewModel.restTimeTargetIndex = nil
+                }
+            })
+        ) {
+            if let index = viewModel.restTimeTargetIndex,
+               index < viewModel.exercisesManager.exercises.count {
+                
                 RestTimeSettingsView(
-                    workoutExercise: viewModel.bindingForExercise(at: selectedExerciseIndex),
+                    workoutExercise: viewModel.bindingForExercise(at: index),
                     onSave: {
-                        // 휴식 시간이 업데이트된 후 명시적으로 Firebase에 저장
-                        guard selectedExerciseIndex < viewModel.exercisesManager.exercises.count else { return }
-                        let updatedExercise = viewModel.exercisesManager.exercises[selectedExerciseIndex]
-                        print("휴식 시간 업데이트: \(updatedExercise.name)의 휴식 시간이 \(updatedExercise.restTime ?? 90)초로 설정됨")
-                        
-                        // 명시적으로 저장 함수 호출
-                        viewModel.saveWorkoutExercises()
-                        
-                        // UI 업데이트를 위해 현재 운동의 휴게시간 갱신
-                        if selectedExerciseIndex == viewModel.currentExerciseIndex {
-                            viewModel.updateRestTimeFromCurrentExercise()
-                        }
-                        
-                        // Log rest time update
-                        analyticsService.logUserAction(
-                            action: "update_rest_time",
-                            itemId: updatedExercise.id,
-                            itemName: updatedExercise.name,
-                            contentType: "exercise_rest_time"
-                        )
+                        viewModel.updateRestTime(for: index)
                     }
                 )
                 .presentationDetents([.medium])
@@ -267,282 +257,6 @@ struct WorkoutSessionView: View {
                 )
             }
         }
-    }
-
-    // MARK: - [Section2-1]: detailExerciseView
-    // 단일 운동 상세 화면
-    private var detailExerciseView: some View {
-        Group {
-            if let exercise = viewModel.currentExercise {
-                VStack(spacing: 0) {
-                    exerciseProgressIndicator
-
-                    // 운동 이름
-                    VStack(spacing: 16) {
-                        exerciseTitleBox(exercise: exercise)
-
-                        // 운동 이미지와 진행률
-                        exerciseProgressCircle(exercise: exercise)
-
-                        exerciseSetsSection(for: exercise)
-                    }
-                }
-            } else {
-                Text("エクササイズがありません")
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 100)
-            }
-        }
-        .vAlign(.top)
-    }
-
-    // 운동 진행 표시기 - 진행 바와 체크 표시
-    private var exerciseProgressIndicator: some View {
-            // 운동 체크 표시
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(0..<viewModel.exercisesManager.exercises.count, id: \.self) { index in
-                        let isCurrentIndex = index == viewModel.currentExerciseIndex
-                        let isCompleted = isExerciseCompleted(index: index)
-
-                        Circle()
-                            .fill(isCurrentIndex || isCompleted ? .main : Color(.systemGray5))
-                            .frame(width: isCurrentIndex ? 32 : 16)
-                            .overlay {
-                                if isCurrentIndex {
-                                    Image(systemName: "flame.fill")
-                                        .fontWeight(.semibold)
-                                }
-
-                            }
-                            .id(index)
-                            .onTapGesture {
-                                withAnimation {
-                                    viewModel.currentExerciseIndex = index
-                                    viewModel.currentSetIndex = 0
-                                    viewModel.stopRestTimer()
-                                }
-                            }
-
-                        if index != viewModel.exercisesManager.exercises.count - 1 {
-                            RoundedRectangle(cornerRadius: 2)
-                                .fill(isCompleted ? .main : Color(.systemGray5))
-                                .frame(width: 16, height: 4)
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
-            }
-            .padding(.vertical, 8)
-            .coordinateSpace(name: scrollNamespace)
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    withAnimation(.easeInOut) {
-                        proxy.scrollTo(viewModel.currentExerciseIndex, anchor: .center)
-                    }
-                }
-            }
-            .onChange(of: viewModel.currentExerciseIndex) { newIndex in
-                withAnimation(.easeInOut) {
-                    proxy.scrollTo(newIndex, anchor: .center)
-                }
-            }
-        }
-    }
-
-    private func exerciseTitleBox(exercise: WorkoutExercise) -> some View {
-        HStack(spacing: 16) {
-            Rectangle()
-                .cornerRadius(4)
-                .frame(width: 8, height: 32)
-                .foregroundStyle(Color(.systemGray5))
-
-            Text(exercise.name)
-                .font(.title2.bold())
-
-            Spacer()
-
-            restTimeSettingView(exercise: exercise)
-        }
-        .padding(.horizontal, 24)
-    }
-
-    // 詳細画面のエクササイズ画像と進行円形インジケーター
-    private func exerciseProgressCircle(exercise: WorkoutExercise) -> some View {
-        ZStack {
-            // 背景の円
-            Circle()
-                .fill(Color(.systemGray6))
-
-            Group {
-                if let key = exercise.key, let uiImage = UIImage(named: key) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .padding(28)
-                } else {
-                    Image(systemName: "nosign")
-                        .resizable()
-                        .foregroundStyle(.gray)
-                        .frame(width: 48, height: 48)
-                }
-            }
-            .scaleEffect(tappedProgress ? 0.9 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: tappedProgress)
-
-            // 進行円
-            Circle()
-                .trim(from: 0.0, to: CGFloat(viewModel.currentExerciseProgress))
-                .stroke(style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
-                .foregroundColor(.main)
-                .rotationEffect(Angle(degrees: 270.0))
-                .animation(.easeOut, value: viewModel.currentExerciseProgress)
-        }
-        .frame(width: 230, height: 230)
-        .onTapGesture {
-            // 탭 애니메이션 효과
-            withAnimation {
-                tappedProgress = true
-            }
-
-            // 진행 원 탭 시 현재 세트 완료 처리
-            if viewModel.currentSetIndex < exercise.sets.count {
-                let currentSetIndex = viewModel.currentSetIndex
-
-                // 약간의 지연 시간 후에 상태 변경
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    viewModel.toggleSetCompletion(
-                        exerciseIndex: viewModel.currentExerciseIndex,
-                        setIndex: currentSetIndex
-                    )
-
-                    // 애니메이션 종료
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        withAnimation {
-                            tappedProgress = false
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // 휴식 시간 설정 뷰
-    private func restTimeSettingView(exercise: WorkoutExercise) -> some View {
-            Button(action: {
-                selectedExerciseIndex = viewModel.currentExerciseIndex // 현재 인덱스 설정
-                showRestTimeSettingsSheet = true
-            }) {
-                HStack(spacing: 8) {
-                    Image(systemName: "timer")
-                    Text("休憩\(exercise.restTime ?? 90)秒")
-                }
-                .font(.subheadline)
-                .padding(.vertical, 6)
-                .padding(.horizontal, 8)
-                .background(Color.blue.opacity(0.1))
-                .foregroundColor(.blue)
-                .cornerRadius(12)
-            }
-    }
-
-    private func exerciseSetsSection(for exercise: WorkoutExercise) -> some View {
-        // 세트 정보
-            VStack(spacing: 8) {
-                HStack {
-                    Text("メニュー")
-                        .font(.headline)
-
-                    Spacer()
-
-                    // 세트 추가 버튼
-                    Button(action: {
-                        viewModel.addSetToCurrentExercise()
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "plus")
-                            Text("追加")
-                                .font(.subheadline)
-                                .bold()
-                        }
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Capsule().fill(Color(.systemGray5)))
-                    }
-                }
-                .padding(.horizontal, 24)
-
-                HStack(spacing: 0) {
-                    Text("セット")
-                        .hAlign(.center)
-                    Text("重さ（kg）")
-                        .hAlign(.center)
-                    Text("レップ数")
-                        .hAlign(.center)
-                    Text("状況")
-                        .hAlign(.center)
-                }
-                .font(.caption)
-
-                // 세트 목록 (중앙 정렬)
-                List {
-                    ForEach(Array(exercise.sets.enumerated()), id: \.element.id) { setIndex, set in
-                        HStack(spacing: 0) {
-                            Text("\(setIndex + 1)")
-                                .hAlign(.center)
-
-                            // 무게 수정 버튼
-                            Button(action: {
-                                viewModel.showEditSetInfo(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex)
-                            }) {
-                                HStack(spacing: 4) {
-                                    Text(String(format: "%.1f", set.weight))
-                                    Image(systemName: "pencil")
-                                        .font(.caption2)
-                                }
-                                .foregroundStyle(viewModel.isSetCompleted(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex) ? .gray : .primary)
-                            }
-                            .buttonStyle(.plain)
-                            .hAlign(.center)
-
-                            // 렙수 표시
-                            Text("\(set.reps)")
-                                .hAlign(.center)
-
-                            // 완료 및 삭제 버튼
-                                // 완료 토글 버튼
-                                Button(action: {
-                                    viewModel.toggleSetCompletion(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex)
-                                }) {
-                                    Image(systemName: viewModel.isSetCompleted(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex) ? "checkmark.circle.fill" : "circle")
-                                        .foregroundStyle(viewModel.isSetCompleted(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex) ? .green : .secondary)
-                                        .font(.title2)
-                                }
-                                .buttonStyle(.plain)
-                            .hAlign(.center)
-                        }
-                        .listRowBackground(setIndex == viewModel.currentSetIndex ? Color.blue.opacity(0.1) : Color.clear)
-                    }
-                    .onDelete { (offsets) in
-                        if let index: Int = offsets.first {
-                            viewModel.removeSet(exerciseIndex: viewModel.currentExerciseIndex, setIndex: index)
-                        }
-                    }
-                    .listRowInsets(EdgeInsets())
-                }
-                .scrollIndicators(.hidden)
-                .scrollContentBackground(.hidden)
-                .listStyle(.plain)
-        }
-        .padding(.top, 16)
-        .background(Color.white)
-        .clipShape(.rect(
-            topLeadingRadius: 24,
-            bottomLeadingRadius: 0,
-            bottomTrailingRadius: 0,
-            topTrailingRadius: 24
-        ))
     }
 
     // MARK: - [Section2-2]: listExercisesView

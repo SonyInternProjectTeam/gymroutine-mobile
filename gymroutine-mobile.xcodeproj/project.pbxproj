@@ -15,6 +15,7 @@
 		007407602D9BC75000808964 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0074075F2D9BC74A00808964 /* Array+Extensions.swift */; };
 		008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008769DE2D8BD5C400965C26 /* LoadingView.swift */; };
 		009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */; };
+		00B107842DE8445C000E7BC9 /* DetailExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B107832DE8445C000E7BC9 /* DetailExercisesView.swift */; };
 		00B107862DE8537D000E7BC9 /* ExerciseSetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B107852DE8537D000E7BC9 /* ExerciseSetCell.swift */; };
 		00CDC4252D845E8E003B18EB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC3DB2D845E8E003B18EB /* Preview Assets.xcassets */; };
 		00CDC4262D845E8E003B18EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC4222D845E8E003B18EB /* Assets.xcassets */; };
@@ -198,6 +199,7 @@
 		0074075F2D9BC74A00808964 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		008769DE2D8BD5C400965C26 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseSetView.swift; sourceTree = "<group>"; };
+		00B107832DE8445C000E7BC9 /* DetailExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailExercisesView.swift; sourceTree = "<group>"; };
 		00B107852DE8537D000E7BC9 /* ExerciseSetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSetCell.swift; sourceTree = "<group>"; };
 		00CDC3D02D845E8E003B18EB /* gymroutine_mobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gymroutine_mobileApp.swift; sourceTree = "<group>"; };
 		00CDC3D12D845E8E003B18EB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
@@ -437,6 +439,7 @@
 			children = (
 				27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */,
 				27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */,
+				00B107832DE8445C000E7BC9 /* DetailExercisesView.swift */,
 			);
 			path = WorkoutSession;
 			sourceTree = "<group>";
@@ -1097,6 +1100,7 @@
 				273751382DB15147003D031D /* ProfileEditViewModel.swift in Sources */,
 				00CDC42E2D845E8E003B18EB /* WorkoutModel.swift in Sources */,
 				271A769D2DAEA89100C294D5 /* HeatmapService.swift in Sources */,
+				00B107842DE8445C000E7BC9 /* DetailExercisesView.swift in Sources */,
 				003AF5EB2D8BF2720019B3AF /* BannerView.swift in Sources */,
 				00CDC42F2D845E8E003B18EB /* FollowRepository.swift in Sources */,
 				275B06382DD8B8F700D626C4 /* TemplateDetailViewModel.swift in Sources */,
