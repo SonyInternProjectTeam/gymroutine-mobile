@@ -2,6 +2,7 @@ const { initializeApp, getApps } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
 const { logger } = require('firebase-functions');
+const { notifyGroupMembersAboutNewGoal } = require('./notificationHandler');
 
 // Initialize Firebase Admin if not already initialized
 if (getApps().length === 0) {
@@ -216,18 +217,23 @@ exports.getGroupStatistics = async (request) => {
             throw new Error('Group ID is required');
         }
 
-        // 사용자가 그룹 멤버인지 확인
-        const memberSnapshot = await db.collection('Groups').doc(groupId).collection('members')
-            .where('userId', '==', userId)
-            .get();
-
-        if (memberSnapshot.empty) {
-            throw new Error('Access denied. Not a group member.');
-        }
-
-        // 그룹 기본 정보
+        // 그룹 기본 정보 조회
         const groupDoc = await db.collection('Groups').doc(groupId).get();
+        if (!groupDoc.exists) {
+            throw new Error('Group not found');
+        }
         const groupData = groupDoc.data();
+        
+        // 비공개 그룹인 경우에만 멤버인지 확인
+        if (groupData.isPrivate) {
+            const memberSnapshot = await db.collection('Groups').doc(groupId).collection('members')
+                .where('userId', '==', userId)
+                .get();
+
+            if (memberSnapshot.empty) {
+                throw new Error('Access denied. Not a member of private group.');
+            }
+        }
 
         // 그룹 멤버 수
         const allMembersSnapshot = await db.collection('Groups').doc(groupId).collection('members')

@@ -158,7 +158,7 @@ final class ProfileViewModel: ObservableObject {
             guard let currentUserID = userManager.currentUser?.uid,
                   let profileUserID = user?.uid,
                   currentUserID != profileUserID else { return }
-            let success = await followService.followUser(currentUserID: currentUserID, profileUserID: profileUserID)
+            let success = await followService.followUserWithNotification(currentUserID: currentUserID, profileUserID: profileUserID)
             if success {
                 DispatchQueue.main.async {
                     self.isFollowing = true
