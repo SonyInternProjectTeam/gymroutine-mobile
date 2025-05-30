@@ -62,6 +62,7 @@ struct EditSetView: View {
                         .frame(width: textFieldSize)
                 }
             }
+            .vAlign(.center)
         }
         .padding(24)
         .vAlign(.top)

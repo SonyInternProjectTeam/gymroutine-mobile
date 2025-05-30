@@ -34,6 +34,9 @@ struct ListExercisesView: View {
                             },
                             isSetCompleted: { setIndex in
                                 viewModel.isSetCompleted(exerciseIndex: index, setIndex: setIndex)
+                            },
+                            onEditSet: { setIndex in
+                                viewModel.showEditSetInfo(exerciseIndex: viewModel.currentExerciseIndex, setIndex: setIndex)
                             }
                         )
                         .id(index)
@@ -49,7 +52,7 @@ struct ListExercisesView: View {
                 .padding(.horizontal, 16)
             }
             .contentMargins(.bottom, 156)
-            .onChange(of: viewModel.currentExerciseIndex) { newIndex in
+            .onChange(of: viewModel.currentExerciseIndex) {_, newIndex in
                 withAnimation {
                     scrollProxy.scrollTo(newIndex, anchor: .center)
                 }
@@ -104,6 +107,7 @@ struct WorkoutExerciseCard: View {
     var onAddClicked: (() -> Void)
     var onToggleSetCompletion: ((Int) -> Void)
     var isSetCompleted: ((Int) -> Bool)
+    var onEditSet: ((Int) -> Void)
 
     var body: some View {
         HStack {
@@ -161,11 +165,13 @@ struct WorkoutExerciseCard: View {
                             .rotationEffect(.degrees(isExpanded ? 90 : 0))
                     }
                 }
+                .padding(.horizontal, 12)
 
                 if isExpanded {
-                    VStack(spacing: 8) {
+                    VStack(spacing: 12) {
                         HStack {
                             Text("メニュー")
+                                .fontWeight(.semibold)
 
                             Spacer()
 
@@ -180,7 +186,7 @@ struct WorkoutExerciseCard: View {
                                 }
                                 .foregroundStyle(.black)
                                 .padding(.horizontal, 16)
-                                .padding(.vertical, 4)
+                                .padding(.vertical, 6)
                                 .background(
                                     Capsule()
                                         .fill(Color.white)
@@ -188,6 +194,7 @@ struct WorkoutExerciseCard: View {
                                 )
                             }
                         }
+                        .padding(.horizontal)
 
                         Divider()
 
@@ -226,15 +233,17 @@ struct WorkoutExerciseCard: View {
                                     .font(.subheadline)
                                     .padding(.vertical, 8)
                                     .background(isCurrentExercise && setIndex == currentSetIndex ? Color.blue.opacity(0.1) : Color.clear)
+                                    .contentShape(.rect)
+                                    .onTapGesture {
+                                        onEditSet(setIndex)
+                                    }
                                 }
                             }
                         }
                     }
-                    .padding(8)
-                    .background(Color(.systemGray6).cornerRadius(8))
                 }
             }
-            .padding(16)
+            .padding(.vertical)
             .background(Color.white)
             .clipShape(.rect(cornerRadius: 8))
             .shadow(color: Color.black.opacity(0.1), radius: 3, y: 1.5)

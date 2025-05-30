@@ -290,11 +290,7 @@ struct WorkoutSessionView: View {
     private var bottomNavigationBox: some View {
         HStack(spacing: 36) {
             Button(action: {
-                if viewModel.isDetailView {
-                    viewModel.moveToPreviousSet()
-                } else {
-                    viewModel.previousExercise()
-                }
+                viewModel.moveToPreviousSet()
             }) {
                 Image(systemName: "chevron.left")
                     .font(.title2.bold())
@@ -310,11 +306,7 @@ struct WorkoutSessionView: View {
             .buttonStyle(CapsuleButtonStyle(color: .main))
             
             Button(action: {
-                if viewModel.isDetailView {
-                    viewModel.moveToNextSet()
-                } else {
-                    viewModel.nextExercise()
-                }
+                viewModel.moveToNextSet()
             }) {
                 Image(systemName: "chevron.right")
                     .font(.title2.bold())
