@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GroupDetailView: View {
     let group: GroupModel
+    var isNewlyJoined: Bool = false
     @StateObject private var viewModel = GroupDetailViewModel()
     @Environment(\.dismiss) private var dismiss
     
@@ -133,8 +134,8 @@ struct GroupDetailView: View {
             }
         }
         .onAppear {
-            print("🔄 [GroupDetailView] onAppear - Loading group data for group: \(group.id ?? "unknown")")
-            viewModel.loadGroupData(groupId: group.id ?? "")
+            print("🔄 [GroupDetailView] onAppear - Loading group data for group: \(group.id ?? "unknown") with isNewlyJoined: \(isNewlyJoined)")
+            viewModel.loadGroupData(groupId: group.id ?? "", isNewlyJoined: isNewlyJoined)
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("GroupDeleted"))) { _ in
             // 그룹이 삭제되었을 때 현재 뷰도 닫기
@@ -471,6 +472,12 @@ struct GroupGoalCell: View {
         return goal.createdBy == userId
     }
     
+    // Check if the current user is a member of the group
+    private var isCurrentUserMember: Bool {
+        guard let currentUserId = authService.currentUser?.uid else { return false }
+        return viewModel.members.contains { $0.userId == currentUserId }
+    }
+    
     // 반복 정보 텍스트 생성
     private var repeatInfoText: String? {
         guard let repeatType = goal.repeatType, repeatType != "none",
@@ -588,7 +595,7 @@ struct GroupGoalCell: View {
                             .font(.caption)
                             .fontWeight(.bold)
                             .foregroundColor(.green)
-                    } else if !isGoalAchievedByCurrentUser {
+                    } else if !isGoalAchievedByCurrentUser && isCurrentUserMember {
                         Button("進捗更新") {
                             // Reset input field before showing alert
                             currentProgressInput = "\(Int(currentUserProgress))"
@@ -699,7 +706,9 @@ struct GroupGoalCell: View {
                 if let newProgress = Double(currentProgressInput), let goalId = goal.id {
                     // Ensure progress doesn't exceed target, or handle as needed
                     let progressToUpdate = min(newProgress, goal.targetValue)
-                    viewModel.updateUserGoalProgress(goalId: goalId, newProgress: progressToUpdate, groupId: groupId)
+                    Task {
+                        await viewModel.updateUserGoalProgress(goalId: goalId, newProgress: progressToUpdate, groupId: groupId)
+                    }
                 }
             }
             Button("キャンセル", role: .cancel) {}
@@ -709,7 +718,9 @@ struct GroupGoalCell: View {
         .alert("目標を削除", isPresented: $showingDeleteAlert) {
             Button("削除", role: .destructive) {
                 if let goalId = goal.id {
-                    viewModel.deleteGoal(goalId: goalId, groupId: groupId)
+                    Task {
+                        await viewModel.deleteGoal(goalId: goalId, groupId: groupId)
+                    }
                 }
             }
             Button("キャンセル", role: .cancel) {}

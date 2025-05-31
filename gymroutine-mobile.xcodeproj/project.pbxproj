@@ -15,6 +15,9 @@
 		007407602D9BC75000808964 /* Array+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0074075F2D9BC74A00808964 /* Array+Extensions.swift */; };
 		008769DF2D8BD5C400965C26 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008769DE2D8BD5C400965C26 /* LoadingView.swift */; };
 		009CE5D12D8AB5A800FD76FD /* EditExerciseSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */; };
+		00B107842DE8445C000E7BC9 /* DetailExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B107832DE8445C000E7BC9 /* DetailExercisesView.swift */; };
+		00B107862DE8537D000E7BC9 /* ExerciseSetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B107852DE8537D000E7BC9 /* ExerciseSetCell.swift */; };
+		00B107882DE94766000E7BC9 /* ListExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B107872DE94766000E7BC9 /* ListExercisesView.swift */; };
 		00CDC4252D845E8E003B18EB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC3DB2D845E8E003B18EB /* Preview Assets.xcassets */; };
 		00CDC4262D845E8E003B18EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC4222D845E8E003B18EB /* Assets.xcassets */; };
 		00CDC4272D845E8E003B18EB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 00CDC4232D845E8E003B18EB /* GoogleService-Info.plist */; };
@@ -160,6 +163,7 @@
 		27E5E5512CCECA57003E3E70 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5502CCECA57003E3E70 /* FirebaseAnalytics */; };
 		27E5E5532CCECA57003E3E70 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5522CCECA57003E3E70 /* FirebaseCore */; };
 		27E5E5632CCECB2A003E3E70 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 27E5E5622CCECB2A003E3E70 /* FirebaseAuth */; };
+		27E6118B2DE87294008EE7E8 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E6118A2DE87294008EE7E8 /* NotificationService.swift */; };
 		27EAD6692DD4D56E001C601F /* WorkoutTemplateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAD6682DD4D56E001C601F /* WorkoutTemplateCell.swift */; };
 		27EAD66B2DD4D579001C601F /* WorkoutTemplateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAD66A2DD4D579001C601F /* WorkoutTemplateModel.swift */; };
 		27EAD66D2DD4D591001C601F /* TemplateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EAD66C2DD4D591001C601F /* TemplateService.swift */; };
@@ -197,6 +201,9 @@
 		0074075F2D9BC74A00808964 /* Array+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extensions.swift"; sourceTree = "<group>"; };
 		008769DE2D8BD5C400965C26 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		009CE5D02D8AB5A800FD76FD /* EditExerciseSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseSetView.swift; sourceTree = "<group>"; };
+		00B107832DE8445C000E7BC9 /* DetailExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailExercisesView.swift; sourceTree = "<group>"; };
+		00B107852DE8537D000E7BC9 /* ExerciseSetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseSetCell.swift; sourceTree = "<group>"; };
+		00B107872DE94766000E7BC9 /* ListExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListExercisesView.swift; sourceTree = "<group>"; };
 		00CDC3D02D845E8E003B18EB /* gymroutine_mobileApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gymroutine_mobileApp.swift; sourceTree = "<group>"; };
 		00CDC3D12D845E8E003B18EB /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		00CDC3D32D845E8E003B18EB /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
@@ -332,6 +339,7 @@
 		27E5E5222CCEC9E9003E3E70 /* gymroutine-mobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gymroutine-mobile.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E5322CCEC9EA003E3E70 /* gymroutine-mobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27E5E53C2CCEC9EA003E3E70 /* gymroutine-mobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "gymroutine-mobileUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		27E6118A2DE87294008EE7E8 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		27EAD6682DD4D56E001C601F /* WorkoutTemplateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateCell.swift; sourceTree = "<group>"; };
 		27EAD66A2DD4D579001C601F /* WorkoutTemplateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTemplateModel.swift; sourceTree = "<group>"; };
 		27EAD66C2DD4D591001C601F /* TemplateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateService.swift; sourceTree = "<group>"; };
@@ -430,6 +438,18 @@
 			path = ExerciseSearch;
 			sourceTree = "<group>";
 		};
+		00B107822DE841A5000E7BC9 /* WorkoutSession */ = {
+			isa = PBXGroup;
+			children = (
+				27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */,
+				27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */,
+				00B107832DE8445C000E7BC9 /* DetailExercisesView.swift */,
+				00B107872DE94766000E7BC9 /* ListExercisesView.swift */,
+				276F87762DB2957000E8435E /* EditSetView.swift */,
+			);
+			path = WorkoutSession;
+			sourceTree = "<group>";
+		};
 		00CDC3D22D845E8E003B18EB /* Application */ = {
 			isa = PBXGroup;
 			children = (
@@ -502,6 +522,7 @@
 		00CDC3E62D845E8E003B18EB /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				27E6118A2DE87294008EE7E8 /* NotificationService.swift */,
 				274B04DC2DE2C5D500F063CC /* GroupService.swift */,
 				27EAD66C2DD4D591001C601F /* TemplateService.swift */,
 				27CCD73C2DD0B9CE0036EB8A /* WeightHistoryService.swift */,
@@ -548,6 +569,7 @@
 				274B05172DE43F7000F063CC /* GroupMemberEditCell.swift */,
 				00D3E1C22DBE334300590F92 /* ExerciseResultCell.swift */,
 				274B04E62DE2C61C00F063CC /* GroupCell.swift */,
+				00B107852DE8537D000E7BC9 /* ExerciseSetCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -745,19 +767,17 @@
 		00CDC47D2D85C1FB003B18EB /* Workout */ = {
 			isa = PBXGroup;
 			children = (
+				00B107822DE841A5000E7BC9 /* WorkoutSession */,
 				001F029A2DE680EB00A516C8 /* TemplateDetail */,
 				0041BDBB2DC3155E007748B8 /* CompletedWorkoutDetail */,
 				00D3E1BD2DBDCBBB00590F92 /* WorkoutEdit */,
 				00D3E1BC2DBDCA7300590F92 /* WorkoutDetail */,
 				00D3E1BB2DBDCA5B00590F92 /* CreateWorkout */,
-				276F87762DB2957000E8435E /* EditSetView.swift */,
 				276F87742DB28EBF00E8435E /* RestTimeSettingsView.swift */,
 				275C71602DAD432300579962 /* GlobalWorkoutSessionView.swift */,
 				275C71522DACD2C300579962 /* GlobalWorkoutSessionView.swift */,
 				277739FB2DA5EF4D0006397D /* WorkoutResultView.swift */,
 				27D6A86C2D9D9ABE004D3F2B /* MiniWorkoutView.swift */,
-				27D6A8662D9D931D004D3F2B /* WorkoutSessionViewModel.swift */,
-				27D6A8642D9D9312004D3F2B /* WorkoutSessionView.swift */,
 			);
 			path = Workout;
 			sourceTree = "<group>";
@@ -1074,6 +1094,7 @@
 				00CDC42A2D845E8E003B18EB /* View+Extensions.swift in Sources */,
 				00CDC42B2D845E8E003B18EB /* UserManager.swift in Sources */,
 				27475F6A2DC663470065C420 /* PasswordResetView.swift in Sources */,
+				00B107882DE94766000E7BC9 /* ListExercisesView.swift in Sources */,
 				27475F6B2DC663470065C420 /* PasswordResetViewModel.swift in Sources */,
 				275C71612DAD432300579962 /* GlobalWorkoutSessionView.swift in Sources */,
 				277467872D8FF510004C25C3 /* RecommendedUserCell.swift in Sources */,
@@ -1086,6 +1107,7 @@
 				273751382DB15147003D031D /* ProfileEditViewModel.swift in Sources */,
 				00CDC42E2D845E8E003B18EB /* WorkoutModel.swift in Sources */,
 				271A769D2DAEA89100C294D5 /* HeatmapService.swift in Sources */,
+				00B107842DE8445C000E7BC9 /* DetailExercisesView.swift in Sources */,
 				003AF5EB2D8BF2720019B3AF /* BannerView.swift in Sources */,
 				00CDC42F2D845E8E003B18EB /* FollowRepository.swift in Sources */,
 				275B06382DD8B8F700D626C4 /* TemplateDetailViewModel.swift in Sources */,
@@ -1098,6 +1120,7 @@
 				79A0A13C2DBE1BCD00DF56F6 /* FollowListView.swift in Sources */,
 				276F873D2DB1EE1A00E8435E /* CompletedWorkoutCell.swift in Sources */,
 				276F872D2DB1D98E00E8435E /* ResultService.swift in Sources */,
+				27E6118B2DE87294008EE7E8 /* NotificationService.swift in Sources */,
 				00CDC4322D845E8E003B18EB /* ExerciseService.swift in Sources */,
 				27D6A8652D9D9319004D3F2B /* WorkoutSessionView.swift in Sources */,
 				00CDC4332D845E8E003B18EB /* FollowService.swift in Sources */,
@@ -1150,6 +1173,7 @@
 				274B050D2DE43F6300F063CC /* GroupGoalCreateViewModel.swift in Sources */,
 				274B050E2DE43F6300F063CC /* GroupGoalCreateView.swift in Sources */,
 				274B050F2DE43F6300F063CC /* GroupDetailView.swift in Sources */,
+				00B107862DE8537D000E7BC9 /* ExerciseSetCell.swift in Sources */,
 				274B05102DE43F6300F063CC /* GroupInviteViewModel.swift in Sources */,
 				274B05112DE43F6300F063CC /* GroupDetailViewModel.swift in Sources */,
 				274B05122DE43F6300F063CC /* GroupEditViewModel.swift in Sources */,
@@ -1395,7 +1419,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.siproject.gymroutine-mobile";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1432,7 +1456,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.siproject.gymroutine-mobile";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

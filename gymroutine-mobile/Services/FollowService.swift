@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import FirebaseFunctions
+import FirebaseAuth
 
 /// フォロー関連のビジネスロジックを担当するサービスクラス
 class FollowService {
@@ -81,6 +83,35 @@ class FollowService {
         case .failure(let error):
             print("ERROR: Fetching following for \(userID) failed: \(error.localizedDescription)")
             return .failure(error)
+        }
+    }
+    
+    /// 지정된 사용자를 팔로우하는 (알림 포함) - 백엔드 API 사용
+    /// - Parameters:
+    ///   - currentUserID: 현재 로그인중인 사용자 ID
+    ///   - profileUserID: 팔로우 대상의 사용자 ID
+    /// - Returns: 성공시는 true, 실패시는 false
+    func followUserWithNotification(currentUserID: String, profileUserID: String) async -> Bool {
+        do {
+            let functions = Functions.functions(region: "asia-northeast1")
+            
+            let data: [String: Any] = [
+                "followedUserId": profileUserID
+            ]
+            
+            let result = try await functions.httpsCallable("followUserWithNotification").call(data)
+            
+            if let resultData = result.data as? [String: Any],
+               let success = resultData["success"] as? Bool {
+                print("DEBUG: Successfully followed user \(profileUserID) with notification - success: \(success)")
+                return success
+            } else {
+                print("ERROR: Invalid response format when following user \(profileUserID)")
+                return false
+            }
+        } catch {
+            print("ERROR: Failed to follow user \(profileUserID) with notification: \(error.localizedDescription)")
+            return false
         }
     }
 }

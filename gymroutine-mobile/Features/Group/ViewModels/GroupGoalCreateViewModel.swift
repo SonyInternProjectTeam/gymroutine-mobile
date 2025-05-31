@@ -133,31 +133,32 @@ class GroupGoalCreateViewModel: ObservableObject {
             isLoading = true
             errorMessage = nil
             
-            // 반복 정보 준비
-            let repeatTypeValue = selectedRepeatOption != .none ? selectedRepeatOption.rawValue : nil
-            let repeatCountValue = selectedRepeatOption != .none ? repeatCount : nil
+            print("🔄 [GroupGoalCreateViewModel] Starting goal creation - groupId: \(groupId)")
+            print("📊 [GroupGoalCreateViewModel] Goal data - title: '\(title)', type: \(selectedGoalType.rawValue), targetValue: \(targetValue), endDate: \(endDate)")
             
-            let result = await groupService.createGroupGoal(
+            let result = await groupService.createGroupGoalWithNotifications(
                 groupId: groupId,
                 title: title.trimmingCharacters(in: .whitespacesAndNewlines),
                 description: description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : description.trimmingCharacters(in: .whitespacesAndNewlines),
-                goalType: selectedGoalType,
+                goalType: selectedGoalType.rawValue,
                 targetValue: targetValue,
                 startDate: startDate,
-                endDate: endDate, // 실제 endDate만 사용
-                repeatType: repeatTypeValue,
-                repeatCount: repeatCountValue
+                endDate: endDate,
+                repeatType: selectedRepeatOption.rawValue,
+                repeatCount: selectedRepeatOption != .none ? repeatCount : nil
             )
             
             isLoading = false
             
             switch result {
             case .success(_):
+                print("✅ [GroupGoalCreateViewModel] Goal creation successful, sending notification")
                 showSuccessAlert = true
                 // 목표 생성 성공 알림 발송
                 NotificationCenter.default.post(name: AppConstants.NotificationNames.didCreateGroupGoal, object: groupId)
                 
             case .failure(let error):
+                print("❌ [GroupGoalCreateViewModel] Goal creation failed: \(error.localizedDescription)")
                 errorMessage = error.localizedDescription
             }
         }
