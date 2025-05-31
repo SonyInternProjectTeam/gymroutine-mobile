@@ -25,6 +25,7 @@ final class WorkoutSessionViewModel: ObservableObject {
     @Published var isRestTimerActive = false
     @Published var restSeconds = 90  // 기본 휴식 시간 90초
     @Published var remainingRestSeconds = 90
+    @Published var isTimerPaused = false
     private var restTimer: Timer?
     private var player: AVAudioPlayer?
     // 총 휴식 시간 추적을 위한 변수
@@ -34,6 +35,7 @@ final class WorkoutSessionViewModel: ObservableObject {
     // 추가된 UI 관련 속성
     @Published var showAddExerciseSheet = false
     @Published var showEditSetSheet = false
+    @Published var restTimeTargetIndex: Int? = nil
     @Published var editingSetInfo: (exerciseIndex: Int, setIndex: Int, weight: Double, reps: Int)? = nil
     
     // WorkoutExercisesManager 인스턴스 (합성 패턴)
@@ -91,6 +93,26 @@ final class WorkoutSessionViewModel: ObservableObject {
         let elapsed = Int(Date().timeIntervalSince(startTime))
         minutes = elapsed / 60
         seconds = elapsed % 60
+    }
+
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+        print("⏱️ 메인 워크아웃 타이머 중지")
+    }
+    
+    private func resumeTimer() {
+        startTime = Date().addingTimeInterval(-TimeInterval(minutes * 60 + seconds))
+        startTimer()
+    }
+    
+    func toggleTimer() {
+        isTimerPaused.toggle()
+        if isTimerPaused {
+            stopTimer()
+        } else {
+            resumeTimer()
+        }
     }
     
     // MARK: - View Mode
@@ -437,11 +459,24 @@ final class WorkoutSessionViewModel: ObservableObject {
         stopRestTimer()
     }
     
-    // Helper to stop the main workout timer
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-        print("⏱️ 메인 워크아웃 타이머 중지")
+    func updateRestTime(for index: Int) {
+        guard index < exercisesManager.exercises.count else { return }
+        
+        let updatedExercise = exercisesManager.exercises[index]
+        print("休憩時間更新: \(updatedExercise.name) - \(updatedExercise.restTime ?? 90)秒")
+
+        saveWorkoutExercises()
+        
+        AnalyticsService.shared.logUserAction(
+            action: "update_rest_time",
+            itemId: updatedExercise.id,
+            itemName: updatedExercise.name,
+            contentType: "exercise_rest_time"
+        )
+
+        if index == currentExerciseIndex {
+            updateRestTimeFromCurrentExercise()
+        }
     }
     
     // MARK: - Cleanup
