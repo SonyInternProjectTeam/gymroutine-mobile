@@ -32,6 +32,10 @@ final class WorkoutSessionViewModel: ObservableObject {
     private var restStartTime: Date?
     private var totalRestTime: TimeInterval = 0
     
+    // 백그라운드 처리를 위한 새로운 속성들
+    var restTimerStartDate: Date?
+    private var backgroundEnterTime: Date?
+    
     // 추가된 UI 관련 속성
     @Published var showAddExerciseSheet = false
     @Published var showEditSetSheet = false
@@ -66,6 +70,9 @@ final class WorkoutSessionViewModel: ObservableObject {
         
         // 운동 목록을 exercisesManager에도 설정 (복원)
         exercisesManager.exercises = workout.exercises
+        
+        // 백그라운드/포그라운드 알림 관찰자 추가
+        setupBackgroundNotifications()
     }
     
     private func setupAudioPlayer() {
@@ -76,6 +83,55 @@ final class WorkoutSessionViewModel: ObservableObject {
         } catch {
             print("🔥 오디오 플레이어 초기화 실패: \(error.localizedDescription)")
         }
+    }
+    
+    private func setupBackgroundNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appDidEnterBackground),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func appDidEnterBackground() {
+        print("📱 앱이 백그라운드로 이동 - 휴식 타이머 상태 저장")
+        if isRestTimerActive {
+            backgroundEnterTime = Date()
+        }
+    }
+    
+    @objc private func appWillEnterForeground() {
+        print("📱 앱이 포그라운드로 복귀 - 휴식 타이머 상태 복원")
+        if isRestTimerActive, 
+           let backgroundTime = backgroundEnterTime,
+           let timerStartDate = restTimerStartDate {
+            
+            let currentTime = Date()
+            let backgroundDuration = currentTime.timeIntervalSince(backgroundTime)
+            let totalElapsed = currentTime.timeIntervalSince(timerStartDate)
+            let newRemainingSeconds = max(0, restSeconds - Int(totalElapsed))
+            
+            print("🔄 백그라운드 지속시간: \(Int(backgroundDuration))초, 총 경과시간: \(Int(totalElapsed))초")
+            print("🔄 남은 휴식시간: \(newRemainingSeconds)초")
+            
+            remainingRestSeconds = newRemainingSeconds
+            
+            if newRemainingSeconds <= 0 {
+                // 타이머가 이미 종료됨
+                stopRestTimer()
+                playTimerEndSound()
+                moveToNextSet()
+            }
+        }
+        backgroundEnterTime = nil
     }
     
     // MARK: - Timer Management
@@ -357,6 +413,7 @@ final class WorkoutSessionViewModel: ObservableObject {
         guard !isRestTimerActive else { return }
         isRestTimerActive = true
         remainingRestSeconds = restSeconds
+        restTimerStartDate = Date() // 타이머 시작 시간 기록
         print("⏰ 휴식 타이머 시작: \(restSeconds)초")
         
         // 휴식 시작 시간 기록
@@ -370,20 +427,21 @@ final class WorkoutSessionViewModel: ObservableObject {
             
             // 메인 액터에서 UI 관련 작업 수행
             Task { @MainActor in
-                if self.remainingRestSeconds > 0 {
-                    self.remainingRestSeconds -= 1
-                } else {
-                    print("🔔 휴식 타이머 종료")
-                    // stopRestTimer 내부에서 UI 업데이트가 있으므로 메인 액터에서 호출
-                    self.stopRestTimer()
-                    self.playTimerEndSound() // 사운드 재생은 백그라운드 가능 (AVAudioPlayer는 스레드 안전)
-                    print("➡️ 휴식 후 다음 세트로 이동")
-                    // moveToNextSet 내부에서 UI 업데이트가 있으므로 메인 액터에서 호출
-                    self.moveToNextSet()
-                    // 타이머 종료 후에는 타이머를 무효화해야 함
-                    // self 참조가 필요 없으므로 [weak self] 캡처 사용 권장
-                    // Task 내에서 timer 직접 참조는 비동기 문제 야기 가능성
-                    // -> restTimer 변수를 사용해 외부에서 invalidate 하는 것이 더 안전
+                // Date 기반으로 남은 시간 계산
+                if let startDate = self.restTimerStartDate {
+                    let elapsed = Date().timeIntervalSince(startDate)
+                    let newRemainingSeconds = max(0, self.restSeconds - Int(elapsed))
+                    self.remainingRestSeconds = newRemainingSeconds
+                    
+                    if newRemainingSeconds <= 0 {
+                        print("🔔 휴식 타이머 종료")
+                        // stopRestTimer 내부에서 UI 업데이트가 있으므로 메인 액터에서 호출
+                        self.stopRestTimer()
+                        self.playTimerEndSound() // 사운드 재생은 백그라운드 가능 (AVAudioPlayer는 스레드 안전)
+                        print("➡️ 휴식 후 다음 세트로 이동")
+                        // moveToNextSet 내부에서 UI 업데이트가 있으므로 메인 액터에서 호출
+                        self.moveToNextSet()
+                    }
                 }
             }
         }
@@ -405,6 +463,8 @@ final class WorkoutSessionViewModel: ObservableObject {
         }
         restTimer?.invalidate()
         restTimer = nil
+        restTimerStartDate = nil // 타이머 시작 시간 초기화
+        backgroundEnterTime = nil // 백그라운드 진입 시간 초기화
         // @Published 프로퍼티 변경은 @MainActor 컨텍스트에서 안전
         isRestTimerActive = false
         remainingRestSeconds = restSeconds
@@ -486,6 +546,8 @@ final class WorkoutSessionViewModel: ObservableObject {
         // invalidate()는 스레드 안전합니다.
         timer?.invalidate()
         restTimer?.invalidate()
+        // 알림 관찰자 제거
+        NotificationCenter.default.removeObserver(self)
         // Task나 @MainActor 관련 메서드 호출은 피합니다.
     }
     
