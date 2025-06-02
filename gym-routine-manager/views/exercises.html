@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>運動管理 - ジムルーティンマネージャー</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+        <link rel="stylesheet" href="/css/style.css" />
+    </head>
+    <body>
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="/">
+                        <i class="bi bi-dumbbell me-2"></i>運動管理
+                    </a>
+                    <button
+                        class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/"
+                                    >テンプレート管理</a
+                                >
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link active"
+                                    href="/exercises.html"
+                                    >運動管理</a
+                                >
+                            </li>
+                            <li class="nav-item">
+                                <a
+                                    class="nav-link"
+                                    href="#"
+                                    id="firebase-status">
+                                    <span class="firebase-indicator"></span>
+                                    Firebase状態
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                <!-- 통계 섹션 -->
+                <div class="exercise-stats row">
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <span class="stat-number" id="total-exercises"
+                                >0</span
+                            >
+                            <span class="stat-label">総運動数</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <span class="stat-number" id="chest-exercises"
+                                >0</span
+                            >
+                            <span class="stat-label">胸運動</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <span class="stat-number" id="back-exercises"
+                                >0</span
+                            >
+                            <span class="stat-label">背中運動</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <span class="stat-number" id="legs-exercises"
+                                >0</span
+                            >
+                            <span class="stat-label">脚運動</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 검색 및 필터 섹션 -->
+                <div class="card mb-4">
+                    <div
+                        class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">運動検索・フィルター</h5>
+                        <button class="btn btn-primary" id="add-exercise-btn">
+                            <i class="bi bi-plus-lg"></i> 新規運動追加
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="search-input"
+                                        placeholder="運動名で検索..."
+                                        autocomplete="off" />
+                                    <button
+                                        class="btn btn-outline-secondary"
+                                        id="search-btn">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select" id="sort-select">
+                                    <option value="name:asc">
+                                        名前順 (昇順)
+                                    </option>
+                                    <option value="name:desc">
+                                        名前順 (降順)
+                                    </option>
+                                    <option value="part:asc">
+                                        部位順 (昇順)
+                                    </option>
+                                    <option value="createdAt:desc">
+                                        作成日時順 (新しい順)
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="exercise-search-filters mt-3">
+                            <button
+                                class="btn btn-outline-secondary part-filter active"
+                                data-part="all">
+                                全体
+                            </button>
+                            <button
+                                class="btn btn-outline-secondary part-filter"
+                                data-part="chest">
+                                胸
+                            </button>
+                            <button
+                                class="btn btn-outline-secondary part-filter"
+                                data-part="back">
+                                背中
+                            </button>
+                            <button
+                                class="btn btn-outline-secondary part-filter"
+                                data-part="shoulders">
+                                肩
+                            </button>
+                            <button
+                                class="btn btn-outline-secondary part-filter"
+                                data-part="legs">
+                                脚
+                            </button>
+                            <button
+                                class="btn btn-outline-secondary part-filter"
+                                data-part="arms">
+                                腕
+                            </button>
+                            <button
+                                class="btn btn-outline-secondary part-filter"
+                                data-part="core">
+                                コア
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 운동 목록 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">運動一覧</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="exercise-table-container">
+                            <table class="table table-hover exercise-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">キー</th>
+                                        <th scope="col">運動名</th>
+                                        <th scope="col">部位</th>
+                                        <th scope="col">詳細部位</th>
+                                        <th scope="col">説明</th>
+                                        <th scope="col" width="150">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="exercises-table-body">
+                                    <!-- 운동 데이터가 여기에 동적으로 추가됩니다 -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div
+                            id="exercise-loading"
+                            class="text-center mt-3"
+                            style="display: none">
+                            <div
+                                class="spinner-border text-primary"
+                                role="status">
+                                <span class="visually-hidden"
+                                    >読み込み中...</span
+                                >
+                            </div>
+                        </div>
+
+                        <div
+                            id="exercise-error"
+                            class="alert alert-danger mt-3"
+                            style="display: none">
+                            データの読み込み中にエラーが発生しました。
+                        </div>
+
+                        <div
+                            id="no-exercises"
+                            class="text-center text-muted mt-3"
+                            style="display: none">
+                            運動データがありません。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 페이지네이션 -->
+                <nav class="exercise-pagination">
+                    <ul class="pagination" id="pagination-controls">
+                        <!-- 페이지네이션 버튼들이 여기에 동적으로 추가됩니다 -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 운동 추가/편집 모달 -->
+        <div class="modal fade" id="exerciseModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exerciseModalTitle">
+                            新規運動追加
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="exercise-form">
+                            <input type="hidden" id="exercise-id" />
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label
+                                            for="exercise-key"
+                                            class="form-label"
+                                            >キー *</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="exercise-key"
+                                            required
+                                            placeholder="例: bench_press" />
+                                        <div class="form-text">
+                                            運動を識別するためのユニークなキー
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label
+                                            for="exercise-name"
+                                            class="form-label"
+                                            >運動名 *</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="exercise-name"
+                                            required
+                                            placeholder="例: ベンチプレス" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label
+                                            for="exercise-part"
+                                            class="form-label"
+                                            >部位 *</label
+                                        >
+                                        <select
+                                            class="form-select"
+                                            id="exercise-part"
+                                            required>
+                                            <option value="">部位を選択</option>
+                                            <option value="chest">胸</option>
+                                            <option value="back">背中</option>
+                                            <option value="shoulders">
+                                                肩
+                                            </option>
+                                            <option value="legs">脚</option>
+                                            <option value="arms">腕</option>
+                                            <option value="core">コア</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label
+                                            for="exercise-detailed-part"
+                                            class="form-label"
+                                            >詳細部位</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="exercise-detailed-part"
+                                            placeholder="例: 上胸部" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label
+                                    for="exercise-description"
+                                    class="form-label"
+                                    >説明</label
+                                >
+                                <textarea
+                                    class="form-control"
+                                    id="exercise-description"
+                                    rows="3"
+                                    placeholder="運動の説明や注意事項を入力してください"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                            キャンセル
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="save-exercise-btn">
+                            保存
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 삭제 확인 모달 -->
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">削除確認</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>この運動を削除してもよろしいですか？</p>
+                        <p class="text-danger">
+                            <strong>注意：</strong>
+                            この操作は取り消すことができません。
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                            キャンセル
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-danger"
+                            id="confirm-delete-btn">
+                            削除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firebase 상태 모달 -->
+        <div class="modal fade" id="firebaseStatusModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Firebase 연결 상태</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="firebase-details">
+                            <div class="mb-3">
+                                <strong>연결 상태:</strong>
+                                <span class="firebase-connection-status"
+                                    >확인 중...</span
+                                >
+                            </div>
+                            <div class="mb-3">
+                                <strong>프로젝트 ID:</strong>
+                                <span class="firebase-project-id">-</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>데이터베이스:</strong>
+                                <span class="firebase-database">Firestore</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>운동 컬렉션:</strong>
+                                <span class="firebase-collection"
+                                    >Exercises</span
+                                >
+                            </div>
+                            <div class="mb-3">
+                                <strong>운동 수:</strong>
+                                <span class="firebase-exercise-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/exercises.js"></script>
+    </body>
+</html>

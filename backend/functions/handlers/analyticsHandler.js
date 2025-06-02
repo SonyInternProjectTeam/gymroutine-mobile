@@ -79,7 +79,7 @@ async function getBodyPartFromExercise(exerciseName) {
     'ベンチプレス': 'bench press',
     'スクワット': 'squat',
     'デッドリフト': 'deadlift',
-    'ショルダープレス': 'shoulder press',
+    'ダンベルショルダープレス': 'dumbbell shoulder press',
     'チンニング': 'chin-up',
     'プルアップ': 'pull-up',
     'レッグプレス': 'leg press',

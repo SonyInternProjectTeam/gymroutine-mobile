@@ -118,3 +118,102 @@ body {
 .firebase-details {
     line-height: 1.6;
 }
+
+/* Exercise Search 스타일 (index.html에서 분리한 인라인 스타일) */
+.exercise-search-item {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.exercise-search-item:hover {
+    background-color: #f8f9fa;
+}
+
+.exercise-tag {
+    font-size: 0.8em;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background-color: #e9ecef;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* Exercise CRUD 페이지 스타일 */
+.exercise-table-container {
+    overflow-x: auto;
+}
+
+.exercise-table {
+    margin-bottom: 0;
+}
+
+.exercise-table th,
+.exercise-table td {
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+.exercise-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.exercise-actions .btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.exercise-form {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.exercise-search-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.part-filter {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.part-filter.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.exercise-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.exercise-stats {
+    background: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.exercise-stats .stat-item {
+    text-align: center;
+}
+
+.exercise-stats .stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0d6efd;
+    display: block;
+}
+
+.exercise-stats .stat-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
