@@ -30,12 +30,42 @@ const CONSTANTS = {
 
 // 전역 캐시 변수
 let exerciseCache = null;
+let cacheTimestamp = null;
+let cacheLoadingPromise = null;
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30분 TTL
 
 // 운동 데이터 캐싱 함수
 async function loadExerciseData() {
-  if (exerciseCache) return exerciseCache;
+  const now = Date.now();
+  
+  // 캐시가 유효한지 확인 (TTL 체크)
+  if (exerciseCache && cacheTimestamp && (now - cacheTimestamp < CACHE_TTL_MS)) {
+    logger.info(`Using cached exercise data (age: ${Math.round((now - cacheTimestamp) / 1000)}s)`);
+    return exerciseCache;
+  }
+  
+  // 이미 로딩 중인 경우, 동일한 Promise를 반환 (중복 요청 방지)
+  if (cacheLoadingPromise) {
+    logger.info('Exercise data loading already in progress, waiting...');
+    return await cacheLoadingPromise;
+  }
+  
+  // 새로운 로딩 시작
+  cacheLoadingPromise = loadExerciseDataFromFirestore();
   
   try {
+    const result = await cacheLoadingPromise;
+    return result;
+  } finally {
+    // 로딩 완료 후 Promise 초기화
+    cacheLoadingPromise = null;
+  }
+}
+
+// Firestore에서 실제 데이터 로딩
+async function loadExerciseDataFromFirestore() {
+  try {
+    logger.info('Loading exercise data from Firestore...');
     const snapshot = await db.collection('Exercises').get();
     const exercises = {};
     
@@ -53,11 +83,31 @@ async function loadExerciseData() {
       }
     });
     
-    exerciseCache = exercises;
-    logger.info(`Exercise cache loaded with ${Object.keys(exercises).length} items`);
+    // 데이터가 정상적으로 로드된 경우에만 캐시 업데이트
+    if (Object.keys(exercises).length > 0) {
+      exerciseCache = exercises;
+      cacheTimestamp = Date.now();
+      logger.info(`Exercise cache updated with ${Object.keys(exercises).length} items`);
+    } else {
+      logger.warn('No exercises found in database, keeping existing cache');
+      // 기존 캐시가 있으면 그대로 사용
+      if (exerciseCache) {
+        logger.info(`Using existing cache with ${Object.keys(exerciseCache).length} items`);
+        return exerciseCache;
+      }
+    }
+    
     return exercises;
   } catch (error) {
     logger.error(`Error loading exercise data: ${error.message}`);
+    
+    // 에러 발생 시 기존 캐시가 있으면 그대로 사용
+    if (exerciseCache) {
+      logger.info(`Using existing cache due to error, ${Object.keys(exerciseCache).length} items`);
+      return exerciseCache;
+    }
+    
+    // 캐시도 없고 에러도 발생한 경우 빈 객체 반환
     return {};
   }
 }
@@ -74,7 +124,54 @@ async function getBodyPartFromExercise(exerciseName) {
     return 'other';
   }
   
-  // 일본어 운동 이름을 영어로 매핑하는 사전
+  logger.info(`Looking up exercise: ${exerciseName}`);
+  
+  // 1. 먼저 데이터베이스 key로 직접 매칭 시도 (영어 운동명)
+  const normalizedExerciseName = exerciseName.toLowerCase();
+  const normalizedName1 = normalizedExerciseName.replace(/\s+/g, '-');
+  const normalizedName2 = normalizedExerciseName.replace(/\s+/g, '');
+  
+  // 정확한 키 매칭 시도
+  if (exercises[exerciseName]) {
+    logger.info(`Found exact key match: ${exerciseName} -> ${exercises[exerciseName].part}`);
+    return exercises[exerciseName].part;
+  }
+  
+  if (exercises[normalizedName1]) {
+    logger.info(`Found normalized key match: ${normalizedName1} -> ${exercises[normalizedName1].part}`);
+    return exercises[normalizedName1].part;
+  }
+  
+  if (exercises[normalizedName2]) {
+    logger.info(`Found normalized key match: ${normalizedName2} -> ${exercises[normalizedName2].part}`);
+    return exercises[normalizedName2].part;
+  }
+  
+  // 2. 데이터베이스 name 필드로 매칭 시도 (일본어 운동명)
+  for (const [key, data] of Object.entries(exercises)) {
+    if (data.name && data.name === exerciseName) {
+      logger.info(`Found exact name match: ${exerciseName} -> ${data.part}`);
+      return data.part;
+    }
+  }
+  
+  // 3. 부분 일치 시도 (key와 name 모두)
+  for (const [key, data] of Object.entries(exercises)) {
+    const lowerKey = key.toLowerCase();
+    const lowerName = data.name ? data.name.toLowerCase() : '';
+    
+    if (normalizedExerciseName.includes(lowerKey) || lowerKey.includes(normalizedExerciseName)) {
+      logger.info(`Found partial key match: ${exerciseName} ~ ${key} -> ${data.part}`);
+      return data.part;
+    }
+    
+    if (lowerName && (exerciseName.includes(data.name) || data.name.includes(exerciseName))) {
+      logger.info(`Found partial name match: ${exerciseName} ~ ${data.name} -> ${data.part}`);
+      return data.part;
+    }
+  }
+  
+  // 4. 일본어-영어 매핑 시도 (백업용)
   const japaneseToEnglish = {
     'ベンチプレス': 'bench press',
     'スクワット': 'squat',
@@ -86,45 +183,35 @@ async function getBodyPartFromExercise(exerciseName) {
     'ディップス': 'dips',
     'プッシュアップ': 'push-up',
     'ラットプルダウン': 'lat pulldown',
-    'ケーブルロウ': 'seated cable row'
+    'ケーブルロウ': 'seated cable row',
+    '腕立て伏せ': 'push-up',
+    'サイドプランク': 'side plank',
+    'プランク': 'plank',
+    'ランジ': 'lunge',
+    'カーフレイズ': 'calf raise',
+    'バイセップカール': 'bicep curl',
+    'トライセップエクステンション': 'tricep extension',
+    'ショルダープレス': 'shoulder press',
+    'ラテラルレイズ': 'lateral raise',
+    'フロントレイズ': 'front raise',
+    'アブクランチ': 'crunch',
+    'シットアップ': 'sit-up',
+    'マウンテンクライマー': 'mountain climber',
+    'バーピー': 'burpee',
+    'ジャンピングジャック': 'jumping jack'
   };
   
-  // 일본어 이름을 영어로 변환 시도
-  let englishName = japaneseToEnglish[exerciseName] || exerciseName;
-  // 대소문자 정규화 - 항상 소문자로 변환
-  englishName = englishName.toLowerCase();
-  
-  logger.info(`Looking up exercise: ${exerciseName} -> (English: ${englishName})`);
-  
-  // 다양한 형태의 정규화 시도
-  const normalizedName1 = englishName.replace(/\s+/g, '-');
-  const normalizedName2 = englishName.replace(/\s+/g, '');
-  const normalizedName3 = englishName;
-  
-  // 정확한 키 매칭 시도
-  if (exercises[normalizedName1]) {
-    logger.info(`Found exact match for ${normalizedName1}: ${exercises[normalizedName1].part}`);
-    return exercises[normalizedName1].part;
-  }
-  
-  // 다른 형태로도 시도
-  if (exercises[normalizedName2]) {
-    logger.info(`Found match for ${normalizedName2}: ${exercises[normalizedName2].part}`);
-    return exercises[normalizedName2].part;
-  }
-  
-  // 부분 일치 시도
-  for (const [key, data] of Object.entries(exercises)) {
-    // 키도 소문자로 변환해서 비교
-    const lowerKey = key.toLowerCase();
-    if (normalizedName3.includes(lowerKey) || lowerKey.includes(normalizedName3)) {
-      logger.info(`Found partial match: ${normalizedName3} ~ ${key}: ${data.part}`);
-      return data.part;
+  // 일본어 이름을 영어로 변환하여 다시 시도
+  const englishName = japaneseToEnglish[exerciseName];
+  if (englishName) {
+    logger.info(`Translated ${exerciseName} to ${englishName}, retrying lookup`);
+    const translatedResult = await getBodyPartFromExercise(englishName);
+    if (translatedResult !== 'other') {
+      return translatedResult;
     }
   }
   
-  // 직접 매핑 시도 (데이터베이스에 없는 운동을 위한 백업)
-  // TODO : db에 없는 운동을 매핑하는
+  // 5. 직접 매핑 시도 (데이터베이스에 없는 운동을 위한 최종 백업)
   const directMapping = {
     'bench press': 'chest',
     'squat': 'lower body',
@@ -143,19 +230,45 @@ async function getBodyPartFromExercise(exerciseName) {
     'front raise': 'shoulder',
     'face pull': 'back',
     'barbell row': 'back',
-    'lat pulldown': 'back'
+    'lat pulldown': 'back',
+    'side plank': 'core',
+    'lunge': 'lower body',
+    'crunch': 'core',
+    'mountain climber': 'core',
+    'burpee': 'full body',
+    'jumping jack': 'full body',
+    'push-up': 'chest',
+    'chin-up': 'back',
+    'dumbbell shoulder press': 'shoulder',
+    'seated cable row': 'back'
   };
   
-  // 직접 매핑에서 찾기
+  // 직접 매핑에서 정확한 매칭 시도
   for (const [key, part] of Object.entries(directMapping)) {
-    if (englishName.includes(key)) {
-      logger.info(`Found in direct mapping: ${englishName} ~ ${key}: ${part}`);
+    if (normalizedExerciseName === key) {
+      logger.info(`Found exact match in direct mapping: ${exerciseName} = ${key} -> ${part}`);
+      return part;
+    }
+    
+    const normalizedKey1 = key.replace(/\s+/g, '-');
+    const normalizedKey2 = key.replace(/\s+/g, '');
+    
+    if (normalizedExerciseName === normalizedKey1 || normalizedExerciseName === normalizedKey2) {
+      logger.info(`Found normalized match in direct mapping: ${exerciseName} ~ ${key} -> ${part}`);
+      return part;
+    }
+  }
+  
+  // 부분 매칭 시도 (최후 수단)
+  for (const [key, part] of Object.entries(directMapping)) {
+    if (normalizedExerciseName.includes(key) || key.includes(normalizedExerciseName)) {
+      logger.info(`Found partial match in direct mapping: ${exerciseName} ~ ${key} -> ${part}`);
       return part;
     }
   }
   
   logger.warn(`No match found for ${exerciseName}, returning 'other'`);
-  return 'other'; // 해당 없는 경우
+  return 'other';
 }
 
 /**
@@ -872,7 +985,32 @@ async function getActiveUsers() {
   }
 }
 
+// 캐시 무효화 함수 (필요 시 수동으로 캐시 클리어)
+function clearExerciseCache() {
+  logger.info('Clearing exercise cache');
+  exerciseCache = null;
+  cacheTimestamp = null;
+  cacheLoadingPromise = null;
+}
+
+// 캐시 상태 확인 함수
+function getCacheStatus() {
+  const now = Date.now();
+  const cacheAge = cacheTimestamp ? Math.round((now - cacheTimestamp) / 1000) : null;
+  const isValid = exerciseCache && cacheTimestamp && (now - cacheTimestamp < CACHE_TTL_MS);
+  
+  return {
+    cached: !!exerciseCache,
+    itemCount: exerciseCache ? Object.keys(exerciseCache).length : 0,
+    ageSeconds: cacheAge,
+    isValid,
+    loading: !!cacheLoadingPromise
+  };
+}
+
 module.exports = {
   updateUserAnalytics,
-  updateAllUsersAnalytics
+  updateAllUsersAnalytics,
+  clearExerciseCache,
+  getCacheStatus
 }; 
