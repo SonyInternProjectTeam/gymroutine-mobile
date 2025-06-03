@@ -24,7 +24,38 @@ class WorkoutService {
         }
     }
     
+    /// 새로운 スケジューリングシステムを사용하여 워크아웃 스케줄을 업데이트
+    func updateWorkoutSchedule(workoutID: String, schedule: WorkoutSchedule, duration: WorkoutDuration?) async -> Result<Void, Error> {
+        do {
+            var updateData: [String: Any] = [:]
+            
+            // 새로운 스케줄 정보 인코딩
+            let scheduleData = try Firestore.Encoder().encode(schedule)
+            updateData["schedule"] = scheduleData
+            
+            // 기간 정보가 있으면 추가
+            if let duration = duration {
+                let durationData = try Firestore.Encoder().encode(duration)
+                updateData["duration"] = durationData
+            } else {
+                updateData["duration"] = FieldValue.delete()
+            }
+            
+            // 기존 호환성 필드들도 업데이트
+            updateData["isRoutine"] = schedule.type != .oneTime
+            updateData["scheduledDays"] = schedule.weeklyDays ?? []
+            
+            try await db.collection("Workouts").document(workoutID).updateData(updateData)
+            return .success(())
+        } catch {
+            print("🔥 ワークアウトスケジュール更新エラー: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+    
     /// 既存ワークアウトの曜日データを更新（新しい構造ではScheduledDaysは[String]タイプ）
+    /// 기존 호환성을 위해 유지하지만 새로운 updateWorkoutSchedule 사용 권장
+    @available(*, deprecated, message: "Use updateWorkoutSchedule instead")
     func updateScheduledDaysForWorkout(workoutID: String, scheduledDays: [String], completion: @escaping (Bool) -> Void) {
         db.collection("Workouts").document(workoutID).updateData([
             "ScheduledDays": scheduledDays
@@ -146,6 +177,81 @@ class WorkoutService {
         }
     }
     
+    /// 新로운 スケジューリングシステムを지원하는 사용자 워크아웃 조회 메서드
+    func fetchUserWorkoutsWithSchedule(uid: String) async -> Result<[Workout], Error> {
+        do {
+            let snapshot = try await db.collection("Workouts")
+                .whereField("userId", isEqualTo: uid)
+                .getDocuments()
+            
+            var workouts: [Workout] = []
+            
+            for document in snapshot.documents {
+                do {
+                    let workout = try document.data(as: Workout.self)
+                    workouts.append(workout)
+                } catch {
+                    print("[ERROR] 워크아웃 디코딩 에러: \(error)")
+                    // 기존 구조의 데이터인 경우 호환성 처리
+                    if let legacyWorkout = try? self.parseLegacyWorkout(from: document.data()) {
+                        workouts.append(legacyWorkout)
+                    }
+                }
+            }
+            
+            return .success(workouts)
+        } catch {
+            print("[ERROR] Firestore 조회 에러: \(error)")
+            return .failure(error)
+        }
+    }
+    
+    /// 기존 구조의 워크아웃 데이터를 새로운 구조로 변환
+    private func parseLegacyWorkout(from data: [String: Any]) throws -> Workout {
+        // 이 메서드는 기존 데이터가 새로운 schedule 필드가 없을 때 호환성을 제공합니다
+        // 실제 구현에서는 기존 isRoutine, scheduledDays 필드를 사용해 WorkoutSchedule을 생성
+        // 여기서는 기본 구현만 제공하고, 필요에 따라 세부 구현을 추가하세요
+        throw NSError(domain: "LegacyConversion", code: 1, userInfo: [NSLocalizedDescriptionKey: "Legacy workout conversion not implemented"])
+    }
+    
+    /// 특정 スケジュール タイプ으로 워크아웃 필터링
+    func fetchWorkoutsByScheduleType(uid: String, scheduleType: WorkoutScheduleType) async -> Result<[Workout], Error> {
+        do {
+            let snapshot = try await db.collection("Workouts")
+                .whereField("userId", isEqualTo: uid)
+                .whereField("schedule.type", isEqualTo: scheduleType.rawValue)
+                .getDocuments()
+            
+            let workouts = try snapshot.documents.compactMap { document in
+                try document.data(as: Workout.self)
+            }
+            
+            return .success(workouts)
+        } catch {
+            print("[ERROR] スケジュール タイプ별 워크아웃 조회 에러: \(error)")
+            return .failure(error)
+        }
+    }
+    
+    /// 특정 요일에 スケジュール된 워크아웃 조회
+    func fetchWorkoutsByWeekday(uid: String, weekday: String) async -> Result<[Workout], Error> {
+        do {
+            let snapshot = try await db.collection("Workouts")
+                .whereField("userId", isEqualTo: uid)
+                .whereField("schedule.weeklyDays", arrayContains: weekday)
+                .getDocuments()
+            
+            let workouts = try snapshot.documents.compactMap { document in
+                try document.data(as: Workout.self)
+            }
+            
+            return .success(workouts)
+        } catch {
+            print("[ERROR] 요일별 워크아웃 조회 에러: \(error)")
+            return .failure(error)
+        }
+    }
+    
     /// 運動オプション(Trainsコレクション)を読み込む
     func fetchTrainOptions(completion: @escaping ([String]) -> Void) {
         db.collection("Trains").getDocuments { (snapshot, error) in
@@ -179,12 +285,12 @@ class WorkoutService {
     ///   - userId: ユーザーID
     ///   - result: 保存するWorkoutResultModelデータ
     func saveWorkoutResult(userId: String, result: WorkoutResultModel) async -> Result<Void, Error> {
-        // 月別サブコレクションパスを作成 (YYYYMM)
+        // 월별サブコレクションパスを作成 (YYYYMM)
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyyMM"
         let monthCollectionId = dateFormatter.string(from: result.createdAt.dateValue())
         
-        // Firestoreパス設定 - ドキュメントID自動生成
+        // Firestoreパス設정 - ドキュメントID自動生成
         let resultDocRef = db.collection("Result")
             .document(userId)
             .collection(monthCollectionId)
@@ -207,7 +313,7 @@ class WorkoutService {
     /// 特定ユーザーの特定月の特定運動結果をIDで取得する関数
     /// - Parameters:
     ///   - userId: ユーザーID
-    ///   - month: 照会する月 (YYYYMM形式の文字列)
+    ///   - month: 照회する月 (YYYYMM形式の文字列)
     ///   - resultId: 取得する結果のドキュメントID
     func fetchWorkoutResultById(userId: String, month: String, resultId: String) async throws -> WorkoutResultModel {
         let resultDocRef = db.collection("Result") // Base collection is "Result"
@@ -234,7 +340,50 @@ class WorkoutService {
 
     // MARK: - Workout Update
 
-    /// ワークアウトの基本情報（名前、メモなど）を更新するメソッド
+    /// 새로운 スケジューリングシステムを지원하는 워크아웃 정보 업데이트 메서드
+    func updateWorkoutInfo(workoutID: String, 
+                          name: String, 
+                          notes: String?, 
+                          schedule: WorkoutSchedule? = nil, 
+                          duration: WorkoutDuration? = nil) async -> Result<Void, Error> {
+        do {
+            var updateData: [String: Any] = [
+                "name": name
+            ]
+            
+            // 메모 처리
+            if let notes = notes, !notes.isEmpty {
+                updateData["notes"] = notes
+            } else {
+                updateData["notes"] = FieldValue.delete()
+            }
+            
+            // 새로운 スケジュール 정보가 제공되면 업데이트
+            if let schedule = schedule {
+                let scheduleData = try Firestore.Encoder().encode(schedule)
+                updateData["schedule"] = scheduleData
+                
+                // 기존 호환성 필드도 업데이트
+                updateData["isRoutine"] = schedule.type != .oneTime
+                updateData["scheduledDays"] = schedule.weeklyDays ?? []
+            }
+            
+            // 기간 정보 업데이트
+            if let duration = duration {
+                let durationData = try Firestore.Encoder().encode(duration)
+                updateData["duration"] = durationData
+            }
+            
+            try await db.collection("Workouts").document(workoutID).updateData(updateData)
+            return .success(())
+        } catch {
+            print("🔥 ワークアウト情報更新エラー: \(error.localizedDescription)")
+            return .failure(error)
+        }
+    }
+    
+    /// 기존 호환성을 위한 워크아웃 정보 업데이트 메서드 (deprecated)
+    @available(*, deprecated, message: "Use updateWorkoutInfo with schedule parameter instead")
     func updateWorkoutInfo(workoutID: String, name: String, notes: String?, scheduledDays: [String] = []) async -> Result<Void, Error> {
         do {
             // 更新するフィールドのみを含める
