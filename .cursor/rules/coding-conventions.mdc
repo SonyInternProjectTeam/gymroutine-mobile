@@ -36,3 +36,98 @@ alwaysApply: false
    - Log important user actions
    - Include relevant context in analytics events
    - Use consistent event naming conventions
+
+## JavaScript/Firebase Functions Guidelines
+
+1. **Naming**
+   - Use camelCase for variables and functions
+   - Use PascalCase for classes and constructors
+   - Use UPPER_SNAKE_CASE for constants
+   - Use descriptive names that convey purpose
+
+2. **File Organization**
+   - Group handlers by functionality in `/handlers` directory
+   - One main handler function per file
+   - Export only necessary functions from modules
+
+3. **Function Structure**
+   - Use async/await for asynchronous operations
+   - Handle errors gracefully with try-catch blocks
+   - Return consistent response structures
+
+4. **Error Handling**
+   - Log errors with appropriate severity levels
+   - Provide meaningful error messages for debugging
+   - Return structured error responses
+
+5. **Logging**
+   - Use Firebase Functions logger for all logging
+   - Include contextual information (userId, operation type)
+   - Use appropriate log levels (info, warn, error)
+   - Example: `logger.info(\`Processing analytics for user: \${userId}\`)`
+
+6. **Database Operations**
+   - Implement caching strategies for frequently accessed data
+   - Use TTL (Time To Live) for cache invalidation
+   - Handle Firestore timestamp conversions properly
+   - Batch operations when possible for performance
+
+7. **Analytics Processing**
+   - Use multi-step matching for exercise recognition
+   - Support both Japanese and English exercise names
+   - Implement fallback mechanisms for unrecognized exercises
+   - Cache exercise data to reduce database calls
+
+## Commit Conventions
+
+1. **Commit Timing**
+   Make a commit after each meaningful change or completion of a single logical task.
+
+   Commit after the following situations:
+   - Implementing a new feature or screen
+   - Fixing a bug or issue
+   - Refactoring code or reorganizing files
+   - Updating documentation
+   - Adding or updating analytics events
+   - Making design or UI adjustments
+   - Completing a TODO or milestone in the project
+
+2. **Commit Message Format**
+   - `fix:` バグ等の修正
+   - `feat:` 新機能
+   - `refactor:` 動作に影響のないコード変更
+   - `docs:` ドキュメントのみの変更
+   - `style:` スタイルのみの変更
+   - `design:` UIの構成変更
+   - `perf:` パフォーマンス向上関連の変更
+   - `chore:` ライブラリ等の変更
+   - `test:` テスト関連の変更
+   - `!:` 破壊的変更
+
+## Testing Guidelines
+
+1. **Swift Testing**
+   - Write unit tests for business logic
+   - Use XCTest framework
+   - Mock external dependencies
+   - Test edge cases and error conditions
+
+2. **Firebase Functions Testing**
+   - Test functions locally using Firebase emulator
+   - Mock Firestore operations for unit tests
+   - Test error scenarios and edge cases
+   - Validate response structures
+
+## Security Guidelines
+
+1. **Data Protection**
+   - Validate all input parameters
+   - Sanitize user-generated content
+   - Implement proper authentication checks
+   - Follow Firebase security rules best practices
+
+2. **API Security**
+   - Use Firebase Authentication for user verification
+   - Implement rate limiting where appropriate
+   - Log security-related events for monitoring
+   - Never expose sensitive data in logs
