@@ -96,10 +96,8 @@ struct AnalyticsView: View {
         }
         .alert(isPresented: $viewModel.showingUpdateAlert) {
             Alert(
-                title: Text(viewModel.updateSuccess ? "分析完了" : "分析失敗"),
-                message: Text(viewModel.updateSuccess 
-                              ? "分析データが更新されました。しばらくしてからもう一度確認してください。"
-                              : "分析データの更新に失敗しました。\(viewModel.errorMessage)"),
+                title: Text(viewModel.getAlertTitle()),
+                message: Text(viewModel.alertMessage),
                 dismissButton: .default(Text("確認")) {
                     if viewModel.updateSuccess {
                         // 更新成功時、5秒後にデータを再読み込み
