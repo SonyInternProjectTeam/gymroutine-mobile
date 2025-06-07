@@ -121,19 +121,21 @@ extension CalendarView {
     // 유효한 날짜의 셀 내용을 렌더링하는 함수
     @ViewBuilder
     private func dayCellContent(weekIndex: Int, validDay: Date) -> some View {
-        let workouts = viewModel.getWorkoutsForWeekday(index: weekIndex)
+        let workouts = viewModel.getWorkoutsForDate(validDay)
         let hasCompleted = viewModel.hasCompletedWorkout(on: validDay)
+        let hasScheduled = viewModel.hasScheduledWorkout(on: validDay)
         
-        VStack {
+        VStack(spacing: 2) {
             // 날짜 숫자
             Text("\(Calendar.current.component(.day, from: validDay))")
+                .font(.system(size: 14, weight: hasScheduled || hasCompleted ? .bold : .regular))
                 .foregroundColor(hasCompleted ? .blue : .primary)
             
             // 도트 표시기
             dayIndicatorDots(workouts: workouts, hasCompleted: hasCompleted)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(hasCompleted ? Color.green.opacity(0.1) : Color.clear)
+        .background(backgroundColorForDay(hasScheduled: hasScheduled, hasCompleted: hasCompleted))
         .overlay(
             RoundedRectangle(cornerRadius: 4)
                 .stroke(validDay.isSameDay(as: viewModel.selectedDate) ? .main : .clear, lineWidth: 2)
@@ -150,25 +152,45 @@ extension CalendarView {
         }
     }
     
+    // 날짜 셀의 배경색을 결정하는 함수
+    private func backgroundColorForDay(hasScheduled: Bool, hasCompleted: Bool) -> Color {
+        if hasCompleted {
+            return Color.green.opacity(0.2)
+        }
+        return Color.clear
+    }
+    
     // 도트 인디케이터를 렌더링하는 함수
     @ViewBuilder
     private func dayIndicatorDots(workouts: [Workout], hasCompleted: Bool) -> some View {
-        HStack(spacing: 2) {
-            // 예정된 운동 표시 (빨간색 점)
-            ForEach(0..<min(workouts.count, 3), id: \.self) { _ in
+        HStack(spacing: 1) {
+            // 스케줄 타입별 다른 색상의 점으로 표시
+            ForEach(Array(workouts.prefix(3).enumerated()), id: \.offset) { index, workout in
                 Circle()
-                    .fill(Color.red)
-                    .frame(width: 6, height: 6)
+                    .fill(colorForScheduleType(workout.schedule.type))
+                    .frame(width: 5, height: 5)
             }
             
-            // 완료된 운동 표시 (녹색 점)
+            // 더 많은 워크아웃이 있으면 "..." 표시
+            if workouts.count > 3 {
+                Text("...")
+                    .font(.system(size: 8))
+                    .foregroundColor(.secondary)
+            }
+            
+            // 완료된 운동 표시 (녹색 체크 마크)
             if hasCompleted {
-                Circle()
-                    .fill(Color.green)
-                    .frame(width: 6, height: 6)
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 8))
+                    .foregroundColor(.green)
             }
         }
-        .frame(height: 6)
+        .frame(height: 12)
+    }
+    
+    // 스케줄 타입별 색상 반환
+    private func colorForScheduleType(_ type: WorkoutScheduleType) -> Color {
+        return .red
     }
     
     private var contentBox: some View {
@@ -198,12 +220,11 @@ extension CalendarView {
     
     private var scheduledWorkoutsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("予定されているワークアウト")
+            Text("予定されたワークアウト")
                 .font(.headline)
                 .foregroundColor(.primary)
             
-            let weekdayIndex = Calendar.current.component(.weekday, from: viewModel.selectedDate) - 1
-            let scheduledWorkouts = viewModel.getWorkoutsForWeekday(index: weekdayIndex)
+            let scheduledWorkouts = viewModel.getWorkoutsForDate(viewModel.selectedDate)
             
             scheduledWorkoutsContent(workouts: scheduledWorkouts)
         }
@@ -212,7 +233,7 @@ extension CalendarView {
     @ViewBuilder
     private func scheduledWorkoutsContent(workouts: [Workout]) -> some View {
         if workouts.isEmpty {
-            Text("予定されているワークアウトなし")
+            Text("予定されたワークアウトなし")
                 .foregroundStyle(.secondary)
                 .padding(.vertical, 4)
         } else {
@@ -224,13 +245,76 @@ extension CalendarView {
     
     private func scheduledWorkoutRow(workout: Workout) -> some View {
         NavigationLink(destination: WorkoutDetailView(viewModel: WorkoutDetailViewModel(workout: workout))) {
-            WorkoutCell(
-                workoutName: workout.name,
-                exerciseImageName: workout.exercises.first?.key,
-                count: workout.exercises.count
-            )
+            VStack {
+                WorkoutCell(
+                    workoutName: workout.name,
+                    exerciseImageName: workout.exercises.first?.key,
+                    count: workout.exercises.count
+                )
+                
+                // 스케줄 및 진행 정보 표시
+                HStack {
+                    scheduleTypeLabel(workout.schedule.type)
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 2) {
+                        // 남은 기간 정보
+                        if let remainingDuration = viewModel.getRemainingDuration(for: workout) {
+                            Text(remainingDuration)
+                                .font(.caption)
+                                .foregroundColor(remainingDuration.contains("期限切れ") || remainingDuration.contains("完了") ? .red : .secondary)
+                        }
+                        
+                        // 진행 상황 (총 횟수가 설정된 경우)
+                        if let progress = viewModel.getWorkoutProgress(for: workout) {
+                            Text("\(progress.completed)/\(progress.total!)回")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 8)
+            }
         }
         .buttonStyle(.plain)
+    }
+    
+    // 스케줄 타입 라벨
+    private func scheduleTypeLabel(_ type: WorkoutScheduleType) -> some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(colorForScheduleType(type))
+                .frame(width: 8, height: 8)
+            
+            Text(type.displayName)
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+    }
+    
+    // 기간 정보 표시 (사용하지 않으므로 제거하거나 간소화)
+    private func durationInfo(_ duration: WorkoutDuration) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "clock")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            if let totalSessions = duration.totalSessions {
+                Text("총 \(totalSessions)회")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } else if let weeks = duration.weeks {
+                Text("\(weeks)주간")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } else if let endDate = duration.endDate {
+                Text("~\(endDate.formatted(.dateTime.month().day()))")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
     }
     
     private var completedWorkoutsSection: some View {

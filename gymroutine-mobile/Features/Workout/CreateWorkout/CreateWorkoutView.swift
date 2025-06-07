@@ -17,34 +17,38 @@ struct CreateWorkoutView: View {
                                             count: 3)
     
     var body: some View {
-        VStack(spacing: 0) {
-            
-            headerBox
-            
-            Divider()
-            
-            ScrollView {
-                VStack(spacing: 24) {
+        NavigationView {
+            VStack {
+                Form {
                     nameBox
-                    routineBox
+                    
                     notesBox
-                    exercisesBox
+                    
+                    scheduleBox
+                    
+                    if viewModel.hasDuration {
+                        durationBox
+                    }
+                    
+                    exercisesSection
                 }
-                .padding()
+                
+                createButton
             }
-            .scrollDismissesKeyboard(.immediately)
-            .background(Color.gray.opacity(0.1))
-            .contentMargins(.top, 16)
-            .contentMargins(.bottom, 80)
+            .navigationTitle("ワークアウト作成")
+            .navigationBarTitleDisplayMode(.large)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("キャンセル") {
+                        dismiss()
+                    }
+                }
+            }
         }
         .fullScreenCover(isPresented: $viewModel.searchExercisesFlg) {
             ExerciseSearchView(exercisesManager: viewModel)
         }
-        .overlay(alignment: .bottom) {
-            buttonBox
-                .background(Color(UIColor.systemGray6))
-        }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
         .onAppear {
             // Log screen view
             analyticsService.logScreenView(screenName: "CreateWorkout")
@@ -54,20 +58,12 @@ struct CreateWorkoutView: View {
 
 //MARK: views
 extension CreateWorkoutView {
-    private var headerBox: some View {
-        Text("ワークアウト作成")
-            .font(.title3.bold())
-            .hAlign(.center)
-            .padding()
-            .background(Color(UIColor.systemGray6))
-    }
-    
     private var nameBox: some View {
         VStack(alignment: .leading) {
-            Text("ワークアウト名")
+            Text("ワークアウトの名前")
                 .font(.headline)
             
-            TextField("入力してください", text: $viewModel.workoutName)
+            TextField("ワークアウトの名前を入力してください", text: $viewModel.workoutName)
                 .fieldBackground()
                 .submitLabel(.done)
                 .clipped()
@@ -75,46 +71,235 @@ extension CreateWorkoutView {
         }
     }
     
-    private var routineBox: some View {
+    private var scheduleBox: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("ルーティーン化する")
-                        .font(.headline)
-                    
-                    Text("ルーティーン化すると、指定された曜日に毎週設定されます")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                
-                Spacer()
-                
-                Toggle("", isOn: $viewModel.isRoutine)
-                    .labelsHidden()
-                    .tint(.main)
-            }
+            Text("スケジュールの設定")
+                .font(.headline)
             
-            if viewModel.isRoutine {
-                LazyVGrid(columns: columns) {
-                    ForEach(Weekday.allCases, id: \.self) { day in
+            // スケジュールの種類の選択
+            VStack(alignment: .leading, spacing: 12) {
+                Text("スケジュールの種類")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                
+                LazyVGrid(columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ], spacing: 8) {
+                    ForEach(WorkoutScheduleType.allCases, id: \.self) { type in
                         HStack {
-                            Image(systemName: viewModel.selectedDays.contains(day) ? "checkmark" : "plus")
-                            
-                            Text(day.japanese)
+                            Image(systemName: viewModel.scheduleType == type ? "checkmark.circle.fill" : "circle")
+                                .foregroundColor(viewModel.scheduleType == type ? .main : .secondary)
+                            Text(type.displayName)
+                                .font(.caption)
                         }
-                        .padding(12)
-                        .background(viewModel.selectedDays.contains(day) ? .main : .secondary.opacity(0.2))
+                        .padding(8)
+                        .background(viewModel.scheduleType == type ? .main.opacity(0.1) : .secondary.opacity(0.1))
                         .clipShape(.rect(cornerRadius: 8))
                         .onTapGesture {
                             withAnimation {
-                                viewModel.toggleSelectionWeekDay(for: day)
+                                viewModel.scheduleType = type
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // スケジュールの種類ごとの設定
+            switch viewModel.scheduleType {
+            case .oneTime:
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("実行日")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    
+                    DatePicker("", selection: $viewModel.startDate, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .labelsHidden()
+                }
+                
+            case .weekly:
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("開始日")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    
+                    DatePicker("", selection: $viewModel.startDate, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .labelsHidden()
+                    
+                    Text("繰り返し日")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    
+                    LazyVGrid(columns: columns) {
+                        ForEach(Weekday.allCases, id: \.self) { day in
+                            HStack {
+                                Image(systemName: viewModel.selectedDays.contains(day) ? "checkmark" : "plus")
+                                
+                                Text(day.japanese)
+                                    .font(.caption)
+                            }
+                            .padding(8)
+                            .background(viewModel.selectedDays.contains(day) ? .main : .secondary.opacity(0.2))
+                            .clipShape(.rect(cornerRadius: 8))
+                            .onTapGesture {
+                                withAnimation {
+                                    viewModel.toggleSelectionWeekDay(for: day)
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            case .interval:
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("開始日")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    
+                    DatePicker("", selection: $viewModel.startDate, displayedComponents: .date)
+                        .datePickerStyle(.compact)
+                        .labelsHidden()
+                    
+                    HStack {
+                        Text("繰り返し間隔")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        
+                        Spacer()
+                        
+                        Stepper(value: $viewModel.intervalDays, in: 1...30) {
+                            Text("\(viewModel.intervalDays)日ごとに")
+                                .font(.subheadline)
+                        }
+                    }
+                }
+                
+            case .specificDates:
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("特定の日付")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            viewModel.addSpecificDate()
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.main)
+                        }
+                    }
+                    
+                    ForEach(Array(viewModel.specificDates.enumerated()), id: \.offset) { index, date in
+                        HStack {
+                            DatePicker("", selection: Binding(
+                                get: { viewModel.specificDates[index] },
+                                set: { viewModel.specificDates[index] = $0 }
+                            ), displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                            .labelsHidden()
+                            
+                            Button(action: {
+                                viewModel.removeSpecificDate(at: index)
+                            }) {
+                                Image(systemName: "minus.circle.fill")
+                                    .foregroundColor(.red)
                             }
                         }
                     }
                 }
             }
         }
-        .animation(.default, value: viewModel.isRoutine)
+        .animation(.default, value: viewModel.scheduleType)
+    }
+    
+    private var durationBox: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("期間の制限")
+                        .font(.headline)
+                    
+                    Text("ワークアウトの継続期間を設定できます")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                
+                Spacer()
+                
+                Toggle("", isOn: $viewModel.hasDuration)
+                    .labelsHidden()
+                    .tint(.main)
+            }
+            
+            if viewModel.hasDuration {
+                VStack(alignment: .leading, spacing: 12) {
+                    // 期間の種類の選択
+                    HStack(spacing: 8) {
+                        ForEach(CreateWorkoutViewModel.DurationType.allCases, id: \.self) { type in
+                            HStack {
+                                Image(systemName: viewModel.durationType == type ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(viewModel.durationType == type ? .main : .secondary)
+                                Text(type.displayName)
+                                    .font(.caption)
+                            }
+                            .padding(8)
+                            .background(viewModel.durationType == type ? .main.opacity(0.1) : .secondary.opacity(0.1))
+                            .clipShape(.rect(cornerRadius: 8))
+                            .onTapGesture {
+                                withAnimation {
+                                    viewModel.durationType = type
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 期間の種類ごとの設定
+                    switch viewModel.durationType {
+                    case .sessions:
+                        HStack {
+                            Text("総回数")
+                                .font(.subheadline)
+                            
+                            Spacer()
+                            
+                            Stepper(value: $viewModel.durationTotalSessions, in: 1...100) {
+                                Text("\(viewModel.durationTotalSessions)回")
+                                    .font(.subheadline)
+                            }
+                        }
+                        
+                    case .weeks:
+                        HStack {
+                            Text("継続期間")
+                                .font(.subheadline)
+                            
+                            Spacer()
+                            
+                            Stepper(value: $viewModel.durationWeeks, in: 1...52) {
+                                Text("\(viewModel.durationWeeks)週")
+                                    .font(.subheadline)
+                            }
+                        }
+                        
+                    case .endDate:
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("終了日")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                            
+                            DatePicker("", selection: $viewModel.durationEndDate, displayedComponents: .date)
+                                .datePickerStyle(.compact)
+                                .labelsHidden()
+                        }
+                    }
+                }
+            }
+        }
+        .animation(.default, value: viewModel.hasDuration)
     }
     
     private var notesBox: some View {
@@ -123,7 +308,7 @@ extension CreateWorkoutView {
                 .font(.headline)
             
             TextField(
-                "メモを残す...",
+                "メモを入力してください...",
                 text: $viewModel.notes,
                 axis: .vertical
             )
@@ -137,9 +322,9 @@ extension CreateWorkoutView {
         }
     }
     
-    private var exercisesBox: some View {
+    private var exercisesSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("エクササイズ")
+            Text("運動の種類")
                 .font(.headline)
             
             ForEach(Array(viewModel.exercises.enumerated()), id: \.element.id) { index, workoutExercise in
@@ -211,7 +396,7 @@ extension CreateWorkoutView {
                     contentType: "workout_creation"
                 )
             } label: {
-                Text("エクササイズを追加する")
+                Text("運動の種類を追加")
                     .font(.headline)
             }
             .buttonStyle(CapsuleButtonStyle(color: .main))
@@ -219,7 +404,7 @@ extension CreateWorkoutView {
         }
     }
     
-    private var buttonBox: some View {
+    private var createButton: some View {
         VStack(spacing: 0) {
             
             Divider()
@@ -244,10 +429,10 @@ extension CreateWorkoutView {
                         // Log workout creation
                         analyticsService.logEvent("workout_created", parameters: [
                             "workout_name": viewModel.workoutName,
-                            "is_routine": viewModel.isRoutine,
+                            "schedule_type": viewModel.scheduleType.rawValue,
+                            "has_duration": viewModel.hasDuration,
                             "has_notes": !viewModel.notes.isEmpty,
-                            "exercise_count": viewModel.exercises.count,
-                            "scheduled_days": viewModel.isRoutine ? viewModel.selectedDays.map { $0.rawValue }.joined(separator: ",") : ""
+                            "exercise_count": viewModel.exercises.count
                         ])
                         
                         dismiss()
