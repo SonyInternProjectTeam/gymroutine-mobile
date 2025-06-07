@@ -11,6 +11,9 @@ struct StoryView: View {
     @State private var showCloseButton = true
     @State private var showControls = true
     
+    // Analytics 관련 상태 변수
+    @State private var storyViewStartTime = Date()
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -42,15 +45,35 @@ struct StoryView: View {
                 // Log screen view
                 analyticsService.logScreenView(screenName: "Story")
                 
-                // Log story viewed
+                // Start tracking story view time
+                storyViewStartTime = Date()
+            }
+            .onDisappear {
+                // Log story viewed when view disappears
                 if viewModel.stories.indices.contains(viewModel.currentStoryIndex) {
                     let story = viewModel.stories[viewModel.currentStoryIndex]
+                    let viewDuration = Date().timeIntervalSince(storyViewStartTime)
                     analyticsService.logStoryViewed(
                         storyId: story.id ?? "unknown",
                         authorId: story.userId,
-                        viewDuration: 0 // Start with 0, will be updated when story changes or view disappears
+                        viewDuration: viewDuration
                     )
                 }
+            }
+            .onChange(of: viewModel.currentStoryIndex) { oldValue, newValue in
+                // Log previous story viewed duration when story changes
+                if viewModel.stories.indices.contains(oldValue) {
+                    let story = viewModel.stories[oldValue]
+                    let viewDuration = Date().timeIntervalSince(storyViewStartTime)
+                    analyticsService.logStoryViewed(
+                        storyId: story.id ?? "unknown",
+                        authorId: story.userId,
+                        viewDuration: viewDuration
+                    )
+                }
+                
+                // Reset timer for new story
+                storyViewStartTime = Date()
             }
         }
     }

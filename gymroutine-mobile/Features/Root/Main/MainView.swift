@@ -14,6 +14,7 @@ struct MainView: View {
     @State private var selectedTab = 0
     @State private var showingTermsForExistingUser = false
     let router: Router
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         ZStack {
@@ -85,6 +86,7 @@ struct MainView: View {
         .onAppear {
             // Check if existing user hasn't agreed to terms
             checkTermsAgreement()
+            analyticsService.logScreenView(screenName: "Main")
         }
         .onChange(of: userManager.currentUser) { _, _ in
             // Check terms agreement when user changes

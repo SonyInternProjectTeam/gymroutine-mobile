@@ -5,6 +5,7 @@ struct GroupDetailView: View {
     var isNewlyJoined: Bool = false
     @StateObject private var viewModel = GroupDetailViewModel()
     @Environment(\.dismiss) private var dismiss
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         ScrollView {
@@ -136,6 +137,7 @@ struct GroupDetailView: View {
         .onAppear {
             print("🔄 [GroupDetailView] onAppear - Loading group data for group: \(group.id ?? "unknown") with isNewlyJoined: \(isNewlyJoined)")
             viewModel.loadGroupData(groupId: group.id ?? "", isNewlyJoined: isNewlyJoined)
+            analyticsService.logScreenView(screenName: "GroupDetail")
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("GroupDeleted"))) { _ in
             // 그룹이 삭제되었을 때 현재 뷰도 닫기

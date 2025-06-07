@@ -53,18 +53,21 @@ struct ExerciseDetailView: View {
 
 extension ExerciseDetailView {
     private var headerBox: some View {
-        if let image = UIImage(named: exercise.key) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 400)
-                        .background(.white)
-        } else {
-                    Image(.welcomeLogo)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 400)
-                        .background(.white)
+        Group {
+            if let image = UIImage(named: exercise.key) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 400)
+                    .background(.white)
+            } else {
+                Label("画像を表示できません", systemImage: "photo.badge.exclamationmark.fill")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                    .frame(height: 400)
+                    .frame(maxWidth: .infinity)
+                    .background(.white)
+            }
         }
     }
 

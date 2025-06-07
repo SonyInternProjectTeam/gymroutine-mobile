@@ -17,6 +17,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+// Exercise 管理页面
+app.get('/exercises.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'exercises.html'));
+});
+
 // APIルート
 app.use('/api/templates', require('./routes/templates'));
 app.use('/api/firebase', require('./routes/firebase'));

@@ -89,19 +89,42 @@ class UserAnalyticsService {
             
             if let resultData = result?.data as? [String: Any] {
                 print("Function response: \(resultData)")
-                
                 // successキーがある場合は使用、ない場合やBool値でない場合はfalseを返す
                 if let success = resultData["success"] as? Bool {
-                    completion(success, nil)
-                } else {
-                    print("Success key not found in response or not a boolean")
-                    completion(false, nil)
+                    if success {
+                        completion(success, nil)
+                    } else {
+                        if let errorMessage = resultData["message"] as? String,
+                           errorMessage == "No workout data available for analysis" {
+                            // No Data用のエラーを吐く
+                            completion(
+                                false,
+                                NSError(
+                                    domain: "AnalyticsService",
+                                    code: 1001,
+                                    userInfo: [NSLocalizedDescriptionKey: "分析に必要なデータが記録されていません。"]
+                                )
+                            )
+                            return
+                        }
+                    }
                 }
             } else {
                 print("Unexpected response format. Raw result: \(String(describing: result?.data))")
-                completion(false, NSError(domain: "AnalyticsService", code: 500, 
-                                        userInfo: [NSLocalizedDescriptionKey: "サーバーレスポンスの形式が正しくありません。"]))
+                completion(false, NSError(domain: "AnalyticsService", code: 500,
+                                          userInfo: [NSLocalizedDescriptionKey: "サーバーレスポンスの形式が正しくありません。"]))
+                return
             }
+
+            completion(
+                false,
+                NSError(
+                    domain: "AnalyticsService",
+                    code: 9999,
+                    userInfo: [NSLocalizedDescriptionKey: "unknown error"]
+                )
+            )
+            return
         }
     }
     

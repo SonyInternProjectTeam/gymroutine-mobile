@@ -12,8 +12,8 @@ class AnalyticsViewModel: ObservableObject {
     // 알림 관련 상태 변수
     @Published var showingUpdateAlert = false
     @Published var updateSuccess = false
-    @Published var errorMessage = ""
-    
+    @Published var alertMessage = ""
+
     private let userAnalyticsService = UserAnalyticsService.shared
     private let db = Firestore.firestore()
     private let userManager = UserManager.shared
@@ -81,7 +81,7 @@ class AnalyticsViewModel: ObservableObject {
             guard let self = self else { return }
             
             self.updateSuccess = success
-            self.errorMessage = error?.localizedDescription ?? ""
+            self.alertMessage = getAlertMessage(error: error)
             self.showingUpdateAlert = true
         }
     }
@@ -131,8 +131,8 @@ class AnalyticsViewModel: ObservableObject {
                         Task {
                             await self?.loadUserData()
                         }
+                        completion(success, nil)
                     }
-                    completion(success, nil)
                 }
             }
         }
@@ -190,6 +190,21 @@ class AnalyticsViewModel: ObservableObject {
             return "あなたはフォロー中のユーザーより週に\(abs(diff))回少なく運動しています"
         } else {
             return "あなたはフォロー中のユーザーと同じくらい運動しています"
+        }
+    }
+
+    func getAlertTitle() -> String {
+        return updateSuccess ? "分析完了" : "更新エラー"
+    }
+
+    func getAlertMessage(error: Error?) -> String {
+        if updateSuccess {
+            return "分析データが更新されました。しばらくしてからもう一度確認してください。"
+        } else {
+            if let error = error as? NSError, error.code == 1001 {
+                return "運動記録がないため分析できません。"
+            }
+            return "分析データの更新に失敗しました。"
         }
     }
 }

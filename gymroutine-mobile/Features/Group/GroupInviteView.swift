@@ -4,6 +4,7 @@ struct GroupInviteView: View {
     let groupId: String
     @StateObject private var viewModel = GroupInviteViewModel()
     @Environment(\.dismiss) private var dismiss
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         NavigationView {
@@ -146,8 +147,8 @@ struct GroupInviteView: View {
                 Text("招待を送信しました！")
             }
             .onAppear {
-                // 뷰가 나타날 때 초대 상태 로드
                 viewModel.loadInvitationStatuses(groupId: groupId)
+                analyticsService.logScreenView(screenName: "GroupInvite")
             }
         }
     }

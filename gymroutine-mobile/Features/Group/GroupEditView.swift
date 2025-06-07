@@ -5,6 +5,7 @@ struct GroupEditView: View {
     @StateObject private var viewModel = GroupEditViewModel()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.presentationMode) var presentationMode
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         ScrollView {
@@ -199,6 +200,7 @@ struct GroupEditView: View {
         }
         .onAppear {
             viewModel.initialize(with: group)
+            analyticsService.logScreenView(screenName: "GroupEdit")
         }
         .alert("グループを削除しますか？", isPresented: $viewModel.showDeleteAlert) {
             Button("削除", role: .destructive) {

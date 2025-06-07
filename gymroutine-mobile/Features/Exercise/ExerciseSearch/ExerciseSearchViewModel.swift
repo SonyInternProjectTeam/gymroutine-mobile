@@ -21,7 +21,7 @@ final class ExerciseSearchViewModel: ObservableObject {
     @Published var isLoading = false
     private var service = ExerciseService()
     private let recommendExeciseIds: [String] = ["qO1BfPHJXlHcoRhzh24n","qX8qffKedwHds0qMI44H"]
-    
+    private let analyticsService = AnalyticsService.shared
     
     @Published var isBoolmarkOnly: Bool = false
 
@@ -45,8 +45,12 @@ final class ExerciseSearchViewModel: ObservableObject {
             switch result {
             case .success(let exercises):
                 self.filterExercises = exercises
+                // Log search event with results count
+                analyticsService.logExerciseSearch(searchQuery: searchWord, resultsCount: exercises.count)
             case .failure(let error):
                 print("[ERROR] Fetch failed: \(error)")
+                // Log search event with 0 results
+                analyticsService.logExerciseSearch(searchQuery: searchWord, resultsCount: 0)
             }
             isLoading = false
         }

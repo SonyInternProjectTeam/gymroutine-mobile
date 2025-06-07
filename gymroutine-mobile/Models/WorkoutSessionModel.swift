@@ -14,6 +14,13 @@ struct WorkoutSessionModel: Codable {
     var elapsedTime: TimeInterval
     var completedSets: Set<String> = [] // 완료된 세트 정보 ("exerciseIndex-setIndex")
     var totalRestTime: TimeInterval = 0 // total rest time in seconds
+    
+    // 휴식 타이머 상태 저장용 추가 필드들
+    var isRestTimerActive: Bool = false
+    var restTimerStartDate: Date?
+    var restTimerDuration: Int = 90 // 설정된 휴식 시간 (초)
+    var currentExerciseIndex: Int = 0
+    var currentSetIndex: Int = 0
     // TODO: add actual exercise data (weight, reps, etc.) if needed
 
     // UserDefaults用のエンコード
@@ -54,6 +61,13 @@ struct WorkoutSessionModel: Codable {
         sessionData["elapsedTime"] = elapsedTime
         sessionData["completedSets"] = Array(completedSets)
         sessionData["totalRestTime"] = totalRestTime
+        
+        // 휴식 타이머 상태 저장
+        sessionData["isRestTimerActive"] = isRestTimerActive
+        sessionData["restTimerStartDate"] = restTimerStartDate?.timeIntervalSince1970
+        sessionData["restTimerDuration"] = restTimerDuration
+        sessionData["currentExerciseIndex"] = currentExerciseIndex
+        sessionData["currentSetIndex"] = currentSetIndex
 
         return sessionData
     }
@@ -86,12 +100,23 @@ struct WorkoutSessionModel: Codable {
         )
 
         // セッションの復元
-        return WorkoutSessionModel(
+        var session = WorkoutSessionModel(
             workout: workout,
             startTime: Date(timeIntervalSince1970: data["startTime"] as! TimeInterval),
             elapsedTime: data["elapsedTime"] as! TimeInterval,
             completedSets: Set(data["completedSets"] as! [String]),
             totalRestTime: data["totalRestTime"] as! TimeInterval
         )
+        
+        // 휴식 타이머 상태 복원
+        session.isRestTimerActive = data["isRestTimerActive"] as? Bool ?? false
+        if let restTimerStartTime = data["restTimerStartDate"] as? TimeInterval {
+            session.restTimerStartDate = Date(timeIntervalSince1970: restTimerStartTime)
+        }
+        session.restTimerDuration = data["restTimerDuration"] as? Int ?? 90
+        session.currentExerciseIndex = data["currentExerciseIndex"] as? Int ?? 0
+        session.currentSetIndex = data["currentSetIndex"] as? Int ?? 0
+        
+        return session
     }
 }

@@ -72,20 +72,27 @@ class AppWorkoutManager: ObservableObject {
             exercises: viewModel.exercisesManager.exercises
         )
 
-        let session = WorkoutSessionModel(
+        var session = WorkoutSessionModel(
             workout: updatedWorkout,
             startTime: viewModel.startTime,
             elapsedTime: Date().timeIntervalSince(viewModel.startTime),
             completedSets: viewModel.completedSets,
             totalRestTime: viewModel.getTotalRestTime()
         )
+        
+        // 휴식 타이머 상태 저장
+        session.isRestTimerActive = viewModel.isRestTimerActive
+        session.restTimerStartDate = viewModel.restTimerStartDate
+        session.restTimerDuration = viewModel.restSeconds
+        session.currentExerciseIndex = viewModel.currentExerciseIndex
+        session.currentSetIndex = viewModel.currentSetIndex
 
         do {
             let sessionData = session.encodeForUserDefaults()
             let jsonData = try JSONSerialization.data(withJSONObject: sessionData)
             let base64String = jsonData.base64EncodedString()
             UserDefaults.standard.set(base64String, forKey: sessionPersistenceKey)
-            print("🔥 AppWorkoutManager: セッション状態をUserDefaultsに保存完了")
+            print("🔥 AppWorkoutManager: セッション状態をUserDefaultsに保存完了 (휴식 타이머 상태 포함)")
         } catch {
             print("🔥 AppWorkoutManager: セッション状態のUserDefaults保存に失敗: \\(error)")
         }
@@ -108,6 +115,38 @@ class AppWorkoutManager: ObservableObject {
 
         let viewModel = WorkoutSessionViewModel(workout: session.workout, startTime: session.startTime)
         viewModel.completedSets = session.completedSets
+        viewModel.currentExerciseIndex = session.currentExerciseIndex
+        viewModel.currentSetIndex = session.currentSetIndex
+        
+        // 휴식 타이머 상태 복원
+        if session.isRestTimerActive {
+            viewModel.restSeconds = session.restTimerDuration
+            viewModel.restTimerStartDate = session.restTimerStartDate
+            viewModel.isRestTimerActive = true
+            
+            // 백그라운드에서 경과된 시간을 계산하여 남은 시간 업데이트
+            if let startDate = session.restTimerStartDate {
+                let elapsed = Date().timeIntervalSince(startDate)
+                let remainingTime = max(0, session.restTimerDuration - Int(elapsed))
+                viewModel.remainingRestSeconds = remainingTime
+                
+                if remainingTime <= 0 {
+                    // 휴식 타이머가 이미 종료됨
+                    print("🔔 복원 시 휴식 타이머가 이미 종료되었음을 감지")
+                    Task { @MainActor in
+                        viewModel.stopRestTimer()
+                        viewModel.moveToNextSet()
+                    }
+                } else {
+                    // 남은 시간이 있으면 타이머 재시작
+                    print("🔄 휴식 타이머 복원: \(remainingTime)초 남음")
+                    Task { @MainActor in
+                        viewModel.startRestTimer()
+                    }
+                }
+            }
+        }
+        
         self.workoutSessionViewModel = viewModel
     }
 
