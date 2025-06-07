@@ -13,6 +13,7 @@ struct RestTimeSettingsView: View {
     var onSave: () -> Void
     
     @State private var selectedTime: Int
+    private let analyticsService = AnalyticsService.shared
     
     private let restTimeOptions = [30, 45, 60, 90, 120, 180]
     
@@ -114,6 +115,9 @@ struct RestTimeSettingsView: View {
             }
             .padding(.top, 32)
             .padding(.horizontal, 16)
+        }
+        .onAppear {
+            analyticsService.logScreenView(screenName: "RestTimeSettings")
         }
     }
 }

@@ -103,6 +103,8 @@ struct UpdateWeightView: View {
             return
         }
         
+        let previousWeight = userManager.currentUser?.currentWeight
+        
         isLoading = true
         errorMessage = nil
         
@@ -114,6 +116,7 @@ struct UpdateWeightView: View {
                 switch result {
                 case .success:
                     print("Weight updated successfully!")
+                    analyticsService.logWeightUpdated(previousWeight: previousWeight, newWeight: newWeight)
                     presentationMode.wrappedValue.dismiss() // Close the sheet
                 case .failure(let error):
                     print("Failed to update weight: \(error.localizedDescription)")

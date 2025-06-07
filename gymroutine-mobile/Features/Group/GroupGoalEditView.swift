@@ -5,6 +5,7 @@ struct GroupGoalEditView: View {
     let groupId: String
     @StateObject private var viewModel = GroupGoalEditViewModel()
     @Environment(\.dismiss) private var dismiss
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         NavigationView {
@@ -163,6 +164,7 @@ struct GroupGoalEditView: View {
         }
         .onAppear {
             viewModel.initialize(with: goal)
+            analyticsService.logScreenView(screenName: "GroupGoalEdit")
         }
     }
 }

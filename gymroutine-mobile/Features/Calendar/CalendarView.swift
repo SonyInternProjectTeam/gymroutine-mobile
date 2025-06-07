@@ -140,6 +140,13 @@ extension CalendarView {
         )
         .onTapGesture {
             viewModel.selectedDate = validDay
+            // Log calendar interaction
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            analyticsService.logCalendarInteraction(
+                interactionType: "date_selected",
+                dateSelected: formatter.string(from: validDay)
+            )
         }
     }
     

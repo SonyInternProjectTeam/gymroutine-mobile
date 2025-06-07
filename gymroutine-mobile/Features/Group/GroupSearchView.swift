@@ -3,6 +3,7 @@ import SwiftUI
 struct GroupSearchView: View {
     @StateObject private var viewModel = GroupSearchViewModel()
     @State private var searchText = ""
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         VStack(spacing: 0) {
@@ -144,6 +145,9 @@ struct GroupSearchView: View {
             if !searchText.isEmpty {
                 viewModel.searchGroups(query: searchText)
             }
+        }
+        .onAppear {
+            analyticsService.logScreenView(screenName: "GroupSearch")
         }
     }
 }

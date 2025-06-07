@@ -3,6 +3,7 @@ import SwiftUI
 struct NotificationsView: View {
     @StateObject private var viewModel = NotificationsViewModel()
     @Environment(\.dismiss) private var dismiss
+    private let analyticsService = AnalyticsService.shared
     
     var body: some View {
         NavigationView {
@@ -122,6 +123,7 @@ struct NotificationsView: View {
             }
             .onAppear {
                 viewModel.loadAllNotifications()
+                analyticsService.logScreenView(screenName: "Notifications")
             }
         }
     }
